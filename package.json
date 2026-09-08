@@ -1,0 +1,51 @@
+{
+  "name": "moe-3d-visualizer",
+  "version": "1.0.0",
+  "description": "Interactive 3D architecture visualizer for 500B+ Mixture-of-Experts (MoE) LLMs with real-time sampling and tensor microscopes",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "moe",
+    "mixture-of-experts",
+    "3d-visualization",
+    "threejs",
+    "transformer",
+    "llm-architecture",
+    "latentmoe",
+    "tensor-microscope"
+  ],
+  "author": "Yuntao Zhang",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yuntaozhang999/moe-3d-visualizer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yuntaozhang999/moe-3d-visualizer/issues"
+  },
+  "homepage": "https://yuntaozhang999.github.io/moe-3d-visualizer",
+  "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "katex": "^0.18.7",
+    "lucide-react": "^1.41.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.160.1"
+  },
+  "devDependencies": {
+    "@types/katex": "^0.16.8",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@types/three": "^0.160.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
+  }
+}
