@@ -171,7 +171,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHoverCell={onHoverCell}
       />
 
-      {/* Input Tokens -> Embed Vector (精确对接表面) */}
+      {/* Input Tokens -> Embed Vector (precise surface docking) */}
       <FlowConnection
         from={[-14.55, 2.0, 0]}
         to={[-12.65, 2.0, 0.8]}
@@ -180,7 +180,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Token Lookup"
       />
 
-      {/* W_embed Weight Projection Flow (X错开2.2，彻底解耦) */}
+      {/* W_embed Weight Projection Flow (X-offset 2.2 for decoupling) */}
       <FlowConnection
         from={[-13.2, 2.0, -1.35]}
         to={[-11.0, 2.0, 0.45]}
@@ -266,7 +266,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onClick={onClickItem}
       />
 
-      {/* High-Altitude Residual Bypass 1 (Attention Residual) 拱顶Y=7.05，距天幕Banner(Y=9.8)净空2.75 */}
+      {/* High-Altitude Residual Bypass 1 (Attention Residual) apex Y=7.05, 2.75 clearance to banner (Y=9.8) */}
       <FlowConnection
         from={[-7.2, 2.45, 0]}
         to={[9.5, 2.45, 0]}
@@ -276,7 +276,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Residual Skip 1 [6144]"
       />
 
-      {/* W_QKV Weights projection flow (退至深层背景高位[-5.0, 3.6, -4.6]，彻底不遮挡Q) */}
+      {/* W_QKV Weights projection flow (retracted to background high [-5.0, 3.6, -4.6], zero occlusion) */}
       <FlowConnection
         from={[-6.75, 2.0, 0]}
         to={[-5.75, 3.6, -4.6]}
@@ -286,8 +286,8 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'node_w_qkv'])}
       />
 
-      {/* Q, K, V Projection Splits: 精确对接各矩阵左表面外侧 */}
-      {/* Pre-Attn GN -> Q (往上走：自然上扬弧线) */}
+      {/* Q, K, V Projection Splits: precise docking to matrix left faces */}
+      {/* Pre-Attn GN -> Q (upward natural arc) */}
       <FlowConnection
         from={[-6.75, 2.0, 0]}
         to={[-3.65, 4.5, -2.2]}
@@ -295,7 +295,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_q'])}
         label="Q (48h)"
       />
-      {/* Pre-Attn GN -> K (水平偏负Z走向：侧向微弯) */}
+      {/* Pre-Attn GN -> K (horizontal/negative-Z with subtle side curve) */}
       <FlowConnection
         from={[-6.75, 2.0, 0]}
         to={[isGlobal ? -2.25 : -2.45, 2.0, -2.0]}
@@ -303,7 +303,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_k'])}
         label={`K (${kvHeads}h)`}
       />
-      {/* Pre-Attn GN -> V (往下走：自适应向下凹陷的优雅下坠弧线！) */}
+      {/* Pre-Attn GN -> V (downward adaptive concave natural drop arc) */}
       <FlowConnection
         from={[-6.75, 2.0, 0]}
         to={[isGlobal ? -2.25 : -2.45, -0.5, -1.5]}
@@ -312,7 +312,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label={`V (${kvHeads}h)`}
       />
 
-      {/* W_Q, W_K, W_V Weight Matrices: 退至深层背景高位 [-5.0, 3.6, -4.6]，彻底解耦前景Q */}
+      {/* W_Q, W_K, W_V Weight Matrices: retracted to background high [-5.0, 3.6, -4.6], decoupled from Q */}
       <TensorMatrix
         id="node_w_qkv"
         label="W_Q, W_K, W_V Weights"
@@ -330,7 +330,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* Q Matrix (高位：Y=4.5, Z=-2.2，消除遮挡与穿透) */}
+      {/* Q Matrix (high tier: Y=4.5, Z=-2.2, zero occlusion and penetration) */}
       <TensorMatrix
         id="node_q"
         label="Q (Query Heads)"
@@ -348,7 +348,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.15}
       />
 
-      {/* K Matrix (中位：Y=2.0, Z=-2.0，距上层Q底面净空充足) */}
+      {/* K Matrix (mid tier: Y=2.0, Z=-2.0, ample clearance below Q) */}
       <TensorMatrix
         id="node_k"
         label={`K (${kvHeads} KV Heads)`}
@@ -366,7 +366,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.08}
       />
 
-      {/* V Matrix (低位：Y=-0.5, Z=-1.5，距中位K底面净空充足) */}
+      {/* V Matrix (low tier: Y=-0.5, Z=-1.5, ample clearance below K) */}
       <TensorMatrix
         id="node_v"
         label={`V (${kvHeads} KV Heads)`}
@@ -384,7 +384,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.08}
       />
 
-      {/* K into ShortConv: 精确对齐 K 轴心高度与纵深 */}
+      {/* K into ShortConv: align precisely to K center height and depth */}
       <FlowConnection
         from={[isGlobal ? -1.75 : -1.55, 2.0, -2.0]}
         to={[-1.1, 2.0, -2.0]}
@@ -393,7 +393,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="ShortConv K=4"
       />
 
-      {/* ShortConv Node: 严格对齐 [-0.6, 2.0, -2.0] */}
+      {/* ShortConv Node: strictly aligned to [-0.6, 2.0, -2.0] */}
       <OperatorNode
         id="op_sconv_k"
         name="ShortConv (K=4)"
@@ -406,7 +406,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* ShortConv K into RoPE (往上走：自然上扬弧线) */}
+      {/* ShortConv K into RoPE (upward natural arc) */}
       <FlowConnection
         from={[-0.1, 2.0, -2.0]}
         to={[0.4, 3.1, -2.2]}
@@ -414,7 +414,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('q_k_norm_rope'), ['op_sconv_k', 'op_rope'])}
       />
 
-      {/* Q into RoPE (往下走：自然下坠弧线) */}
+      {/* Q into RoPE (downward natural arc) */}
       <FlowConnection
         from={[-0.35, 4.5, -2.2]}
         to={[0.4, 3.5, -2.2]}
@@ -423,7 +423,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label={ropeLabel}
       />
 
-      {/* RoPE Node: 精简 label 为 Half-RoPE [64/64]，彻底杜绝刺入 Score Map！ */}
+      {/* RoPE Node: concise label Half-RoPE [64/64], prevents clipping into Score Map */}
       <OperatorNode
         id="op_rope"
         name={isGlobal ? "100% NoPE (Off)" : "Half-RoPE [64/64]"}
@@ -437,7 +437,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelOffset={[0, 0.72, 0]}
       />
 
-      {/* RoPE (Q & K) to Attention Score Map (向下流入分数矩阵) */}
+      {/* RoPE (Q & K) to Attention Score Map (flow down into score matrix) */}
       <FlowConnection
         from={[1.3, 3.3, -2.2]}
         to={[2.75, 2.4, -1.8]}
@@ -446,7 +446,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Q · K^T / √d"
       />
 
-      {/* V to Attention Score Map (从低位自然向上扬起飞入分数矩阵) */}
+      {/* V to Attention Score Map (fly up naturally from low tier into score matrix) */}
       <FlowConnection
         from={[isGlobal ? -1.75 : -1.55, -0.5, -1.5]}
         to={[2.75, 2.0, -1.8]}
@@ -458,7 +458,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       {/* ========================================================
           STAGE 3: ATTENTION MATRIX (SOFTMAX HEATMAP), XSA & HEAD GATE
           ======================================================== */}
-      {/* Attention Score Map: 右移至 [4.0, 2.2, -1.8]，留出 0.55 安全净空 */}
+      {/* Attention Score Map: shifted right to [4.0, 2.2, -1.8], maintaining 0.55 clearance */}
       <TensorMatrix
         id="node_attn_matrix"
         label="Attention Score Map"
@@ -476,7 +476,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.12}
       />
 
-      {/* Attn Output to XSA (右表面精确连到算子边缘) */}
+      {/* Attn Output to XSA (right face precisely connected to operator edge) */}
       <FlowConnection
         from={[5.25, 2.2, -1.8]}
         to={[5.8, 2.2, -1.5]}
@@ -485,7 +485,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="XSA Decorr"
       />
 
-      {/* XSA Node: 移至 [6.3, 2.2, -1.5] */}
+      {/* XSA Node: placed at [6.3, 2.2, -1.5] */}
       <OperatorNode
         id="op_xsa"
         name="XSA (Decorrelate)"
@@ -507,7 +507,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Gate 2·σ"
       />
 
-      {/* Head Gate Node: 移至 [7.8, 2.2, -0.8] */}
+      {/* Head Gate Node: placed at [7.8, 2.2, -0.8] */}
       <OperatorNode
         id="op_head_gate"
         name="Head Gate (2·σ)"
@@ -528,7 +528,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['op_head_gate', 'op_attn_add'])}
       />
 
-      {/* W_O Output Projection Weight: 推至负Z深层 [7.8, 4.4, -2.4]，彻底不遮挡 Head Gate */}
+      {/* W_O Output Projection Weight: shifted to negative-Z background [7.8, 4.4, -2.4], no Head Gate occlusion */}
       <TensorMatrix
         id="node_w_o"
         label="W_O Weight Matrix"
@@ -546,7 +546,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* W_O Weight into Attn Add (往下走：自然下坠弧线) */}
+      {/* W_O Weight into Attn Add (downward natural drop arc) */}
       <FlowConnection
         from={[7.8, 3.65, -2.4]}
         to={[9.4, 2.5, 0]}
@@ -580,7 +580,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('attn_proj_residual') || isStep('pre_moe_gated_norm'), ['op_attn_add', 'op_moe_gn'])}
       />
 
-      {/* Pre-MoE GatedNorm: 移至 [11.8, 2.0, 0] */}
+      {/* Pre-MoE GatedNorm: placed at [11.8, 2.0, 0] */}
       <OperatorNode
         id="op_moe_gn"
         name="Pre-MoE GatedNorm"
@@ -593,7 +593,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* MoE Bypass Residual High Arch (from [11.8, 2.45, 0] to [25.5, 2.45, 0], 拱顶 Y=7.05，距天幕Banner(Y=9.8)净空2.75) */}
+      {/* MoE Bypass Residual High Arch (from [11.8, 2.45, 0] to [25.5, 2.45, 0], apex Y=7.05, 2.75 clearance to banner) */}
       <FlowConnection
         from={[11.8, 2.45, 0]}
         to={[25.5, 2.45, 0]}
@@ -603,7 +603,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="MoE Residual Skip [6144]"
       />
 
-      {/* Pre-MoE GN Branch A: to QB Router (+Z branch: 精确接入 Router [14.0, 2.0, 3.5] 左表面) */}
+      {/* Pre-MoE GN Branch A: to QB Router (+Z branch: precise connection to Router [14.0, 2.0, 3.5] left face) */}
       <FlowConnection
         from={[12.3, 2.0, 0]}
         to={[13.15, 2.0, 3.5]}
@@ -612,7 +612,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Router In"
       />
 
-      {/* W_router Weight Matrix: 移至 [13.8, 4.6, 3.8]，高位背板，与 Router 保持 0.38 垂直净空 */}
+      {/* W_router Weight Matrix: placed at [13.8, 4.6, 3.8], high background board, 0.38 vertical clearance to Router */}
       <TensorMatrix
         id="node_w_router"
         label="W_router [6144 × 384]"
@@ -630,7 +630,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* W_router Weight into Router (往下走：自然向下凹陷优雅下坠) */}
+      {/* W_router Weight into Router (downward concave natural drop arc) */}
       <FlowConnection
         from={[13.8, 3.75, 3.8]}
         to={[14.0, 2.75, 3.5]}
@@ -640,7 +640,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('router_qb_selection'), ['node_w_router', 'node_router'])}
       />
 
-      {/* Router Logits & QB Selection (384 experts, 移至 [14.0, 2.0, 3.5]) */}
+      {/* Router Logits & QB Selection (384 experts, placed at [14.0, 2.0, 3.5]) */}
       <TensorMatrix
         id="node_router"
         label="Router (Top-8 of 384)"
@@ -665,7 +665,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('router_qb_selection'), ['node_router', 'op_router_qb'])}
       />
 
-      {/* QB Routing Operator: 移至 [16.2, 2.0, 3.5] */}
+      {/* QB Routing Operator: placed at [16.2, 2.0, 3.5] */}
       <OperatorNode
         id="op_router_qb"
         name="QB Routing (Top 8)"
@@ -678,7 +678,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="top"
       />
 
-      {/* 2 Concurrent Shared Experts (高位 [20.5, 4.5, 2.5]) */}
+      {/* 2 Concurrent Shared Experts (high tier [20.5, 4.5, 2.5]) */}
       <TensorMatrix
         id="node_experts_shared"
         label="2 Shared Experts"
@@ -696,7 +696,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* Pre-MoE GN Branch B: to Latent Down (往下走：自然向下凹陷优雅下坠，错开至 X=15.6) */}
+      {/* Pre-MoE GN Branch B: to Latent Down (downward natural drop arc, offset to X=15.6) */}
       <FlowConnection
         from={[12.3, 2.0, 0]}
         to={[14.75, 0.5, -0.6]}
@@ -705,7 +705,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Compress 6144→3072"
       />
 
-      {/* W_latent_down Weight Matrix: 移至 [14.0, 0.5, -2.2] */}
+      {/* W_latent_down Weight Matrix: placed at [14.0, 0.5, -2.2] */}
       <TensorMatrix
         id="node_w_latent_down"
         label="W_latent_down [6144 × 3072]"
@@ -733,7 +733,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('latent_compression'), ['node_w_latent_down', 'node_latent_down'])}
       />
 
-      {/* Compressed Latent Vector: 右移至 [15.6, 0.5, -0.6]，与上方 Router (X=14.0) 完全错开！ */}
+      {/* Compressed Latent Vector: shifted right to [15.6, 0.5, -0.6], fully offset from Router (X=14.0) */}
       <TensorMatrix
         id="node_latent_down"
         label="Latent Vector (3072)"
@@ -760,7 +760,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="RMSNorm"
       />
 
-      {/* Latent RMSNorm: 移至 [17.4, 0.5, -0.6]，与上方 QB 路由算子 (X=16.2) 完全错开！ */}
+      {/* Latent RMSNorm: placed at [17.4, 0.5, -0.6], fully offset from QB Router (X=16.2) */}
       <OperatorNode
         id="op_latent_norm"
         name="Latent RMSNorm"
@@ -773,7 +773,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="top"
       />
 
-      {/* QB Router to 8 Routed Experts: Gating dispatch (往下走：自然下坠弧线) */}
+      {/* QB Router to 8 Routed Experts: Gating dispatch (downward natural drop arc) */}
       <FlowConnection
         from={[16.7, 2.0, 3.5]}
         to={[19.15, 1.3, -1.2]}
@@ -782,7 +782,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Top-8 Gating Beam"
       />
 
-      {/* Latent RMSNorm into 8 Routed Experts (往上走：自然上扬弧线) */}
+      {/* Latent RMSNorm into 8 Routed Experts (upward natural arc) */}
       <FlowConnection
         from={[17.9, 0.5, -0.6]}
         to={[19.15, 1.1, -1.2]}
@@ -791,7 +791,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Latent [3072]"
       />
 
-      {/* Full-Width mlp_in into 2 Shared Experts (往上走：自然上扬飞入) */}
+      {/* Full-Width mlp_in into 2 Shared Experts (upward natural fly-in arc) */}
       <FlowConnection
         from={[12.3, 2.2, 0]}
         to={[18.85, 4.5, 2.5]}
@@ -800,7 +800,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Full Width [6144]"
       />
 
-      {/* 8 Routed Half-Width Experts: 位于低位 [20.0, 1.2, -1.2]，右沿 X=20.8 */}
+      {/* 8 Routed Half-Width Experts: located at low tier [20.0, 1.2, -1.2], right edge X=20.8 */}
       <TensorMatrix
         id="node_experts_routed"
         label="8 Routed Half-Width Experts"
@@ -817,7 +817,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.1}
       />
 
-      {/* W_latent_up Weight Matrix: 移至 [23.2, 0.6, -2.0]，左边缘 X=22.6，与 Routed Experts(右沿20.8) 保持 1.8 充裕间距，彻底消除刺穿！ */}
+      {/* W_latent_up Weight Matrix: placed at [23.2, 0.6, -2.0], left edge X=22.6 with 1.8 clearance to Routed Experts */}
       <TensorMatrix
         id="node_w_latent_up"
         label="W_latent_up"
@@ -846,7 +846,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Up 3072→6144"
       />
 
-      {/* MoE Residual Merge Node: 移至 [25.5, 2.0, 0] */}
+      {/* MoE Residual Merge Node: placed at [25.5, 2.0, 0] */}
       <OperatorNode
         id="op_moe_add"
         name="Latent Up & Merge"
@@ -859,7 +859,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* Shared Experts to MoE Add (往下走：自然下坠弧线) */}
+      {/* Shared Experts to MoE Add (downward natural drop arc) */}
       <FlowConnection
         from={[22.15, 4.5, 2.5]}
         to={[25.5, 2.4, 0.4]}
@@ -868,7 +868,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Shared Out"
       />
 
-      {/* Routed Experts to MoE Add (往上走：自然上扬弧线) */}
+      {/* Routed Experts to MoE Add (upward natural arc) */}
       <FlowConnection
         from={[20.85, 1.2, -1.2]}
         to={[25.0, 1.9, 0]}
@@ -887,7 +887,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('moe_aggregation_residual') || isStep('final_gated_norm'), ['op_moe_add', 'op_final_gn'])}
       />
 
-      {/* Final GatedNorm: 移至 [27.5, 2.0, 0] */}
+      {/* Final GatedNorm: placed at [27.5, 2.0, 0] */}
       <OperatorNode
         id="op_final_gn"
         name="Final GatedNorm"
@@ -900,7 +900,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* Final GN to LM Head Logits (精确对齐 LM Head [31.8, 2.0, 1.0] 左表面) */}
+      {/* Final GN to LM Head Logits (aligned precisely to LM Head [31.8, 2.0, 1.0] left face) */}
       <FlowConnection
         from={[28.0, 2.0, 0]}
         to={[30.95, 2.0, 1.0]}
@@ -909,7 +909,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Predict"
       />
 
-      {/* Untied LM Head Weight W_out: 移至 [29.5, 2.0, -2.2]，与前景 LM Head (X=31.8) 错开 2.3 间距，彻底消除碰撞 */}
+      {/* Untied LM Head Weight W_out: placed at [29.5, 2.0, -2.2], offset 2.3 from foreground LM Head (X=31.8) */}
       <TensorMatrix
         id="node_w_lm_head"
         label="W_out"
@@ -927,7 +927,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* W_lm_head weight into LM Head (从 W_out 前表面射向 LM Head 后表面) */}
+      {/* W_lm_head weight into LM Head (from W_out front face to LM Head back face) */}
       <FlowConnection
         from={[29.5, 2.0, -1.75]}
         to={[31.8, 2.0, 0.65]}
@@ -938,7 +938,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Untied W_out [128k]"
       />
 
-      {/* LM Head Output Logits: 移至 [31.8, 2.0, 1.0] */}
+      {/* LM Head Output Logits: placed at [31.8, 2.0, 1.0] */}
       <TensorMatrix
         id="node_lm_head"
         label="Logits & Top-1 Token"

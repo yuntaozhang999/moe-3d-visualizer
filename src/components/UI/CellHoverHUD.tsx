@@ -579,8 +579,8 @@ export const CellHoverHUD: React.FC<CellHoverHUDProps> = ({
               </div>
               <p className="text-[10px] text-slate-400 leading-normal font-sans">
                 {displayedCell.specialNote.includes('Strict Causal')
-                  ? '因果掩码生效：未来位置严格屏蔽 (j > i，上三角掩码矩阵 Softmax = 0)。'
-                  : '局部滑动窗口掩码：超出局部注意力跨度窗口，强制截断为 0。'}
+                  ? 'Causal Mask Applied: Future tokens strictly masked (j > i, upper-triangular mask matrix Softmax = 0).'
+                  : 'Local Sliding Window Mask: Beyond local attention span window, strictly clamped to 0.'}
               </p>
             </div>
           ) : (

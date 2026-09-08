@@ -109,7 +109,7 @@ export const TokenInputBar: React.FC<TokenInputBarProps> = ({
             <button
               onClick={() => onAppendSampledToken(sampledToken.token)}
               className="ml-1 px-1.5 py-0.5 rounded bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 hover:text-white text-[10px] font-mono font-medium transition-colors border border-amber-400/40 flex items-center space-x-0.5"
-              title="追加该采样 Token 到序列末尾 (自回归生成推进)"
+              title="Append sampled token to the end of sequence (Autoregressive generation step)"
             >
               <Plus className="w-2.5 h-2.5" />
               <span>Append</span>
@@ -127,7 +127,7 @@ export const TokenInputBar: React.FC<TokenInputBarProps> = ({
               ? 'bg-amber-500/20 border-amber-400/70 text-amber-300 shadow-sm shadow-amber-500/20'
               : 'bg-slate-900/80 border-slate-700/60 hover:border-amber-400/50 text-slate-400 hover:text-amber-300'
           }`}
-          title="打开/收起动态采样面板 (Sampling HUD)"
+          title="Toggle Dynamic Sampling HUD"
         >
           <Dices className="w-3.5 h-3.5" />
           <span className="text-[10px] font-mono font-medium hidden lg:inline">Sampling HUD</span>

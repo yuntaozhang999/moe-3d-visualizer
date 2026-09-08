@@ -125,7 +125,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     const end = new THREE.Vector3(...(reverse ? from : to));
     const dist = start.distanceTo(end);
 
-    // 增加退化保护：当起点与终点重合时避免生成无效曲线
+    // Degeneracy guard: avoid generating invalid curves when start and end coincide
     if (dist < 0.001) {
       return { curve: null as unknown as THREE.QuadraticBezierCurve3, linePoints: [] as THREE.Vector3[], midPoint: start, distance: 0 };
     }
@@ -134,37 +134,37 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
 
     if (isResidual) {
-      // 残差连接：保持高空跳跃飞拱，支持指定 curveHeight 或动态计算
+      // Residual connection: maintain high flying arch, supports explicit curveHeight or dynamic calculation
       mid.y += curveHeight || Math.max(2.6, dist * 0.22);
       mid.z += 0.5;
     } else if (curveHeight !== undefined && curveHeight !== 0) {
-      // 显式传入了 curveHeight（支持正值上凸、负值下凹）
+      // Explicit curveHeight passed (supports positive convex arch and negative drop)
       mid.y += curveHeight;
     } else {
-      // 自适应判断起点与终点的相对走向
+      // Adaptive direction analysis between start and end points
       const deltaY = end.y - start.y;
       const deltaZ = end.z - start.z;
       const deltaX = end.x - start.x;
       const magnitude = Math.min(0.8, Math.max(0.25, dist * 0.15));
 
       if (deltaY > 0.3) {
-        // 往上走：控制点向上凸起
+        // Moving upward: control point curves upward
         mid.y += magnitude;
       } else if (deltaY < -0.3) {
-        // 往下走：控制点向下凹陷，实现自然下坠曲线
+        // Moving downward: control point arches downward for natural sagging arc
         mid.y -= magnitude;
       } else {
-        // 近似水平走 (|deltaY| <= 0.3)
+        // Near-horizontal trajectory (|deltaY| <= 0.3)
         if (Math.abs(deltaZ) > 0.6) {
           if (Math.abs(deltaX) < 0.2) {
-            // 共线侧拱：Z 轴为主走向且 X 轴接近共线，将偏移加在 X 轴形成真实的 3D 侧弯立体弧线
+            // Collinear lateral arch: Z-axis is primary trajectory with near-collinear X; offset on X-axis creates true 3D side curve
             mid.x += magnitude * 0.5;
           } else {
-            // 在 Z 轴做平滑侧向拱弯（避免穿透正面）
+            // Smooth lateral arch along Z-axis (avoids intersecting front plane)
             mid.z += (deltaZ > 0 ? 1 : -1) * magnitude * 0.6;
           }
         } else {
-          // Z 轴也较平，仅保留微小弧度
+          // Z-axis is flat as well, retain subtle curve
           mid.y += 0.08;
         }
       }

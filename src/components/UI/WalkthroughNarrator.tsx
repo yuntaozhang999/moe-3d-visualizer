@@ -44,7 +44,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
       <div
         onClick={() => onToggleCollapse?.(false)}
         className="absolute top-4 left-4 z-20 flex items-center bg-[#0b0f19]/90 hover:bg-[#101626]/95 backdrop-blur-xl border border-sky-500/40 hover:border-sky-400/80 rounded-xl px-2.5 py-1.5 shadow-2xl hover:shadow-sky-500/20 group transition-all duration-200 select-none cursor-pointer"
-        title="点击展开完整数学公式与步骤详解 (快捷键: M)"
+        title="Click to expand full math formulas & step walkthrough (Shortcut: M)"
       >
         <div className="flex items-center space-x-2">
           <span className="text-xs">📐</span>
@@ -68,7 +68,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
             }}
             disabled={stepIndex === 0}
             className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 transition-colors"
-            title="上一步"
+            title="Previous Step"
           >
             <ChevronLeft className="w-3 h-3" />
           </button>
@@ -79,7 +79,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
             }}
             disabled={stepIndex === totalSteps - 1}
             className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 transition-colors"
-            title="下一步"
+            title="Next Step"
           >
             <ChevronRight className="w-3 h-3" />
           </button>
@@ -91,7 +91,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
                 onOpenSamplingHUD();
               }}
               className="flex items-center space-x-1 ml-1 px-2 py-0.5 rounded-md bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 border border-amber-400/50 text-[11px] font-medium transition-colors animate-pulse"
-              title="Step 19 专属: 打开动态采样面板 (快捷键: S)"
+              title="Step 19 Exclusive: Open Dynamic Sampling HUD (Shortcut: S)"
             >
               <Dices className="w-3 h-3" />
               <span>Sampling</span>
@@ -104,9 +104,9 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
               onToggleCollapse?.(false);
             }}
             className="flex items-center space-x-1 ml-1 px-2 py-0.5 rounded-md bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-sky-100 text-[11px] font-medium transition-colors"
-            title="展开卡片 (快捷键: M)"
+            title="Expand Walkthrough (Shortcut: M)"
           >
-            <span>展开公式与步骤</span>
+            <span>Formulas & Walkthrough</span>
             <ChevronDown className="w-3 h-3" />
           </button>
         </div>
@@ -135,7 +135,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
               onClick={onPrevStep}
               disabled={stepIndex === 0}
               className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 transition-colors"
-              title="上一步 (ArrowLeft)"
+              title="Previous Step (ArrowLeft)"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
@@ -146,7 +146,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
               onClick={onNextStep}
               disabled={stepIndex === totalSteps - 1}
               className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 transition-colors"
-              title="下一步 (ArrowRight)"
+              title="Next Step (ArrowRight)"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -158,7 +158,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
           <button
             onClick={() => onToggleCollapse?.(true)}
             className="p-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-            title="收起为气泡胶囊 (快捷键: Esc 或 M)"
+            title="Minimize to floating pill (Shortcut: Esc or M)"
           >
             <Minimize2 className="w-3.5 h-3.5" />
           </button>
@@ -167,7 +167,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
           <button
             onClick={() => onToggleCollapse?.(true)}
             className="p-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-rose-300 transition-colors"
-            title="收起关闭 (快捷键: Esc)"
+            title="Close / Minimize (Shortcut: Esc)"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -188,7 +188,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
           <button
             onClick={onOpenDetails}
             className="text-slate-400 hover:text-sky-300 flex items-center space-x-1 transition-colors text-[10px]"
-            title="打开详细算子与变量检查面板"
+            title="Open detailed operator & variable inspector modal"
           >
             <span>Deep Dive & Shapes</span>
             <HelpCircle className="w-3 h-3" />
@@ -218,16 +218,16 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
                 <span className="text-base">🎲</span>
                 <div className="text-left">
                   <div className="font-bold text-[11px] text-amber-300 flex items-center space-x-1.5">
-                    <span>{isSamplingHUDOpen ? '采样面板已展开 (Sampling HUD Active)' : '开启动态采样实验面板 (Open Sampling HUD)'}</span>
+                    <span>{isSamplingHUDOpen ? 'Sampling HUD Active' : 'Open Dynamic Sampling HUD'}</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
                   </div>
                   <div className="text-[10px] text-slate-400 font-mono">
-                    调节 Temperature • Top-k • Top-p • 蒙特卡洛轮盘
+                    Tuning Temperature • Top-k • Top-p • Monte Carlo Roulette
                   </div>
                 </div>
               </div>
               <span className="px-2 py-0.5 rounded bg-amber-500/30 text-amber-200 text-[10px] font-mono border border-amber-400/40">
-                {isSamplingHUDOpen ? '查看面板 →' : '立即体验 →'}
+                {isSamplingHUDOpen ? 'View HUD →' : 'Try Now →'}
               </span>
             </button>
           </div>
@@ -237,21 +237,21 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
       {/* Footer Shortcut Tip & Quick Collapse Link */}
       <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1.5 border-t border-slate-800/60">
         <span className="flex items-center space-x-1">
-          <span>💡 专注 3D 视野？按</span>
+          <span>💡 Focus 3D viewport? Press</span>
           <kbd className="px-1 py-0.2 rounded bg-slate-800 text-slate-300 font-mono text-[9px] border border-slate-700">
             Esc
           </kbd>
-          <span>或</span>
+          <span>or</span>
           <kbd className="px-1 py-0.2 rounded bg-slate-800 text-slate-300 font-mono text-[9px] border border-slate-700">
             M
           </kbd>
-          <span>可一键收起</span>
+          <span>to collapse</span>
         </span>
         <button
           onClick={() => onToggleCollapse?.(true)}
           className="text-sky-400/90 hover:text-sky-300 hover:underline flex items-center space-x-0.5"
         >
-          <span>收起卡片 ▲</span>
+          <span>Collapse Card ▲</span>
         </button>
       </div>
     </div>

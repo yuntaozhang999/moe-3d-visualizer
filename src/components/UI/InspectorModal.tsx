@@ -201,7 +201,7 @@ export const InspectorModal: React.FC<InspectorModalProps> = ({
       <div
         onClick={() => onToggleCollapse?.(false)}
         className="absolute top-20 right-6 z-30 flex items-center bg-[#0c101d]/90 hover:bg-[#11172b]/95 backdrop-blur-xl border border-sky-500/50 hover:border-sky-400 rounded-xl px-3 py-1.5 shadow-2xl hover:shadow-sky-500/20 cursor-pointer group transition-all select-none animate-in fade-in slide-in-from-right-3 duration-200"
-        title="点击展开完整数学公式与算子检查面板"
+        title="Click to expand full mathematical formula and operator inspector modal"
       >
         <div className="flex items-center space-x-2">
           <span className="text-sm">📐</span>
@@ -224,7 +224,7 @@ export const InspectorModal: React.FC<InspectorModalProps> = ({
             }}
             className="flex items-center space-x-1 px-2 py-0.5 rounded-md bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-sky-100 text-[11px] font-medium transition-colors"
           >
-            <span>展开公式</span>
+            <span>Expand Formula</span>
             <Maximize2 className="w-3 h-3" />
           </button>
           <button
@@ -233,7 +233,7 @@ export const InspectorModal: React.FC<InspectorModalProps> = ({
               onClose();
             }}
             className="p-1 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-            title="关闭"
+            title="Close"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -253,7 +253,7 @@ export const InspectorModal: React.FC<InspectorModalProps> = ({
               {info.category}
             </span>
             <span className="text-[10px] text-slate-400 font-mono">
-              [公式详情]
+              [Formula Details]
             </span>
           </div>
           <h2 className="text-sm font-bold text-slate-100 mt-1">
@@ -264,15 +264,15 @@ export const InspectorModal: React.FC<InspectorModalProps> = ({
           <button
             onClick={() => onToggleCollapse?.(true)}
             className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs transition-colors border border-slate-700/60"
-            title="收起为浮动小气泡 (保持节点选中)"
+            title="Minimize to floating pill (keeps node selected)"
           >
             <Minimize2 className="w-3.5 h-3.5 text-sky-400" />
-            <span className="text-[11px]">收起</span>
+            <span className="text-[11px]">Minimize</span>
           </button>
           <button
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-            title="关闭检查器 (Esc)"
+            title="Close Inspector (Esc)"
           >
             <X className="w-4 h-4" />
           </button>
@@ -332,13 +332,13 @@ export const InspectorModal: React.FC<InspectorModalProps> = ({
 
       {/* Footer bar with tip and collapse button */}
       <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
-        <span>按 Esc 关闭 · 可随时收起为浮动小气泡</span>
+        <span>Press Esc to close · Can be minimized anytime</span>
         <button
           onClick={() => onToggleCollapse?.(true)}
           className="text-sky-400 hover:text-sky-300 flex items-center space-x-1 transition-colors font-medium"
         >
           <Minimize2 className="w-3 h-3" />
-          <span>收起面板</span>
+          <span>Minimize Panel</span>
         </button>
       </div>
     </div>

@@ -148,10 +148,10 @@ export const Controls: React.FC<ControlsProps> = ({
                 ? 'bg-indigo-500/25 border border-indigo-400/80 text-indigo-200 shadow-sm shadow-indigo-500/20'
                 : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60'
             }`}
-            title={isNarratorActive ? "收起步骤讲解与公式卡片 (快捷键: M)" : "展开步骤讲解与公式卡片 (快捷键: M)"}
+            title={isNarratorActive ? "Collapse step walkthrough & formula card (Shortcut: M)" : "Expand step walkthrough & formula card (Shortcut: M)"}
           >
             <span className="text-xs">📖</span>
-            <span>步骤讲解</span>
+            <span>Walkthrough</span>
             <span className={`w-1.5 h-1.5 rounded-full ${isNarratorActive ? 'bg-indigo-400 animate-pulse' : 'bg-slate-500'}`} />
           </button>
         )}
@@ -165,10 +165,10 @@ export const Controls: React.FC<ControlsProps> = ({
                 ? 'bg-sky-500/25 border border-sky-400/80 text-sky-200 shadow-sm shadow-sky-500/20'
                 : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60'
             }`}
-            title={isInspectorActive ? "收起/关闭公式详情" : "展开数学公式与算子详情"}
+            title={isInspectorActive ? "Collapse/Close formula inspector" : "Expand mathematical formula & operator details"}
           >
             <span className="text-xs">📐</span>
-            <span>公式详情</span>
+            <span>Formulas</span>
             <span className={`w-1.5 h-1.5 rounded-full ${isInspectorActive ? 'bg-sky-400 animate-pulse' : 'bg-slate-500'}`} />
           </button>
         )}
@@ -186,14 +186,14 @@ export const Controls: React.FC<ControlsProps> = ({
             }`}
             title={
               isSamplingHUDOpen
-                ? '收起/关闭采样面板 (快捷键: S)'
+                ? 'Collapse/Close Sampling HUD (Shortcut: S)'
                 : isStep19
-                ? 'Step 19 专属: 展开动态采样与轮盘赌面板 (快捷键: S)'
-                : '展开动态采样与概率分布面板 (快捷键: S)'
+                ? 'Step 19 Exclusive: Expand Dynamic Sampling & Roulette HUD (Shortcut: S)'
+                : 'Expand Dynamic Sampling & Distribution HUD (Shortcut: S)'
             }
           >
             <span className="text-xs">🎲</span>
-            <span>动态采样</span>
+            <span>Sampling</span>
             {isStep19 && (
               <span className="px-1 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500/30 text-amber-200 border border-amber-400/40">
                 Step 19
