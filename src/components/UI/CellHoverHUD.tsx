@@ -412,9 +412,7 @@ export const CellHoverHUD: React.FC<CellHoverHUDProps> = ({
     <div
       onMouseEnter={handleMouseEnterHUD}
       onMouseLeave={handleMouseLeaveHUD}
-      className={`absolute bottom-20 ${
-        isSamplingHUDOpen ? 'right-[516px]' : 'right-6'
-      } z-30 bg-[#090d16]/95 backdrop-blur-xl border ${
+      className={`fixed bottom-24 left-4 z-30 bg-[#090d16]/95 backdrop-blur-xl border ${
         isPinned
           ? 'border-amber-500/70 shadow-[0_8px_32px_rgba(0,0,0,0.8),0_0_20px_rgba(245,158,11,0.2)]'
           : 'border-sky-500/60 shadow-[0_8px_32px_rgba(0,0,0,0.7),0_0_15px_rgba(56,189,248,0.15)]'

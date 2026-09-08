@@ -555,7 +555,7 @@ export function App() {
           {activeStep.id === 'untied_lm_head' && !isSamplingHUDOpen && (
             <button
               onClick={() => setIsSamplingHUDOpen(true)}
-              className="fixed bottom-28 right-6 z-25 flex items-center space-x-2 px-3.5 py-2 rounded-2xl bg-[#0c101d]/95 hover:bg-[#131b2e] border-2 border-amber-400/70 hover:border-amber-300 text-amber-300 hover:text-white shadow-2xl shadow-amber-500/30 backdrop-blur-xl transition-all duration-200 hover:scale-105 select-none animate-bounce cursor-pointer"
+              className="fixed bottom-48 right-4 z-25 flex items-center space-x-2 px-3.5 py-2 rounded-2xl bg-[#0c101d]/95 hover:bg-[#131b2e] border-2 border-amber-400/70 hover:border-amber-300 text-amber-300 hover:text-white shadow-2xl shadow-amber-500/30 backdrop-blur-xl transition-all duration-200 hover:scale-105 select-none animate-bounce cursor-pointer"
               title="Step 19 Core Feature: Open Dynamic Sampling HUD (Shortcut: S)"
             >
               <span className="text-base">🎲</span>

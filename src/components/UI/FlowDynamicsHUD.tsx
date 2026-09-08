@@ -21,7 +21,7 @@ export const FlowDynamicsHUD: React.FC<FlowDynamicsHUDProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="absolute top-20 right-4 z-20 flex items-center space-x-2 select-none">
+    <div className="absolute bottom-36 right-4 z-20 flex items-center space-x-2 select-none">
       {/* Mini Toggle / Status Pill */}
       <div className="bg-[#0b0f19]/90 backdrop-blur-md border border-slate-800 rounded-xl p-1.5 flex items-center space-x-2 text-xs shadow-xl">
         <div className="flex items-center space-x-1.5 px-2 py-0.5 rounded-lg bg-sky-950/60 border border-sky-800/40 text-sky-300">

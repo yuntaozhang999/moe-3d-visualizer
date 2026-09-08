@@ -22,7 +22,7 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
   onToggleAutoFollow,
 }) => {
   return (
-    <div className="absolute top-4 right-4 z-20 bg-[#0b0f19]/90 backdrop-blur-md border border-slate-700/60 rounded-xl p-1.5 flex items-center space-x-1.5 text-xs select-none shadow-2xl shadow-black/60">
+    <div className="absolute bottom-24 right-4 z-20 bg-[#0b0f19]/90 backdrop-blur-md border border-slate-700/60 rounded-xl p-1.5 flex items-center space-x-1.5 text-xs select-none shadow-2xl shadow-black/60">
       {/* 1. Reset Camera (Iso 45° overview) with R badge */}
       <button
         onClick={onResetCamera}

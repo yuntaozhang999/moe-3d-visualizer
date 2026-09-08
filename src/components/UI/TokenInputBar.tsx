@@ -40,7 +40,7 @@ export const TokenInputBar: React.FC<TokenInputBarProps> = ({
   };
 
   return (
-    <div className="absolute top-20 left-76 z-20 bg-[#0b0f19]/90 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 shadow-xl flex items-center space-x-3 text-xs select-none">
+    <div className="absolute top-16 left-4 z-20 bg-[#0b0f19]/90 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 shadow-xl flex items-center space-x-3 text-xs select-none">
       <div className="flex items-center space-x-1.5 text-slate-400 font-mono pl-1">
         <Type className="w-3.5 h-3.5 text-sky-400" />
         <span className="text-[11px] font-semibold text-slate-300">Prompt:</span>
