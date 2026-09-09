@@ -45,8 +45,6 @@ export interface FlowConnectionProps {
   reverse?: boolean;
 }
 
-const Y_AXIS = new THREE.Vector3(0, 1, 0);
-
 export type PortDirection = 'left' | 'right' | 'top' | 'bottom' | 'front' | 'back';
 
 export function getNodePort(
@@ -106,7 +104,6 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
   const effectiveDensityMultiplier = propDensityMultiplier ?? context.densityMultiplier ?? 1.0;
 
   const instancedRef = useRef<THREE.InstancedMesh>(null);
-  const leadPacketRef = useRef<THREE.Mesh>(null);
   const impactRef = useRef<THREE.Mesh>(null);
   const tubeMatRef = useRef<THREE.MeshStandardMaterial>(null);
 
@@ -176,7 +173,6 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
   }, [from, to, isResidual, curveHeight, reverse]);
 
   const baseColor = isResidual ? '#f43f5e' : color;
-  const leadColor = isHighlighted ? '#ffffff' : (isResidual ? '#ffe4e6' : '#e0f2fe');
 
   // Tube geometry for glowing conduit sheath
   const tubeRadius = customTubeRadius || (isHighlighted ? 0.042 : 0.024);
@@ -216,7 +212,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     const baseSpeed = (customSpeed || (isHighlighted ? 0.75 : 0.38)) * effectiveSpeedMultiplier;
     const travelTime = clockTime * baseSpeed;
 
-    // 0. Conduit Tube Emissive Breathing Pulse
+    // 1. Glowing conduit sheath
     if (tubeMatRef.current) {
       const burstBoost = context.isBurstActive ? 0.8 : 0.0;
       const pulse = 0.5 + 0.5 * Math.sin(clockTime * (isHighlighted ? 4.5 : 2.2));
@@ -224,41 +220,23 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
       tubeMatRef.current.opacity = Math.min(1.0, (isHighlighted ? (0.6 + 0.18 * pulse) : (isResidual ? 0.28 : 0.18)) + burstBoost * 0.3);
     }
 
-    // 1. Lead Token Packet
-    if (leadPacketRef.current) {
-      const tLead = (travelTime) % 1;
-      const pt = curve.getPoint(tLead);
-      const tangent = curve.getTangent(tLead);
-
-      leadPacketRef.current.position.copy(pt);
-      leadPacketRef.current.quaternion.setFromUnitVectors(Y_AXIS, tangent);
-
-      // Smooth envelope scale: swell up in middle, gracefully shrink at endpoints
-      const env = Math.sin(tLead * Math.PI);
-      const leadScale = (isHighlighted ? 0.14 : 0.09) * Math.pow(env, 0.4);
-      leadPacketRef.current.scale.set(leadScale, leadScale * 2.2, leadScale);
-    }
-
-    // 2. Trailing Swarm Particles via InstancedMesh
+    // 2. Continuous uniform micro-particle dataflow stream
     if (instancedRef.current) {
+      const count = Math.max(1, actualParticleCount);
+      const baseS = isHighlighted ? 0.035 : 0.022;
       for (let i = 0; i < actualParticleCount; i++) {
-        // Staggered phase offset for stream effect
-        const offset = (i + 1) / (actualParticleCount + 1);
+        // Spaced evenly along the curve: offset = i / actualParticleCount
+        const offset = i / count;
         const t = (travelTime + offset) % 1;
-        const pt = curve.getPoint(t);
-        const tangent = curve.getTangent(t);
+        const pt = curve.getPointAt(t);
 
         dummy.position.copy(pt);
-        dummy.quaternion.setFromUnitVectors(Y_AXIS, tangent);
 
-        // Natural pulse and endpoint fading
+        // Uniform, delicate particle size with smooth fade at endpoints
         const env = Math.sin(t * Math.PI);
-        // Trailing particles taper down in size along the tail
-        const taper = 1.0 - (i / (actualParticleCount + 1)) * 0.45;
-        const particleScale = (isHighlighted ? 0.085 : 0.055) * taper * Math.pow(env, 0.45);
-        const stretch = 1.8; // elongated photons
-        
-        dummy.scale.set(particleScale, particleScale * stretch, particleScale);
+        const s = Math.max(0.0001, baseS * env);
+
+        dummy.scale.set(s, s, s);
         dummy.updateMatrix();
         instancedRef.current.setMatrixAt(i, dummy.matrix);
       }
@@ -311,16 +289,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
       {/* Inner Crisp Optical Core Fiber */}
       <primitive object={lineObject} />
 
-      {/* Leading High-Energy Data Packet (Head Photon) */}
-      <mesh ref={leadPacketRef}>
-        <sphereGeometry args={[1, 12, 12]} />
-        <meshBasicMaterial
-          color={leadColor}
-          toneMapped={false}
-        />
-      </mesh>
-
-      {/* Trailing Photon Swarm (Multi-Particle Stream) */}
+      {/* Continuous Uniform Micro-Particle Stream */}
       <instancedMesh
         ref={instancedRef}
         args={[undefined, undefined, actualParticleCount]}
@@ -328,6 +297,10 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
         <sphereGeometry args={[1, 8, 8]} />
         <meshBasicMaterial
           color={baseColor}
+          transparent={true}
+          opacity={isHighlighted ? 0.85 : 0.35}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
           toneMapped={false}
         />
       </instancedMesh>

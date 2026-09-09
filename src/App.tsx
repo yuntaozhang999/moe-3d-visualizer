@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import 'katex/dist/katex.min.css';
 import { Header } from './components/UI/Header';
-import { LayerSidebar } from './components/UI/LayerSidebar';
 import { Controls } from './components/UI/Controls';
 import { InspectorModal } from './components/UI/InspectorModal';
 import { TokenInputBar } from './components/UI/TokenInputBar';
@@ -379,15 +378,6 @@ export function App() {
       />
 
       <div className="flex flex-1 relative overflow-hidden">
-        {/* Left Sidebar: 48-Layer Panorama */}
-        <LayerSidebar
-          layers={layers}
-          selectedLayerIndex={selectedLayerIndex}
-          onSelectLayer={handleSelectLayer}
-          viewMode={viewMode}
-          onExitIsolation={() => handleExitIsolation('quad_cycle')}
-        />
-
         {/* Center: 3D Stage Viewport */}
         <main className="flex-1 h-full relative">
           {/* Top Floating View Mode Switcher */}
