@@ -1,20 +1,12 @@
 import React from 'react';
-import { Layers, Compass, ExternalLink, Cpu, Sparkles } from 'lucide-react';
+import { ExternalLink, Cpu } from 'lucide-react';
 import { ModelSpecs } from '../../types/model';
 
 interface HeaderProps {
   config: ModelSpecs;
-  autoFollow: boolean;
-  onToggleAutoFollow: () => void;
-  onResetCamera: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  config,
-  autoFollow,
-  onToggleAutoFollow,
-  onResetCamera,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ config }) => {
   return (
     <header className="h-16 px-5 border-b border-slate-800/80 bg-[#0b0f19]/90 backdrop-blur-md flex items-center justify-between z-30 select-none">
       {/* Brand & Model Title */}
@@ -58,30 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="text-slate-400">Schedule:</span> <strong className="text-indigo-400">3 Local : 1 Global</strong>
         </div>
       </div>
-
-      {/* Actions / View Controls */}
-      <div className="flex items-center space-x-2.5">
-        <button
-          onClick={onToggleAutoFollow}
-          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-            autoFollow
-              ? 'bg-sky-500/20 border border-sky-400/50 text-sky-300 shadow-sm shadow-sky-500/20'
-              : 'bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-300'
-          }`}
-          title="Toggle between Auto Guided Tour and Free Orbit"
-        >
-          <Compass className="w-3.5 h-3.5" />
-          <span>{autoFollow ? 'Auto-Track Cam' : 'Free Orbit Cam'}</span>
-        </button>
-
-        <button
-          onClick={onResetCamera}
-          className="px-2.5 py-1.5 rounded-md text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-300 transition-colors"
-          title="Reset Camera View"
-        >
-          Reset View
-        </button>
-      </div>
     </header>
   );
 };
+

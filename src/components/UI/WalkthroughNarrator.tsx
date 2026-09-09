@@ -4,9 +4,7 @@ import {
   ChevronRight,
   HelpCircle,
   Minimize2,
-  X,
-  ChevronDown,
-  Dices
+  X
 } from 'lucide-react';
 import { ForwardStep } from '../../types/model';
 import { IntuitiveEquation } from './IntuitiveEquation';
@@ -38,80 +36,9 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
 }) => {
   const isStep19 = currentStep.id === 'untied_lm_head';
 
-  // Collapsed Mode: Lightweight, non-intrusive floating pill button
+  // Collapsed Mode: Hidden to keep 3D viewport clean & de-bloated (open via bottom Controls bar)
   if (isCollapsed) {
-    return (
-      <div
-        onClick={() => onToggleCollapse?.(false)}
-        className="absolute top-4 left-4 z-20 flex items-center bg-[#0b0f19]/90 hover:bg-[#101626]/95 backdrop-blur-xl border border-sky-500/40 hover:border-sky-400/80 rounded-xl px-2.5 py-1.5 shadow-2xl hover:shadow-sky-500/20 group transition-all duration-200 select-none cursor-pointer"
-        title="Click to expand full math formulas & step walkthrough (Shortcut: M)"
-      >
-        <div className="flex items-center space-x-2">
-          <span className="text-xs">📐</span>
-          <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-indigo-950/90 border border-indigo-700/60 text-indigo-300">
-            {currentStep.category}
-          </span>
-          <span className="text-xs font-semibold text-slate-200 group-hover:text-white max-w-[140px] sm:max-w-[200px] truncate">
-            {stepIndex + 1}. {currentStep.name}
-          </span>
-          <span className="text-[10px] font-mono text-sky-400 bg-sky-950/70 border border-sky-800/50 px-1.5 py-0.5 rounded">
-            {stepIndex + 1}/{totalSteps}
-          </span>
-        </div>
-
-        {/* Quick step navigation & expand handle */}
-        <div className="flex items-center space-x-1 pl-2 ml-2 border-l border-slate-700/80">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onPrevStep();
-            }}
-            disabled={stepIndex === 0}
-            className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 transition-colors"
-            title="Previous Step"
-          >
-            <ChevronLeft className="w-3 h-3" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onNextStep();
-            }}
-            disabled={stepIndex === totalSteps - 1}
-            className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 transition-colors"
-            title="Next Step"
-          >
-            <ChevronRight className="w-3 h-3" />
-          </button>
-
-          {isStep19 && onOpenSamplingHUD && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenSamplingHUD();
-              }}
-              className="flex items-center space-x-1 ml-1 px-2 py-0.5 rounded-md bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 border border-amber-400/50 text-[11px] font-medium transition-colors animate-pulse"
-              title="Step 19 Exclusive: Open Dynamic Sampling HUD (Shortcut: S)"
-            >
-              <Dices className="w-3 h-3" />
-              <span>Sampling</span>
-            </button>
-          )}
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleCollapse?.(false);
-            }}
-            className="flex items-center space-x-1 ml-1 px-2 py-0.5 rounded-md bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-sky-100 text-[11px] font-medium transition-colors"
-            title="Expand Walkthrough (Shortcut: M)"
-          >
-            <span>Formulas & Walkthrough</span>
-            <ChevronDown className="w-3 h-3" />
-          </button>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // Expanded Mode: Full walkthrough card with clear minimize / close controls
@@ -158,7 +85,7 @@ export const WalkthroughNarrator: React.FC<WalkthroughNarratorProps> = ({
           <button
             onClick={() => onToggleCollapse?.(true)}
             className="p-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-            title="Minimize to floating pill (Shortcut: Esc or M)"
+            title="Collapse Walkthrough (Shortcut: Esc or M)"
           >
             <Minimize2 className="w-3.5 h-3.5" />
           </button>

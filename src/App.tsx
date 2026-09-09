@@ -11,7 +11,6 @@ import { WalkthroughNarrator } from './components/UI/WalkthroughNarrator';
 import { CellHoverHUD, HoveredCellInfo } from './components/UI/CellHoverHUD';
 import { CameraPresetsBar } from './components/UI/CameraPresetsBar';
 import { SceneContainer } from './components/ThreeScene/SceneContainer';
-import { IsolatedLayerBanner } from './components/UI/IsolatedLayerBanner';
 import {
   MARIN_535B_CONFIG,
   DEFAULT_TOY_TOKENS,
@@ -34,7 +33,6 @@ export function App() {
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [autoFollow, setAutoFollow] = useState(true);
   const [tokens, setTokens] = useState<string[]>(DEFAULT_TOY_TOKENS);
   const [inspectedId, setInspectedId] = useState<string | null>(null);
@@ -177,10 +175,18 @@ export function App() {
     setResetTrigger((prev) => prev + 1);
   }, [viewMode, selectedLayerIndex, activeBranchFocus]);
 
+  const handleToggleAutoFollow = useCallback(() => {
+    setAutoFollow((prev) => {
+      if (!prev) setCameraOverride(null);
+      return !prev;
+    });
+  }, []);
+
   // Select layer handler that isolates the layer (hiding all others) and aligns currentGroupIndex
   const handleSelectLayer = useCallback((index: number, isolate: boolean = true) => {
-    setSelectedLayerIndex(index);
-    const g = Math.floor(index / 4);
+    const clampedIndex = Math.max(0, Math.min(layers.length - 1, index));
+    setSelectedLayerIndex(clampedIndex);
+    const g = Math.floor(clampedIndex / 4);
     setCurrentGroupIndex(g);
     if (isolate) {
       setViewMode('single_block');
@@ -191,14 +197,7 @@ export function App() {
       });
       setResetTrigger((prev) => prev + 1);
     }
-  }, []);
-
-  const handleExitIsolation = useCallback((targetMode: ViewMode = 'quad_cycle') => {
-    setCameraOverride(null);
-    setAutoFollow(true);
-    setViewMode(targetMode);
-    setResetTrigger((prev) => prev + 1);
-  }, []);
+  }, [layers.length]);
 
   const handleChangeGroup = useCallback((gIndex: number) => {
     setCurrentGroupIndex(gIndex);
@@ -242,12 +241,12 @@ export function App() {
   // Playback timer
   useEffect(() => {
     if (!isPlaying) return;
-    const intervalMs = 2400 / playbackSpeed;
+    const intervalMs = 2400;
     const timer = setInterval(() => {
       handleNextStep();
     }, intervalMs);
     return () => clearInterval(timer);
-  }, [isPlaying, playbackSpeed, handleNextStep]);
+  }, [isPlaying, handleNextStep]);
 
   // Synchronize inspected node with step changes if inspector is already active
   useEffect(() => {
@@ -355,15 +354,7 @@ export function App() {
   return (
     <div className="flex flex-col w-screen h-screen bg-[#07090e] text-slate-100 overflow-hidden select-none">
       {/* Top Header Navigation */}
-      <Header
-        config={MARIN_535B_CONFIG}
-        autoFollow={autoFollow}
-        onToggleAutoFollow={() => {
-          setCameraOverride(null);
-          setAutoFollow(!autoFollow);
-        }}
-        onResetCamera={handleResetCamera}
-      />
+      <Header config={MARIN_535B_CONFIG} />
 
       <div className="flex flex-1 relative overflow-hidden">
         {/* Center: 3D Stage Viewport */}
@@ -373,12 +364,18 @@ export function App() {
             viewMode={viewMode}
             onChangeViewMode={(mode) => {
               setCameraOverride(null);
+              setAutoFollow(true);
               setViewMode(mode);
+              setResetTrigger((prev) => prev + 1);
             }}
             onOpenLayerSpecs={() => setShowLayerSpecsModal(true)}
             currentGroupIndex={currentGroupIndex}
             onChangeGroup={handleChangeGroup}
             selectedLayerIndex={selectedLayerIndex}
+            currentLayer={currentLayer}
+            totalLayers={layers.length}
+            onPrevLayer={() => handleSelectLayer(selectedLayerIndex - 1, true)}
+            onNextLayer={() => handleSelectLayer(selectedLayerIndex + 1, true)}
           />
 
           {/* Token Input Bar for customizing sequence */}
@@ -391,18 +388,6 @@ export function App() {
             onOpenSamplingHUD={handleToggleSamplingHUD}
             isSamplingHUDOpen={isSamplingHUDOpen}
           />
-
-          {/* Prominent Floating Banner when Layer is Isolated */}
-          {viewMode === 'single_block' && (
-            <IsolatedLayerBanner
-              currentLayer={currentLayer}
-              totalLayers={layers.length}
-              onPrevLayer={() => handleSelectLayer(Math.max(0, selectedLayerIndex - 1), true)}
-              onNextLayer={() => handleSelectLayer(Math.min(layers.length - 1, selectedLayerIndex + 1), true)}
-              onSelectLayer={(idx) => handleSelectLayer(idx, true)}
-              onExitIsolation={handleExitIsolation}
-            />
-          )}
 
           {/* bbycroft-style Walkthrough Narrator Bar (Collapsible Pill & Card) */}
           <WalkthroughNarrator
@@ -436,7 +421,8 @@ export function App() {
             onFocusBranch={handleFocusBranch}
             activeBranchFocus={activeBranchFocus}
             autoFollow={autoFollow}
-            onToggleAutoFollow={() => setAutoFollow(!autoFollow)}
+            onToggleAutoFollow={handleToggleAutoFollow}
+            isSamplingHUDOpen={isSamplingHUDOpen}
           />
 
           {/* Three.js 3D Scene */}
@@ -489,7 +475,6 @@ export function App() {
             steps={FORWARD_STEPS}
             currentStepIndex={currentStepIndex}
             isPlaying={isPlaying}
-            playbackSpeed={playbackSpeed}
             onPrevStep={handlePrevStep}
             onNextStep={handleNextStep}
             onTogglePlay={() => setIsPlaying(!isPlaying)}
@@ -499,7 +484,6 @@ export function App() {
               setCurrentStepIndex(idx);
               setIsPlaying(false);
             }}
-            onChangeSpeed={setPlaybackSpeed}
             onToggleInspector={() => {
               if (!inspectedId) {
                 handleOpenInspector(activeStep.activeNodeIds[0] || 'node_tokens');

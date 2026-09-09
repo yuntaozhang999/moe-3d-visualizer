@@ -2,11 +2,7 @@ import React from 'react';
 import {
   Play,
   Pause,
-  SkipBack,
-  SkipForward,
   RotateCcw,
-  Sparkles,
-  Layers,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -16,13 +12,11 @@ interface ControlsProps {
   steps: ForwardStep[];
   currentStepIndex: number;
   isPlaying: boolean;
-  playbackSpeed: number;
   onPrevStep: () => void;
   onNextStep: () => void;
   onTogglePlay: () => void;
   onReset: () => void;
   onSelectStep: (index: number) => void;
-  onChangeSpeed: (speed: number) => void;
   onToggleInspector?: () => void;
   isInspectorActive?: boolean;
   onToggleNarrator?: () => void;
@@ -36,13 +30,11 @@ export const Controls: React.FC<ControlsProps> = ({
   steps,
   currentStepIndex,
   isPlaying,
-  playbackSpeed,
   onPrevStep,
   onNextStep,
   onTogglePlay,
   onReset,
   onSelectStep,
-  onChangeSpeed,
   onToggleInspector,
   isInspectorActive = false,
   onToggleNarrator,
@@ -210,24 +202,6 @@ export const Controls: React.FC<ControlsProps> = ({
             />
           </button>
         )}
-
-        {/* Speed Controls */}
-        <div className="flex items-center space-x-1 text-xs font-mono">
-          <span className="text-slate-500 text-[11px] mr-1">Speed:</span>
-          {[0.5, 1, 2].map((s) => (
-            <button
-              key={s}
-              onClick={() => onChangeSpeed(s)}
-              className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
-                playbackSpeed === s
-                  ? 'bg-sky-500/20 border border-sky-400/60 text-sky-300'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400'
-              }`}
-            >
-              {s}x
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );

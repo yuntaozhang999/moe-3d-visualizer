@@ -1,5 +1,5 @@
 import React from 'react';
-import { RotateCcw, Grid, Focus, Zap, Compass, Video } from 'lucide-react';
+import { RotateCcw, Grid, Focus, Zap, Compass } from 'lucide-react';
 import { ViewMode } from '../../types/model';
 
 export interface CameraPresetsBarProps {
@@ -10,6 +10,7 @@ export interface CameraPresetsBarProps {
   activeBranchFocus?: 'attn' | 'moe';
   autoFollow: boolean;
   onToggleAutoFollow: () => void;
+  isSamplingHUDOpen?: boolean;
 }
 
 export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
@@ -20,14 +21,19 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
   activeBranchFocus = 'attn',
   autoFollow,
   onToggleAutoFollow,
+  isSamplingHUDOpen = false,
 }) => {
   return (
-    <div className="absolute bottom-24 right-4 z-20 bg-[#0b0f19]/90 backdrop-blur-md border border-slate-700/60 rounded-xl p-1.5 flex items-center space-x-1.5 text-xs select-none shadow-2xl shadow-black/60">
+    <div
+      className={`absolute bottom-24 ${
+        isSamplingHUDOpen ? 'right-[510px]' : 'right-4'
+      } z-20 bg-[#0b0f19]/90 backdrop-blur-md border border-slate-700/60 rounded-xl p-1.5 flex items-center space-x-1.5 text-xs select-none shadow-2xl shadow-black/60 transition-all duration-300`}
+    >
       {/* 1. Reset Camera (Iso 45° overview) with R badge */}
       <button
         onClick={onResetCamera}
-        className="px-2.5 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/50 text-sky-200 hover:text-white flex items-center space-x-1.5 font-medium transition-all shadow-sm shadow-sky-500/20 active:scale-95"
-        title="Reset camera smoothly to default isometric angle (45°, full overview) [Shortcut: R]"
+        className="px-2.5 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/50 text-sky-200 hover:text-white flex items-center space-x-1.5 font-medium transition-all shadow-sm shadow-sky-500/20 active:scale-95 cursor-pointer"
+        title="Reset camera smoothly to default isometric overview angle (Shortcut: R)"
       >
         <RotateCcw className="w-3.5 h-3.5 text-sky-300" />
         <span className="font-semibold">Reset View</span>
@@ -41,7 +47,7 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
       {/* 2. Top-Down Floorplan View */}
       <button
         onClick={onSetTopDownView}
-        className="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-slate-300 hover:text-white flex items-center space-x-1.5 transition-all active:scale-95"
+        className="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-slate-300 hover:text-white flex items-center space-x-1.5 transition-all active:scale-95 cursor-pointer"
         title="90° Top-down floorplan architecture view"
       >
         <Grid className="w-3.5 h-3.5 text-emerald-400" />
@@ -55,7 +61,7 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
         <div className="flex items-center space-x-1">
           <button
             onClick={() => onFocusBranch('attn')}
-            className={`px-2 py-1.5 rounded-lg border flex items-center space-x-1 transition-all active:scale-95 ${
+            className={`px-2 py-1.5 rounded-lg border flex items-center space-x-1 transition-all active:scale-95 cursor-pointer ${
               activeBranchFocus === 'attn'
                 ? 'bg-purple-500/20 border-purple-400/60 text-purple-200 font-semibold'
                 : 'bg-slate-800/80 hover:bg-slate-700 border-slate-700/50 text-slate-300'
@@ -67,7 +73,7 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
           </button>
           <button
             onClick={() => onFocusBranch('moe')}
-            className={`px-2 py-1.5 rounded-lg border flex items-center space-x-1 transition-all active:scale-95 ${
+            className={`px-2 py-1.5 rounded-lg border flex items-center space-x-1 transition-all active:scale-95 cursor-pointer ${
               activeBranchFocus === 'moe'
                 ? 'bg-amber-500/20 border-amber-400/60 text-amber-200 font-semibold'
                 : 'bg-slate-800/80 hover:bg-slate-700 border-slate-700/50 text-slate-300'
@@ -81,7 +87,7 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
       ) : viewMode === 'quad_cycle' ? (
         <button
           onClick={() => onFocusBranch()}
-          className="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-slate-300 hover:text-white flex items-center space-x-1.5 transition-all active:scale-95"
+          className="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-slate-300 hover:text-white flex items-center space-x-1.5 transition-all active:scale-95 cursor-pointer"
           title="Focus currently active layer"
         >
           <Focus className="w-3.5 h-3.5 text-sky-400" />
@@ -90,7 +96,7 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
       ) : (
         <button
           onClick={() => onFocusBranch()}
-          className="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-slate-300 hover:text-white flex items-center space-x-1.5 transition-all active:scale-95"
+          className="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-slate-300 hover:text-white flex items-center space-x-1.5 transition-all active:scale-95 cursor-pointer"
           title="Focus currently selected layer"
         >
           <Focus className="w-3.5 h-3.5 text-indigo-400" />
@@ -103,16 +109,21 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
       {/* 4. Auto-Follow Toggle */}
       <button
         onClick={onToggleAutoFollow}
-        className={`px-2 py-1.5 rounded-lg border flex items-center space-x-1 transition-all ${
+        className={`px-2.5 py-1.5 rounded-lg border flex items-center space-x-1.5 transition-all cursor-pointer ${
           autoFollow
             ? 'bg-sky-500/20 border-sky-400/50 text-sky-300 shadow-sm shadow-sky-500/10'
-            : 'bg-slate-800/60 hover:bg-slate-700 border-slate-700 text-slate-400'
+            : 'bg-slate-800/60 hover:bg-slate-700 border-slate-700 text-slate-400 hover:text-slate-200'
         }`}
-        title={autoFollow ? 'Step auto-tracking camera: Enabled' : 'Free camera mode (Drag to orbit freely)'}
+        title={
+          autoFollow
+            ? 'Camera Auto-Follow is Active: Tracking current step tensor (Click to switch to Free Orbit)'
+            : 'Free Orbit Camera: Drag/scroll freely (Click to re-enable Step Auto-Follow)'
+        }
       >
         <Compass className={`w-3.5 h-3.5 ${autoFollow ? 'text-sky-400' : 'text-slate-400'}`} />
-        <span className="text-[11px] font-mono">{autoFollow ? 'Follow On' : 'Free Cam'}</span>
+        <span className="text-[11px] font-mono font-semibold">{autoFollow ? 'Follow On' : 'Free Cam'}</span>
       </button>
     </div>
   );
 };
+

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Layers, Cuboid, Network, FileSpreadsheet } from 'lucide-react';
-import { ViewMode } from '../../types/model';
+import { Layers, Cuboid, Network, FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayerMetadata, ViewMode } from '../../types/model';
 
 interface ViewModeSwitcherProps {
   viewMode: ViewMode;
@@ -9,6 +9,10 @@ interface ViewModeSwitcherProps {
   currentGroupIndex: number;
   onChangeGroup: (groupIndex: number) => void;
   selectedLayerIndex?: number;
+  currentLayer?: LayerMetadata;
+  onPrevLayer?: () => void;
+  onNextLayer?: () => void;
+  totalLayers?: number;
 }
 
 export const ViewModeSwitcher: React.FC<ViewModeSwitcherProps> = ({
@@ -18,7 +22,16 @@ export const ViewModeSwitcher: React.FC<ViewModeSwitcherProps> = ({
   currentGroupIndex,
   onChangeGroup,
   selectedLayerIndex = 0,
+  currentLayer,
+  onPrevLayer,
+  onNextLayer,
+  totalLayers = 48,
 }) => {
+  const layerIdx = currentLayer ? currentLayer.index : selectedLayerIndex;
+  const isGlobal = currentLayer ? currentLayer.isGlobal : layerIdx % 4 === 3;
+  const isFirstLayer = layerIdx <= 0;
+  const isLastLayer = layerIdx >= totalLayers - 1;
+
   return (
     <div className="absolute top-4 right-4 z-20 flex items-center space-x-2 select-none">
       {/* Quad Group Selector (if in quad_cycle mode) */}
@@ -36,6 +49,40 @@ export const ViewModeSwitcher: React.FC<ViewModeSwitcherProps> = ({
               </option>
             ))}
           </select>
+        </div>
+      )}
+
+      {/* Compact Layer Stepper Pill (if in single_block mode) */}
+      {viewMode === 'single_block' && (
+        <div className="flex items-center bg-[#0b0f19]/90 backdrop-blur-md border border-indigo-700/60 rounded-xl px-2 py-1 space-x-2 text-xs font-mono shadow-lg shadow-indigo-950/40">
+          <button
+            onClick={onPrevLayer}
+            disabled={!onPrevLayer || isFirstLayer}
+            className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer disabled:cursor-not-allowed"
+            title="Previous Layer (ArrowUp)"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <div className="flex items-center space-x-1.5">
+            <span className="font-bold text-slate-100">L{layerIdx}</span>
+            <span
+              className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full border ${
+                isGlobal
+                  ? 'bg-purple-950/80 border-purple-600/70 text-purple-300'
+                  : 'bg-sky-950/80 border-sky-600/70 text-sky-300'
+              }`}
+            >
+              {isGlobal ? 'Global Causal' : 'Local 2048w'}
+            </span>
+          </div>
+          <button
+            onClick={onNextLayer}
+            disabled={!onNextLayer || isLastLayer}
+            className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer disabled:cursor-not-allowed"
+            title="Next Layer (ArrowDown)"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
@@ -93,3 +140,4 @@ export const ViewModeSwitcher: React.FC<ViewModeSwitcherProps> = ({
     </div>
   );
 };
+

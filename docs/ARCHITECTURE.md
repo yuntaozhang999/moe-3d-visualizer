@@ -43,7 +43,7 @@ visualizer/
 │   │   │   └── CameraRig.tsx      # Smooth camera interpolation with user orbit priority
 │   │   └── UI/                    # 2D Glassmorphic HUD Overlays
 │   │       ├── Header.tsx         # Top title bar with parameter badges
-│   │       ├── IsolatedLayerBanner.tsx # Top status island when a layer is isolated
+│   │       ├── SamplingHUD.tsx    # Live next-token sampling & generation panel
 │   │       ├── IntuitiveEquation.tsx # KaTeX math + dataflow + variable explorer
 │   │       ├── WalkthroughNarrator.tsx # Top step-by-step narration bar
 │   │       ├── InspectorModal.tsx # Right deep-dive formula & code inspector

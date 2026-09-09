@@ -11,44 +11,44 @@ When exploring deep transformer models, isolating an individual layer is crucial
 ### How to Isolate a Layer
 - **In 4-Layer Cycle View (`quad_cycle`)**: Hover over any of the 4 layer cards. The card highlights, and a `🔍 Focus & Isolate Layer` 3D button appears. Clicking either the card or the button immediately hides all other layers and focuses on that layer.
 - **In 48-Layer Tower View (`macro_stack`)**: Click any of the 48 layer slabs in the 3D tower.
-- **In Left Sidebar (`LayerSidebar`)**: Click any layer in the 48-item list.
-- **Keyboard Shortcuts**: Press `↑` / `↓` while in isolation mode to step to the previous or next layer while remaining in isolated view.
+- **Top-Right Stepper & Keyboard Shortcuts**: In `Single Block` mode, step seamlessly between layers L0–L47 using the top-right `◀` / `▶` buttons or the `↑` / `↓` arrow keys on your keyboard.
 
 ### Exiting Isolation Mode
-When a layer is isolated, a floating status bar appears at the top center of the viewport:
-- Click `[Show 4-Layer Cycle]` to return to the 4-layer repeating pipeline view.
-- Click `[Show 48 Layers]` to return to the macro perspective view.
-- Click `Exit Focus` in the left sidebar.
+To exit single block mode and view broader architectural contexts:
+- Click **`4-Layer Cycle`** in the top-right switcher to return to the 4-layer repeating pipeline view.
+- Click **`48-Layer Tower`** to return to the full 48-layer 3D macro perspective view.
 
 ---
 
 ## 2. 3D View Modes Switcher (Top Right)
 Located in the upper right corner of the screen:
 - **`4-Layer Cycle`**: Visualizes the repeating fundamental unit (3 Local Sliding Window layers + 1 Global Full Causal layer). Includes a Cycle Group dropdown (`Group 1 (L0–L3)` through `Group 12 (L44–L47)`).
-- **`Single Block (L#)`**: Focuses exclusively on the micro architecture of the selected layer.
+- **`Single Block (L#)`**: Focuses exclusively on the micro architecture of the selected layer. When active, an adjacent compact layer navigator (`◀ L{idx} [Global Causal | Local 2048w] ▶`) provides instant, boundary-guarded stepping between layers.
 - **`48-Layer Tower`**: Displays all 48 layers laid out in 3D perspective.
 - **`Layer Specs`**: Opens the comprehensive modal containing architectural parameter tables for all 48 layers.
 
 ---
 
-## 3. Step-by-Step Forward Pass Playback (Bottom Bar & Top Narrator)
-- **Controls**:
+## 3. Step-by-Step Forward Pass Playback (Bottom Bar & Walkthrough)
+- **Playback Controls**:
   - `Prev Step` (`←` key) and `Next Step` (`→` key).
-  - `Play / Pause` (`Spacebar`).
-  - Speed adjustment: `0.5x`, `1x`, `2x`.
-  - Timeline Scrubber: Jump directly to any of the 19 forward steps.
-- **Auto-Follow Mode**: When enabled, the 3D camera smoothly flies to and frames the active tensor or operator for the current step.
+  - `Play / Pause` (`Spacebar`) at a steady, readable 2.4s cadence.
+  - `Reset` to return to Step 1 (Input Tokens & Latent Embedding).
+  - Interactive scrub slider: Jump directly to any of the 19 forward steps.
+- **Drawer & HUD Triggers**:
+  - `Walkthrough` (`M` key): Toggles the detailed bbycroft-style walkthrough card with intuitive KaTeX equations and tensor dataflow. When collapsed, it remains hidden to maximize 3D viewport immersion.
+  - `Formulas`: Toggles the mathematical formula inspector and variable shape inspector.
+  - `Sampling` (`S` key): Step 19 dynamic temperature, top-k/top-p, and Monte Carlo roulette sampling simulator.
 
 ---
 
-## 4. Camera Controls & Presets Bar
+## 4. Unified Camera Controls & Presets Bar
 Located at the bottom right corner:
-- **`Overview`**: Global isometric framing of the layer.
-- **`Attention`**: Zooms directly into the Q, K, V, XSA, and Attention matrix.
-- **`LatentMoE`**: Zooms directly into the Router, Latent Down-Projection, 384 Experts pool, and Shared Experts.
-- **`Top-Down`**: Orthographic top-down plan view.
-- **Mouse Orbit & Zoom**: Left-click drag to rotate; Right-click drag or middle-click drag to pan; Wheel to zoom.
-- *Note*: Mouse interaction immediately disengages auto-camera interpolation so you retain complete control over 3D navigation.
+- **`Reset View [R]`**: Smoothly animates the camera back to the optimal 45° isometric overview angle.
+- **`Top Down`**: Switches to a 90° orthographic plan floorplan view.
+- **`Focus Attn` / `Focus MoE`**: In `Single Block` mode, zooms directly into either the Attention branch or the LatentMoE branch.
+- **`Follow On` / `Free Cam`**: Toggles camera auto-tracking. When enabled, the camera smoothly tracks the active step tensor. Dragging or zooming freely transitions to Free Cam mode.
+- **Smart HUD Avoidance**: When the Step 19 Sampling HUD is open, the camera bar automatically lifts upwards to avoid any overlap or occlusion.
 
 ---
 
