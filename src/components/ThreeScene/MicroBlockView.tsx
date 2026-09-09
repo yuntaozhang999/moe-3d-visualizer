@@ -46,6 +46,9 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
   const windowLabel = isGlobal ? 'Full Causal [4096]' : 'Sliding Window [2048]';
   const ropeLabel = isGlobal ? 'NoPE (Disabled)' : 'Half-RoPE (64/128)';
   const DIM_W = 0.05;
+  // Floor stage markers need to pop against the dark slate platform.
+  const STAGE_LABEL_COLOR = '#cfe1f7';
+  const STAGE_LABEL_OUTLINE = '#0a0e14';
 
   return (
     <group position={[0, 0, 0]}>
@@ -64,8 +67,11 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         <Text
           position={[-13.0, 0, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.42}
-          color="#223048"
+          fontSize={0.52}
+          color={STAGE_LABEL_COLOR}
+          outlineWidth={0.02}
+          outlineColor={STAGE_LABEL_OUTLINE}
+          outlineBlur={0.008}
           fontWeight={700}
           anchorX="center"
           anchorY="middle"
@@ -75,8 +81,11 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         <Text
           position={[3.5, 0, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.42}
-          color="#223048"
+          fontSize={0.52}
+          color={STAGE_LABEL_COLOR}
+          outlineWidth={0.02}
+          outlineColor={STAGE_LABEL_OUTLINE}
+          outlineBlur={0.008}
           fontWeight={700}
           anchorX="center"
           anchorY="middle"
@@ -86,8 +95,11 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         <Text
           position={[25.5, 0, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.42}
-          color="#223048"
+          fontSize={0.52}
+          color={STAGE_LABEL_COLOR}
+          outlineWidth={0.02}
+          outlineColor={STAGE_LABEL_OUTLINE}
+          outlineBlur={0.008}
           fontWeight={700}
           anchorX="center"
           anchorY="middle"
@@ -97,8 +109,11 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         <Text
           position={[40.0, 0, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.42}
-          color="#223048"
+          fontSize={0.52}
+          color={STAGE_LABEL_COLOR}
+          outlineWidth={0.02}
+          outlineColor={STAGE_LABEL_OUTLINE}
+          outlineBlur={0.008}
           fontWeight={700}
           anchorX="center"
           anchorY="middle"
