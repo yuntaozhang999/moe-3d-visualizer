@@ -1,9 +1,9 @@
 import React from 'react';
 import * as THREE from 'three';
-import { Text, Billboard } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import { TensorMatrix } from './TensorMatrix';
 import { OperatorNode } from './OperatorNode';
-import { FlowConnection, getNodePort, getOperatorPort } from './FlowConnections';
+import { FlowConnection } from './FlowConnections';
 import { LayerMetadata, ForwardStep } from '../../types/model';
 import { ActivationData } from '../../data/tokenSimulation';
 import { HoveredCellInfo } from '../UI/CellHoverHUD';
@@ -45,112 +45,67 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
   const kvHeads = layer.kvHeads;
   const windowLabel = isGlobal ? 'Full Causal [4096]' : 'Sliding Window [2048]';
   const ropeLabel = isGlobal ? 'NoPE (Disabled)' : 'Half-RoPE (64/128)';
-  // One world-unit column represents 96 real features (6144 -> 64, 3072 -> 32, ...)
   const DIM_W = 0.05;
 
   return (
     <group position={[0, 0, 0]}>
-      {/* 3D Ground Platform / Bounding Enclosure (bbycroft style) lowered to Y=-1.5 and expanded to [52, 0.1, 18] */}
-      <mesh position={[8.5, -1.5, 0]}>
-        <boxGeometry args={[52, 0.1, 18]} />
-        <meshStandardMaterial color="#080b12" roughness={0.9} metalness={0.1} />
+      {/* 3D Ground Platform / Bounding Enclosure (obsidian dark slate) */}
+      <mesh position={[13.0, -1.8, 0]}>
+        <boxGeometry args={[66, 0.15, 20]} />
+        <meshStandardMaterial color="#080b11" roughness={0.9} metalness={0.1} />
       </mesh>
-      <lineSegments position={[8.5, -1.5, 0]}>
-        <edgesGeometry args={[new THREE.BoxGeometry(52, 0.1, 18)]} />
-        <lineBasicMaterial color="#1e293b" />
+      <lineSegments position={[13.0, -1.8, 0]}>
+        <edgesGeometry args={[new THREE.BoxGeometry(66, 0.15, 20)]} />
+        <lineBasicMaterial color="#172033" />
       </lineSegments>
 
-      {/* 3D Main Layer Title Banner Elevated to Sky Deck Y=11.8 */}
-      <Billboard follow={true} position={[8.5, 11.8, 0]}>
-        <mesh position={[0, -0.2, -0.02]}>
-          <planeGeometry args={[18.5, 1.8]} />
-          <meshBasicMaterial color="#080c16" transparent opacity={0.94} depthWrite={true} />
-        </mesh>
-        <lineSegments position={[0, -0.2, -0.01]}>
-          <edgesGeometry args={[new THREE.PlaneGeometry(18.5, 1.8)]} />
-          <lineBasicMaterial color={isGlobal ? "#a855f7" : "#0284c7"} transparent opacity={0.65} />
-        </lineSegments>
+      {/* Subtle Ground Stage Demarcations (Floor Markers) */}
+      <group position={[0, -1.72, 7.5]}>
         <Text
-          position={[0, 0.25, 0.01]}
-          fontSize={0.72}
-          color={isGlobal ? "#d8b4fe" : "#38bdf8"}
-          fontWeight={800}
+          position={[-13.0, 0, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          fontSize={0.42}
+          color="#223048"
+          fontWeight={700}
           anchorX="center"
+          anchorY="middle"
         >
-          {`Layer ${layer.index} (${isGlobal ? 'GLOBAL CAUSAL' : 'LOCAL 2048w'}) — ISOLATED FOCUS`}
+          STAGE 1: EMBEDDING & NORM
         </Text>
         <Text
-          position={[0, -0.38, 0.01]}
-          fontSize={0.28}
-          color="#cbd5e1"
+          position={[3.5, 0, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          fontSize={0.42}
+          color="#223048"
+          fontWeight={700}
           anchorX="center"
+          anchorY="middle"
         >
-          {isGlobal
-            ? '6 KV Heads (GQA 8:1) · Full Causal Attention · NoPE · LatentMoE 384 (Top-8 + 2 Shared)'
-            : '12 KV Heads (GQA 4:1) · 2048 Sliding Window · Half-RoPE (64d) · LatentMoE 384 (Top-8 + 2 Shared)'}
+          {`STAGE 2: ATTENTION (${isGlobal ? 'GLOBAL CAUSAL' : 'LOCAL 2048w'})`}
         </Text>
-      </Billboard>
-
-      {/* 3D Floating Stage Titles Unified to Y=9.8 Sky Deck (2.05 safety clearance above Residual Skip Arches) */}
-      {/* Stage 1: Embedding & Norm */}
-      <Billboard follow={true} position={[-13.0, 9.8, 0]}>
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[4.5, 0.62]} />
-          <meshBasicMaterial color="#080c16" transparent opacity={0.94} depthWrite={true} />
-        </mesh>
-        <lineSegments position={[0, 0, 0]}>
-          <edgesGeometry args={[new THREE.PlaneGeometry(4.5, 0.62)]} />
-          <lineBasicMaterial color="#0284c7" transparent opacity={0.75} />
-        </lineSegments>
-        <Text position={[0, 0, 0.01]} fontSize={0.34} color="#7dd3fc" fontWeight={700} anchorX="center" anchorY="middle">
-          Embedding & Norm
+        <Text
+          position={[25.5, 0, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          fontSize={0.42}
+          color="#223048"
+          fontWeight={700}
+          anchorX="center"
+          anchorY="middle"
+        >
+          STAGE 3: LATENT MoE (384 EXPERTS + 2 SHARED)
         </Text>
-      </Billboard>
-
-      {/* Stage 2: Attention Branch (Elevated to Y=9.8, X=3.5, Z=-2.5 to completely avoid Residual Skip 1 label) */}
-      <Billboard follow={true} position={[3.5, 9.8, -2.5]}>
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[7.4, 0.62]} />
-          <meshBasicMaterial color="#080c16" transparent opacity={0.94} depthWrite={true} />
-        </mesh>
-        <lineSegments position={[0, 0, 0]}>
-          <edgesGeometry args={[new THREE.PlaneGeometry(7.4, 0.62)]} />
-          <lineBasicMaterial color="#9333ea" transparent opacity={0.75} />
-        </lineSegments>
-        <Text position={[0, 0, 0.01]} fontSize={0.34} color="#c084fc" fontWeight={700} anchorX="center" anchorY="middle">
-          {`Attention Branch (${isGlobal ? 'Global Causal' : 'Local 2048w'})`}
+        <Text
+          position={[40.0, 0, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          fontSize={0.42}
+          color="#223048"
+          fontWeight={700}
+          anchorX="center"
+          anchorY="middle"
+        >
+          STAGE 4: LM HEAD
         </Text>
-      </Billboard>
-
-      {/* Stage 3: LatentMoE Branch (Elevated to Y=9.8, X=18.5, Z=+2.2 to completely avoid MoE Residual Skip label) */}
-      <Billboard follow={true} position={[18.5, 9.8, 2.2]}>
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[9.4, 0.62]} />
-          <meshBasicMaterial color="#080c16" transparent opacity={0.94} depthWrite={true} />
-        </mesh>
-        <lineSegments position={[0, 0, 0]}>
-          <edgesGeometry args={[new THREE.PlaneGeometry(9.4, 0.62)]} />
-          <lineBasicMaterial color="#d97706" transparent opacity={0.75} />
-        </lineSegments>
-        <Text position={[0, 0, 0.01]} fontSize={0.34} color="#fbbf24" fontWeight={700} anchorX="center" anchorY="middle">
-          LatentMoE Branch (384 Experts · Top-8 + 2 Shared)
-        </Text>
-      </Billboard>
-
-      {/* Stage 5: Output & LM Head (Elevated to Y=9.8, X=30.5, Z=0) */}
-      <Billboard follow={true} position={[30.5, 9.8, 0]}>
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[5.2, 0.62]} />
-          <meshBasicMaterial color="#080c16" transparent opacity={0.94} depthWrite={true} />
-        </mesh>
-        <lineSegments position={[0, 0, 0]}>
-          <edgesGeometry args={[new THREE.PlaneGeometry(5.2, 0.62)]} />
-          <lineBasicMaterial color="#f43f5e" transparent opacity={0.75} />
-        </lineSegments>
-        <Text position={[0, 0, 0.01]} fontSize={0.34} color="#fb7185" fontWeight={700} anchorX="center" anchorY="middle">
-          Untied LM Head (128k)
-        </Text>
-      </Billboard>
+      </group>
 
       {/* ========================================================
           STAGE 1: INPUT & EMBEDDING
@@ -160,8 +115,8 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_tokens"
         label="Prompt Tokens"
         subLabel={`S=${activationData.tokens.length}`}
-        position={[-15.2, 2.0, 0]}
-        size={[1.2, 3.2, 0.6]}
+        position={[-16.5, 2.0, 0]}
+        size={[1.3, 3.2, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={1}
         colorTheme="cyan"
@@ -171,23 +126,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHoverCell={onHoverCell}
       />
 
-      {/* Input Tokens -> Embed Vector (precise surface docking) */}
+      {/* Input Tokens -> Embed Vector */}
       <FlowConnection
-        from={[-14.55, 2.0, 0]}
-        to={[-12.65, 2.0, 0.8]}
+        from={[-15.8, 2.0, 0]}
+        to={[-13.15, 2.0, 0.8]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('input_tokens') || isStep('token_embed'), ['node_tokens', 'node_embed'])}
-        label="Token Lookup"
-      />
-
-      {/* W_embed Weight Projection Flow (X-offset 2.2 for decoupling) */}
-      <FlowConnection
-        from={[-13.2, 2.0, -1.35]}
-        to={[-11.0, 2.0, 0.45]}
-        color="#64748b"
-        tubeRadius={0.018}
-        particleCount={4}
-        isHighlighted={isFlowActive(isStep('token_embed'), ['node_w_embed', 'node_embed'])}
+        label="Lookup"
       />
 
       {/* Token Embed Matrix W_embed (Weight) */}
@@ -195,7 +140,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_w_embed"
         label="W_embed (128k × 6144)"
         subLabel="Untied Embedding"
-        position={[-13.2, 2.0, -1.8]}
+        position={[-14.0, 2.0, -2.4]}
         size={[1.4, 3.2, 0.8]}
         gridRows={activationData.tokens.length}
         gridCols={16}
@@ -207,12 +152,22 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHoverCell={onHoverCell}
       />
 
+      {/* W_embed Weight Flow */}
+      <FlowConnection
+        from={[-14.0, 2.0, -1.95]}
+        to={[-11.5, 2.0, 0.45]}
+        color="#64748b"
+        tubeRadius={0.018}
+        particleCount={4}
+        isHighlighted={isFlowActive(isStep('token_embed'), ['node_w_embed', 'node_embed'])}
+      />
+
       {/* Embed Activation Vector */}
       <TensorMatrix
         id="node_embed"
         label="Embed Vector"
         subLabel={`S × 6144 (shown ${activationData.tokens.length} × 64)`}
-        position={[-11.0, 2.0, 0.8]}
+        position={[-11.5, 2.0, 0.8]}
         size={[64 * DIM_W, 3.2, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={64}
@@ -226,27 +181,29 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* Embed Vector -> Embed GatedNorm */}
       <FlowConnection
-        from={[-9.35, 2.0, 0.8]}
-        to={[-9.45, 2.0, 0]}
+        from={[-9.85, 2.0, 0.8]}
+        to={[-9.35, 2.0, 0]}
         color="#10b981"
         isHighlighted={isFlowActive(isStep('token_embed') || isStep('embed_gated_norm'), ['node_embed', 'op_embed_gn'])}
       />
 
+      {/* Embed GatedNorm */}
       <OperatorNode
         id="op_embed_gn"
         name="Embed GatedNorm"
         symbol="GN"
-        position={[-9.0, 2.0, 0]}
+        position={[-8.8, 2.0, 0]}
         color="#10b981"
         isHighlighted={isHighlighted('op_embed_gn')}
         onHover={onHoverItem}
         onClick={onClickItem}
+        labelPosition="bottom"
       />
 
       {/* Embed GN -> Pre-Attn GN */}
       <FlowConnection
-        from={[-8.5, 2.0, 0]}
-        to={[-7.7, 2.0, 0]}
+        from={[-8.25, 2.0, 0]}
+        to={[-7.35, 2.0, 0]}
         color="#10b981"
         isHighlighted={isFlowActive(isStep('embed_gated_norm') || isStep('pre_attn_gated_norm'), ['op_embed_gn', 'op_attn_gn'])}
         label="Pre-Attn Stream"
@@ -259,65 +216,30 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="op_attn_gn"
         name="Pre-Attn GatedNorm"
         symbol="GN"
-        position={[-7.2, 2.0, 0]}
+        position={[-6.8, 2.0, 0]}
         color="#10b981"
         isHighlighted={isHighlighted('op_attn_gn')}
         onHover={onHoverItem}
         onClick={onClickItem}
+        labelPosition="bottom"
       />
 
-      {/* High-Altitude Residual Bypass 1 (Attention Residual) apex Y=7.05, 2.75 clearance to banner (Y=9.8) */}
+      {/* High-Altitude Residual Bypass 1 (Attention Residual) */}
       <FlowConnection
-        from={[-7.2, 2.45, 0]}
-        to={[9.5, 2.45, 0]}
+        from={[-6.8, 2.45, 0]}
+        to={[13.5, 2.45, 0]}
         isResidual={true}
-        curveHeight={4.5}
+        curveHeight={5.5}
         isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['op_attn_gn', 'op_attn_add'])}
         label="Residual Skip 1 [6144]"
       />
 
-      {/* W_QKV Weights projection flow (retracted to background high [-5.0, 3.6, -4.6], zero occlusion) */}
-      <FlowConnection
-        from={[-6.75, 2.0, 0]}
-        to={[-5.75, 3.6, -4.6]}
-        color="#64748b"
-        tubeRadius={0.02}
-        particleCount={5}
-        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'node_w_qkv'])}
-      />
-
-      {/* Q, K, V Projection Splits: precise docking to matrix left faces */}
-      {/* Pre-Attn GN -> Q (upward natural arc) */}
-      <FlowConnection
-        from={[-6.75, 2.0, 0]}
-        to={[-3.65, 4.5, -2.2]}
-        color="#c084fc"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_q'])}
-        label="Q (48h)"
-      />
-      {/* Pre-Attn GN -> K (horizontal/negative-Z with subtle side curve) */}
-      <FlowConnection
-        from={[-6.75, 2.0, 0]}
-        to={[isGlobal ? -2.25 : -2.45, 2.0, -2.0]}
-        color="#c084fc"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_k'])}
-        label={`K (${kvHeads}h)`}
-      />
-      {/* Pre-Attn GN -> V (downward adaptive concave natural drop arc) */}
-      <FlowConnection
-        from={[-6.75, 2.0, 0]}
-        to={[isGlobal ? -2.25 : -2.45, -0.5, -1.5]}
-        color="#c084fc"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_v'])}
-        label={`V (${kvHeads}h)`}
-      />
-
-      {/* W_Q, W_K, W_V Weight Matrices: retracted to background high [-5.0, 3.6, -4.6], decoupled from Q */}
+      {/* W_QKV Weights Matrix */}
       <TensorMatrix
         id="node_w_qkv"
         label="W_Q, W_K, W_V Weights"
         subLabel="[6144 × 9216]"
-        position={[-5.0, 3.6, -4.6]}
+        position={[-4.6, 4.6, -4.5]}
         size={[1.4, 3.4, 0.8]}
         gridRows={16}
         gridCols={16}
@@ -330,12 +252,47 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* Q Matrix (high tier: Y=4.5, Z=-2.2, zero occlusion and penetration) */}
+      {/* W_QKV Weights projection flow */}
+      <FlowConnection
+        from={[-6.3, 2.0, 0]}
+        to={[-5.35, 4.6, -4.5]}
+        color="#64748b"
+        tubeRadius={0.02}
+        particleCount={5}
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'node_w_qkv'])}
+      />
+
+      {/* Pre-Attn GN -> Q */}
+      <FlowConnection
+        from={[-6.3, 2.0, 0]}
+        to={[-3.25, 4.8, -2.0]}
+        color="#818cf8"
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_q'])}
+        label="Q (48h)"
+      />
+      {/* Pre-Attn GN -> K */}
+      <FlowConnection
+        from={[-6.3, 2.0, 0]}
+        to={[isGlobal ? -1.85 : -2.05, 2.0, -2.0]}
+        color="#818cf8"
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_k'])}
+        label={`K (${kvHeads}h)`}
+      />
+      {/* Pre-Attn GN -> V */}
+      <FlowConnection
+        from={[-6.3, 2.0, 0]}
+        to={[isGlobal ? -1.85 : -2.05, -0.8, -1.5]}
+        color="#818cf8"
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_v'])}
+        label={`V (${kvHeads}h)`}
+      />
+
+      {/* Q Matrix */}
       <TensorMatrix
         id="node_q"
         label="Q (Query Heads)"
         subLabel="48 Heads × 128"
-        position={[-2.0, 4.5, -2.2]}
+        position={[-1.6, 4.8, -2.0]}
         size={[64 * DIM_W, 1.6, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={64}
@@ -348,12 +305,12 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.15}
       />
 
-      {/* K Matrix (mid tier: Y=2.0, Z=-2.0, ample clearance below Q) */}
+      {/* K Matrix */}
       <TensorMatrix
         id="node_k"
         label={`K (${kvHeads} KV Heads)`}
-        subLabel={isGlobal ? "⚡ GQA 8:1 (6 KV Heads · -50% Cache)" : "GQA 4:1 (12 KV Heads)"}
-        position={[-2.0, 2.0, -2.0]}
+        subLabel={isGlobal ? "GQA 8:1 (6 KV Heads)" : "GQA 4:1 (12 KV Heads)"}
+        position={[-1.6, 2.0, -2.0]}
         size={isGlobal ? [8 * DIM_W, 1.3, 0.3] : [16 * DIM_W, 1.3, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={isGlobal ? 8 : 16}
@@ -366,12 +323,12 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.08}
       />
 
-      {/* V Matrix (low tier: Y=-0.5, Z=-1.5, ample clearance below K) */}
+      {/* V Matrix */}
       <TensorMatrix
         id="node_v"
         label={`V (${kvHeads} KV Heads)`}
-        subLabel={isGlobal ? "⚡ GQA 8:1 (6 KV Heads · -50% Cache)" : "GQA 4:1 (12 KV Heads)"}
-        position={[-2.0, -0.5, -1.5]}
+        subLabel={isGlobal ? "GQA 8:1 (6 KV Heads)" : "GQA 4:1 (12 KV Heads)"}
+        position={[-1.6, -0.8, -1.5]}
         size={isGlobal ? [8 * DIM_W, 1.3, 0.3] : [16 * DIM_W, 1.3, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={isGlobal ? 8 : 16}
@@ -384,21 +341,21 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.08}
       />
 
-      {/* K into ShortConv: align precisely to K center height and depth */}
+      {/* K into ShortConv */}
       <FlowConnection
-        from={[isGlobal ? -1.75 : -1.55, 2.0, -2.0]}
-        to={[-1.1, 2.0, -2.0]}
+        from={[isGlobal ? -1.35 : -1.15, 2.0, -2.0]}
+        to={[-0.3, 2.0, -2.0]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('short_conv_k'), ['node_k', 'op_sconv_k'])}
         label="ShortConv K=4"
       />
 
-      {/* ShortConv Node: strictly aligned to [-0.6, 2.0, -2.0] */}
+      {/* ShortConv Node */}
       <OperatorNode
         id="op_sconv_k"
         name="ShortConv (K=4)"
         symbol="SC"
-        position={[-0.6, 2.0, -2.0]}
+        position={[0.2, 2.0, -2.0]}
         color="#38bdf8"
         isHighlighted={isHighlighted('op_sconv_k')}
         onHover={onHoverItem}
@@ -406,30 +363,30 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* ShortConv K into RoPE (upward natural arc) */}
+      {/* ShortConv K into RoPE */}
       <FlowConnection
-        from={[-0.1, 2.0, -2.0]}
-        to={[0.4, 3.1, -2.2]}
-        color="#c084fc"
+        from={[0.75, 2.0, -2.0]}
+        to={[1.6, 3.2, -2.0]}
+        color="#818cf8"
         isHighlighted={isFlowActive(isStep('q_k_norm_rope'), ['op_sconv_k', 'op_rope'])}
       />
 
-      {/* Q into RoPE (downward natural arc) */}
+      {/* Q into RoPE */}
       <FlowConnection
-        from={[-0.35, 4.5, -2.2]}
-        to={[0.4, 3.5, -2.2]}
-        color="#c084fc"
+        from={[0.05, 4.8, -2.0]}
+        to={[1.6, 3.6, -2.0]}
+        color="#818cf8"
         isHighlighted={isFlowActive(isStep('q_k_norm_rope'), ['node_q', 'op_rope'])}
         label={ropeLabel}
       />
 
-      {/* RoPE Node: concise label Half-RoPE [64/64], prevents clipping into Score Map */}
+      {/* RoPE Node */}
       <OperatorNode
         id="op_rope"
         name={isGlobal ? "100% NoPE (Off)" : "Half-RoPE [64/64]"}
         symbol={isGlobal ? "NoPE" : "Half-RoPE"}
-        position={[0.8, 3.3, -2.2]}
-        color={isGlobal ? "#6b7280" : "#c084fc"}
+        position={[2.1, 3.4, -2.0]}
+        color={isGlobal ? "#64748b" : "#818cf8"}
         isHighlighted={isHighlighted('op_rope')}
         onHover={onHoverItem}
         onClick={onClickItem}
@@ -437,33 +394,33 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelOffset={[0, 0.72, 0]}
       />
 
-      {/* RoPE (Q & K) to Attention Score Map (flow down into score matrix) */}
+      {/* RoPE to Attention Score Map */}
       <FlowConnection
-        from={[1.3, 3.3, -2.2]}
-        to={[2.75, 2.4, -1.8]}
-        color="#c084fc"
+        from={[2.65, 3.4, -2.0]}
+        to={[4.25, 2.4, -1.8]}
+        color="#818cf8"
         isHighlighted={isFlowActive(isStep('attention_weights'), ['op_rope', 'node_attn_matrix'])}
         label="Q · K^T / √d"
       />
 
-      {/* V to Attention Score Map (fly up naturally from low tier into score matrix) */}
+      {/* V to Attention Score Map */}
       <FlowConnection
-        from={[isGlobal ? -1.75 : -1.55, -0.5, -1.5]}
-        to={[2.75, 2.0, -1.8]}
-        color="#a855f7"
+        from={[isGlobal ? -1.35 : -1.15, -0.8, -1.5]}
+        to={[4.25, 2.0, -1.8]}
+        color="#818cf8"
         isHighlighted={isFlowActive(isStep('attention_weights') || isStep('attention_output'), ['node_v', 'node_attn_matrix'])}
         label="Attn · V"
       />
 
       {/* ========================================================
-          STAGE 3: ATTENTION MATRIX (SOFTMAX HEATMAP), XSA & HEAD GATE
+          STAGE 2B: ATTENTION MATRIX (SOFTMAX HEATMAP), XSA & HEAD GATE
           ======================================================== */}
-      {/* Attention Score Map: shifted right to [4.0, 2.2, -1.8], maintaining 0.55 clearance */}
+      {/* Attention Score Map */}
       <TensorMatrix
         id="node_attn_matrix"
         label="Attention Score Map"
         subLabel={windowLabel}
-        position={[4.0, 2.2, -1.8]}
+        position={[5.5, 2.2, -1.8]}
         size={[2.4, 2.4, 0.4]}
         gridRows={activationData.tokens.length}
         gridCols={activationData.tokens.length}
@@ -476,22 +433,22 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.12}
       />
 
-      {/* Attn Output to XSA (right face precisely connected to operator edge) */}
+      {/* Attn Output to XSA */}
       <FlowConnection
-        from={[5.25, 2.2, -1.8]}
-        to={[5.8, 2.2, -1.5]}
-        color="#e879f9"
+        from={[6.75, 2.2, -1.8]}
+        to={[7.75, 2.2, -1.4]}
+        color="#c084fc"
         isHighlighted={isFlowActive(isStep('xsa_decorrelation'), ['node_attn_matrix', 'op_xsa'])}
         label="XSA Decorr"
       />
 
-      {/* XSA Node: placed at [6.3, 2.2, -1.5] */}
+      {/* XSA Node */}
       <OperatorNode
         id="op_xsa"
         name="XSA (Decorrelate)"
         symbol="XSA"
-        position={[6.3, 2.2, -1.5]}
-        color="#e879f9"
+        position={[8.3, 2.2, -1.4]}
+        color="#c084fc"
         isHighlighted={isHighlighted('op_xsa')}
         onHover={onHoverItem}
         onClick={onClickItem}
@@ -500,20 +457,20 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* XSA to Head Gate */}
       <FlowConnection
-        from={[6.8, 2.2, -1.5]}
-        to={[7.3, 2.2, -0.8]}
-        color="#f43f5e"
+        from={[8.85, 2.2, -1.4]}
+        to={[9.85, 2.2, -0.8]}
+        color="#fb7185"
         isHighlighted={isFlowActive(isStep('head_gating'), ['op_xsa', 'op_head_gate'])}
         label="Gate 2·σ"
       />
 
-      {/* Head Gate Node: placed at [7.8, 2.2, -0.8] */}
+      {/* Head Gate Node */}
       <OperatorNode
         id="op_head_gate"
         name="Head Gate (2·σ)"
         symbol="HG"
-        position={[7.8, 2.2, -0.8]}
-        color="#f43f5e"
+        position={[10.4, 2.2, -0.8]}
+        color="#fb7185"
         isHighlighted={isHighlighted('op_head_gate')}
         onHover={onHoverItem}
         onClick={onClickItem}
@@ -522,19 +479,19 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* Head Gate to Attn Add */}
       <FlowConnection
-        from={[8.3, 2.2, -0.8]}
-        to={[9.0, 2.0, 0]}
+        from={[10.95, 2.2, -0.8]}
+        to={[13.0, 2.0, 0]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['op_head_gate', 'op_attn_add'])}
       />
 
-      {/* W_O Output Projection Weight: shifted to negative-Z background [7.8, 4.4, -2.4], no Head Gate occlusion */}
+      {/* W_O Output Projection Weight */}
       <TensorMatrix
         id="node_w_o"
         label="W_O Weight Matrix"
         subLabel="[6144 × 6144]"
-        position={[7.8, 4.4, -2.4]}
-        size={[1.2, 1.4, 0.6]}
+        position={[10.4, 4.8, -2.4]}
+        size={[1.3, 1.5, 0.6]}
         gridRows={8}
         gridCols={12}
         isWeight={true}
@@ -546,10 +503,10 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* W_O Weight into Attn Add (downward natural drop arc) */}
+      {/* W_O Weight into Attn Add */}
       <FlowConnection
-        from={[7.8, 3.65, -2.4]}
-        to={[9.4, 2.5, 0]}
+        from={[10.4, 4.0, -2.4]}
+        to={[13.3, 2.5, 0]}
         color="#64748b"
         tubeRadius={0.02}
         particleCount={5}
@@ -557,12 +514,12 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="W_O Proj"
       />
 
-      {/* Attn Add Node: [9.5, 2.0, 0] */}
+      {/* Attn Add Node */}
       <OperatorNode
         id="op_attn_add"
         name="Attn W_O + Res"
         symbol="+"
-        position={[9.5, 2.0, 0]}
+        position={[13.5, 2.0, 0]}
         color="#38bdf8"
         isHighlighted={isHighlighted('op_attn_add')}
         onHover={onHoverItem}
@@ -571,21 +528,21 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       />
 
       {/* ========================================================
-          STAGE 4: PRE-MOE GATEDNORM & 384 EXPERTS + 2 SHARED
+          STAGE 3: PRE-MOE GATEDNORM & 384 EXPERTS + 2 SHARED
           ======================================================== */}
       <FlowConnection
-        from={[10.0, 2.0, 0]}
-        to={[11.3, 2.0, 0]}
+        from={[14.05, 2.0, 0]}
+        to={[15.55, 2.0, 0]}
         color="#10b981"
         isHighlighted={isFlowActive(isStep('attn_proj_residual') || isStep('pre_moe_gated_norm'), ['op_attn_add', 'op_moe_gn'])}
       />
 
-      {/* Pre-MoE GatedNorm: placed at [11.8, 2.0, 0] */}
+      {/* Pre-MoE GatedNorm */}
       <OperatorNode
         id="op_moe_gn"
         name="Pre-MoE GatedNorm"
         symbol="GN"
-        position={[11.8, 2.0, 0]}
+        position={[16.1, 2.0, 0]}
         color="#10b981"
         isHighlighted={isHighlighted('op_moe_gn')}
         onHover={onHoverItem}
@@ -593,32 +550,33 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* MoE Bypass Residual High Arch (from [11.8, 2.45, 0] to [25.5, 2.45, 0], apex Y=7.05, 2.75 clearance to banner) */}
+      {/* MoE Bypass Residual High Arch */}
       <FlowConnection
-        from={[11.8, 2.45, 0]}
-        to={[25.5, 2.45, 0]}
+        from={[16.1, 2.45, 0]}
+        to={[35.0, 2.45, 0]}
         isResidual={true}
-        curveHeight={4.5}
+        curveHeight={5.5}
         isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['op_moe_gn', 'op_moe_add'])}
         label="MoE Residual Skip [6144]"
       />
 
-      {/* Pre-MoE GN Branch A: to QB Router (+Z branch: precise connection to Router [14.0, 2.0, 3.5] left face) */}
+      {/* --- LANE A: ROUTER & SHARED EXPERTS (UPPER LATERAL TIER) --- */}
+      {/* Flow to Router */}
       <FlowConnection
-        from={[12.3, 2.0, 0]}
-        to={[13.15, 2.0, 3.5]}
+        from={[16.65, 2.0, 0]}
+        to={[18.25, 2.2, 3.5]}
         color="#f59e0b"
         isHighlighted={isFlowActive(isStep('router_qb_selection'), ['op_moe_gn', 'node_router'])}
         label="Router In"
       />
 
-      {/* W_router Weight Matrix: placed at [13.8, 4.6, 3.8], high background board, 0.38 vertical clearance to Router */}
+      {/* W_router Weight Matrix */}
       <TensorMatrix
         id="node_w_router"
         label="W_router [6144 × 384]"
         subLabel="QB Router Projection"
-        position={[13.8, 4.6, 3.8]}
-        size={[1.3, 1.6, 0.6]}
+        position={[19.2, 5.0, 3.8]}
+        size={[1.4, 1.6, 0.6]}
         gridRows={12}
         gridCols={16}
         isWeight={true}
@@ -630,23 +588,23 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* W_router Weight into Router (downward concave natural drop arc) */}
+      {/* W_router Weight into Router */}
       <FlowConnection
-        from={[13.8, 3.75, 3.8]}
-        to={[14.0, 2.75, 3.5]}
+        from={[19.2, 4.15, 3.8]}
+        to={[19.2, 2.95, 3.5]}
         color="#64748b"
         tubeRadius={0.02}
         particleCount={4}
         isHighlighted={isFlowActive(isStep('router_qb_selection'), ['node_w_router', 'node_router'])}
       />
 
-      {/* Router Logits & QB Selection (384 experts, placed at [14.0, 2.0, 3.5]) */}
+      {/* Router Logits & QB Selection */}
       <TensorMatrix
         id="node_router"
         label="Router (Top-8 of 384)"
         subLabel="QB Threshold & Sigmoid"
-        position={[14.0, 2.0, 3.5]}
-        size={[1.6, 1.4, 0.5]}
+        position={[19.2, 2.2, 3.5]}
+        size={[1.8, 1.4, 0.5]}
         gridRows={activationData.tokens.length}
         gridCols={16}
         colorTheme="amber"
@@ -659,31 +617,31 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* Router Matrix to QB Operator */}
       <FlowConnection
-        from={[14.85, 2.0, 3.5]}
-        to={[15.7, 2.0, 3.5]}
+        from={[20.15, 2.2, 3.5]}
+        to={[21.65, 2.2, 3.5]}
         color="#f59e0b"
         isHighlighted={isFlowActive(isStep('router_qb_selection'), ['node_router', 'op_router_qb'])}
       />
 
-      {/* QB Routing Operator: placed at [16.2, 2.0, 3.5] */}
+      {/* QB Routing Operator */}
       <OperatorNode
         id="op_router_qb"
         name="QB Routing (Top 8)"
         symbol="QB"
-        position={[16.2, 2.0, 3.5]}
+        position={[22.2, 2.2, 3.5]}
         color="#f59e0b"
         isHighlighted={isHighlighted('op_router_qb')}
         onHover={onHoverItem}
         onClick={onClickItem}
-        labelPosition="top"
+        labelPosition="bottom"
       />
 
-      {/* 2 Concurrent Shared Experts (high tier [20.5, 4.5, 2.5]) */}
+      {/* 2 Concurrent Shared Experts (Elevated High-Capacity Highway) */}
       <TensorMatrix
         id="node_experts_shared"
         label="2 Shared Experts"
         subLabel="6144 → 3072 → 6144 (each)"
-        position={[20.5, 4.5, 2.5]}
+        position={[27.0, 5.2, 2.5]}
         size={[64 * DIM_W, 1.6, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={64}
@@ -696,21 +654,31 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* Pre-MoE GN Branch B: to Latent Down (downward natural drop arc, offset to X=15.6) */}
+      {/* Full-Width mlp_in into 2 Shared Experts */}
       <FlowConnection
-        from={[12.3, 2.0, 0]}
-        to={[14.75, 0.5, -0.6]}
+        from={[16.65, 2.2, 0]}
+        to={[25.35, 5.2, 2.5]}
+        color="#10b981"
+        isHighlighted={isFlowActive(isStep('shared_experts_swiglu'), ['op_moe_gn', 'node_experts_shared'])}
+        label="Full Width [6144]"
+      />
+
+      {/* --- LANE B: LATENT COMPRESSION & ROUTED EXPERTS (LOWER LATERAL TIER) --- */}
+      {/* Branch to Latent Down */}
+      <FlowConnection
+        from={[16.65, 2.0, 0]}
+        to={[18.15, 0.0, -1.0]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('latent_compression'), ['op_moe_gn', 'node_latent_down'])}
         label="Compress 6144→3072"
       />
 
-      {/* W_latent_down Weight Matrix: placed at [14.0, 0.5, -2.2] */}
+      {/* W_latent_down Weight Matrix */}
       <TensorMatrix
         id="node_w_latent_down"
         label="W_latent_down [6144 × 3072]"
         subLabel="Compression Matrix"
-        position={[14.0, 0.5, -2.2]}
+        position={[19.2, 0.0, -3.2]}
         size={[1.4, 1.4, 0.6]}
         gridRows={12}
         gridCols={12}
@@ -725,20 +693,20 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* W_latent_down Weight into Latent Down Matrix */}
       <FlowConnection
-        from={[14.0, 0.5, -1.85]}
-        to={[15.6, 0.5, -0.9]}
+        from={[19.2, 0.0, -2.85]}
+        to={[19.2, 0.0, -1.35]}
         color="#64748b"
         tubeRadius={0.02}
         particleCount={4}
         isHighlighted={isFlowActive(isStep('latent_compression'), ['node_w_latent_down', 'node_latent_down'])}
       />
 
-      {/* Compressed Latent Vector: shifted right to [15.6, 0.5, -0.6], fully offset from Router (X=14.0) */}
+      {/* Compressed Latent Vector */}
       <TensorMatrix
         id="node_latent_down"
         label="Latent Vector (3072)"
         subLabel="50% Comms Reduction"
-        position={[15.6, 0.5, -0.6]}
+        position={[19.8, 0.0, -1.0]}
         size={[32 * DIM_W, 1.4, 0.5]}
         gridRows={activationData.tokens.length}
         gridCols={32}
@@ -753,59 +721,50 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* Latent Down to Latent RMSNorm */}
       <FlowConnection
-        from={[16.45, 0.5, -0.6]}
-        to={[16.9, 0.5, -0.6]}
+        from={[20.65, 0.0, -1.0]}
+        to={[22.05, 0.0, -1.0]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('latent_compression'), ['node_latent_down', 'op_latent_norm'])}
         label="RMSNorm"
       />
 
-      {/* Latent RMSNorm: placed at [17.4, 0.5, -0.6], fully offset from QB Router (X=16.2) */}
+      {/* Latent RMSNorm Node */}
       <OperatorNode
         id="op_latent_norm"
         name="Latent RMSNorm"
         symbol="LN"
-        position={[17.4, 0.5, -0.6]}
+        position={[22.6, 0.0, -1.0]}
         color="#38bdf8"
         isHighlighted={isHighlighted('op_latent_norm')}
         onHover={onHoverItem}
         onClick={onClickItem}
-        labelPosition="top"
+        labelPosition="bottom"
       />
 
-      {/* QB Router to 8 Routed Experts: Gating dispatch (downward natural drop arc) */}
+      {/* QB Router to 8 Routed Experts: Gating dispatch */}
       <FlowConnection
-        from={[16.7, 2.0, 3.5]}
-        to={[19.15, 1.3, -1.2]}
+        from={[22.75, 2.2, 3.5]}
+        to={[27.35, 1.2, -1.2]}
         color="#f59e0b"
         isHighlighted={isFlowActive(isStep('router_qb_selection') || isStep('routed_experts_swiglu'), ['op_router_qb', 'node_experts_routed'])}
         label="Top-8 Gating Beam"
       />
 
-      {/* Latent RMSNorm into 8 Routed Experts (upward natural arc) */}
+      {/* Latent RMSNorm into 8 Routed Experts */}
       <FlowConnection
-        from={[17.9, 0.5, -0.6]}
-        to={[19.15, 1.1, -1.2]}
+        from={[23.15, 0.0, -1.0]}
+        to={[27.35, 0.8, -1.2]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('routed_experts_swiglu'), ['op_latent_norm', 'node_experts_routed'])}
         label="Latent [3072]"
       />
 
-      {/* Full-Width mlp_in into 2 Shared Experts (upward natural fly-in arc) */}
-      <FlowConnection
-        from={[12.3, 2.2, 0]}
-        to={[18.85, 4.5, 2.5]}
-        color="#10b981"
-        isHighlighted={isFlowActive(isStep('shared_experts_swiglu'), ['op_moe_gn', 'node_experts_shared'])}
-        label="Full Width [6144]"
-      />
-
-      {/* 8 Routed Half-Width Experts: located at low tier [20.0, 1.2, -1.2], right edge X=20.8 */}
+      {/* 8 Routed Half-Width Experts */}
       <TensorMatrix
         id="node_experts_routed"
-        label="8 Routed Half-Width Experts"
+        label="8 Routed Experts"
         subLabel="Top-8 Active SwiGLU (3072)"
-        position={[20.0, 1.2, -1.2]}
+        position={[28.2, 1.0, -1.2]}
         size={[32 * DIM_W, 1.8, 0.6]}
         gridRows={8}
         gridCols={32}
@@ -817,13 +776,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.1}
       />
 
-      {/* W_latent_up Weight Matrix: placed at [23.2, 0.6, -2.0], left edge X=22.6 with 1.8 clearance to Routed Experts */}
+      {/* W_latent_up Weight Matrix */}
       <TensorMatrix
         id="node_w_latent_up"
         label="W_latent_up"
         subLabel="[3072 × 6144]"
-        position={[23.2, 0.6, -2.0]}
-        size={[1.2, 1.4, 0.6]}
+        position={[31.8, 0.5, -2.4]}
+        size={[1.3, 1.4, 0.6]}
         gridRows={12}
         gridCols={12}
         isWeight={true}
@@ -835,23 +794,41 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={-0.1}
       />
 
-      {/* W_latent_up into MoE Add */}
+      {/* W_latent_up projected output → MoE Merge */}
       <FlowConnection
-        from={[23.2, 1.35, -1.7]}
-        to={[25.1, 1.8, -0.3]}
-        color="#64748b"
-        tubeRadius={0.02}
-        particleCount={5}
+        from={[31.8, 1.25, -2.1]}
+        to={[34.5, 1.8, -0.3]}
+        color="#f59e0b"
+        tubeRadius={0.035}
+        particleCount={8}
         isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['node_w_latent_up', 'op_moe_add'])}
-        label="Up 3072→6144"
+        label="Up-Projected [6144]"
       />
 
-      {/* MoE Residual Merge Node: placed at [25.5, 2.0, 0] */}
+      {/* Routed Experts → W_latent_up (matrix multiply 3072→6144) */}
+      <FlowConnection
+        from={[29.05, 1.0, -1.2]}
+        to={[31.15, 0.5, -2.4]}
+        color="#f59e0b"
+        isHighlighted={isFlowActive(isStep('routed_experts_swiglu') || isStep('moe_aggregation_residual'), ['node_experts_routed', 'node_w_latent_up'])}
+        label="Routed [3072] → W↑"
+      />
+
+      {/* Shared Experts to MoE Add */}
+      <FlowConnection
+        from={[28.65, 5.2, 2.5]}
+        to={[34.8, 2.4, 0.4]}
+        color="#10b981"
+        isHighlighted={isFlowActive(isStep('shared_experts_swiglu') || isStep('moe_aggregation_residual'), ['node_experts_shared', 'op_moe_add'])}
+        label="Shared Out"
+      />
+
+      {/* MoE Residual Merge Node */}
       <OperatorNode
         id="op_moe_add"
-        name="Latent Up & Merge"
+        name="MoE Add (Σ)"
         symbol="+"
-        position={[25.5, 2.0, 0]}
+        position={[35.0, 2.0, 0]}
         color="#f59e0b"
         isHighlighted={isHighlighted('op_moe_add')}
         onHover={onHoverItem}
@@ -859,40 +836,22 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* Shared Experts to MoE Add (downward natural drop arc) */}
-      <FlowConnection
-        from={[22.15, 4.5, 2.5]}
-        to={[25.5, 2.4, 0.4]}
-        color="#10b981"
-        isHighlighted={isFlowActive(isStep('shared_experts_swiglu') || isStep('moe_aggregation_residual'), ['node_experts_shared', 'op_moe_add'])}
-        label="Shared Out"
-      />
-
-      {/* Routed Experts to MoE Add (upward natural arc) */}
-      <FlowConnection
-        from={[20.85, 1.2, -1.2]}
-        to={[25.0, 1.9, 0]}
-        color="#f59e0b"
-        isHighlighted={isFlowActive(isStep('routed_experts_swiglu') || isStep('moe_aggregation_residual'), ['node_experts_routed', 'op_moe_add'])}
-        label="Routed Out"
-      />
-
       {/* ========================================================
-          STAGE 5: FINAL NORM & UNTIED LM HEAD
+          STAGE 4: FINAL NORM & UNTIED LM HEAD
           ======================================================== */}
       <FlowConnection
-        from={[26.0, 2.0, 0]}
-        to={[27.0, 2.0, 0]}
+        from={[35.55, 2.0, 0]}
+        to={[36.95, 2.0, 0]}
         color="#10b981"
         isHighlighted={isFlowActive(isStep('moe_aggregation_residual') || isStep('final_gated_norm'), ['op_moe_add', 'op_final_gn'])}
       />
 
-      {/* Final GatedNorm: placed at [27.5, 2.0, 0] */}
+      {/* Final GatedNorm */}
       <OperatorNode
         id="op_final_gn"
         name="Final GatedNorm"
         symbol="GN"
-        position={[27.5, 2.0, 0]}
+        position={[37.5, 2.0, 0]}
         color="#10b981"
         isHighlighted={isHighlighted('op_final_gn')}
         onHover={onHoverItem}
@@ -900,21 +859,21 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* Final GN to LM Head Logits (aligned precisely to LM Head [31.8, 2.0, 1.0] left face) */}
+      {/* Final GN to LM Head Logits */}
       <FlowConnection
-        from={[28.0, 2.0, 0]}
-        to={[30.95, 2.0, 1.0]}
-        color="#f43f5e"
+        from={[38.05, 2.0, 0]}
+        to={[41.55, 2.0, 0.8]}
+        color="#fb7185"
         isHighlighted={isFlowActive(isStep('final_gated_norm') || isStep('untied_lm_head'), ['op_final_gn', 'node_lm_head'])}
         label="Predict"
       />
 
-      {/* Untied LM Head Weight W_out: placed at [29.5, 2.0, -2.2], offset 2.3 from foreground LM Head (X=31.8) */}
+      {/* Untied LM Head Weight W_out */}
       <TensorMatrix
         id="node_w_lm_head"
-        label="W_out"
-        subLabel="[6144 × 128k]"
-        position={[29.5, 2.0, -2.2]}
+        label="W_out [6144 × 128k]"
+        subLabel="Untied Output Projection"
+        position={[40.0, 2.0, -2.5]}
         size={[1.4, 3.2, 0.8]}
         gridRows={16}
         gridCols={16}
@@ -927,23 +886,23 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* W_lm_head weight into LM Head (from W_out front face to LM Head back face) */}
+      {/* W_lm_head weight into LM Head */}
       <FlowConnection
-        from={[29.5, 2.0, -1.75]}
-        to={[31.8, 2.0, 0.65]}
+        from={[40.0, 2.0, -2.05]}
+        to={[42.4, 2.0, 0.45]}
         color="#64748b"
         tubeRadius={0.02}
         particleCount={5}
         isHighlighted={isFlowActive(isStep('untied_lm_head'), ['node_w_lm_head', 'node_lm_head'])}
-        label="Untied W_out [128k]"
+        label="Untied W_out"
       />
 
-      {/* LM Head Output Logits: placed at [31.8, 2.0, 1.0] */}
+      {/* LM Head Output Logits */}
       <TensorMatrix
         id="node_lm_head"
         label="Logits & Top-1 Token"
         subLabel="Vocab: 128,256"
-        position={[31.8, 2.0, 1.0]}
+        position={[42.4, 2.0, 0.8]}
         size={[1.6, 3.2, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={20}

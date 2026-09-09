@@ -10,6 +10,7 @@ interface CameraRigProps {
   autoFollow: boolean;
   onUserInteract?: () => void;
   resetTrigger?: number;
+  cameraMode?: 'perspective' | 'orthographic';
 }
 
 export const CameraRig: React.FC<CameraRigProps> = ({
@@ -18,6 +19,7 @@ export const CameraRig: React.FC<CameraRigProps> = ({
   autoFollow,
   onUserInteract,
   resetTrigger,
+  cameraMode,
 }) => {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const { camera } = useThree();

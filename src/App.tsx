@@ -22,18 +22,25 @@ import { simulateActivations, TokenCandidate } from './data/tokenSimulation';
 import { ViewMode } from './types/model';
 import { SamplingHUD } from './components/UI/SamplingHUD';
 
+// Default single_block overview camera: framed to fit the full forward-pass strip
+// spanning roughly x ∈ [-18, 44], so nothing is clipped at the viewport edges.
+const SINGLE_BLOCK_CAMERA: { pos: [number, number, number]; focus: [number, number, number] } = {
+  pos: [12.5, 20.0, 70.0],
+  focus: [12.5, 2.0, 0],
+};
+
 export function App() {
   const layers = useMemo(() => generateLayersMetadata(), []);
   const layerGroups = useMemo(() => generateLayerGroups(), []);
 
-  // View mode: default to 'quad_cycle' (the simplified 4-layer 3 Local + 1 Global unit!)
-  const [viewMode, setViewMode] = useState<ViewMode>('quad_cycle');
+  // View mode: default to 'single_block' (the comprehensive isolated layer architecture)
+  const [viewMode, setViewMode] = useState<ViewMode>('single_block');
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [selectedLayerIndex, setSelectedLayerIndex] = useState(0);
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [autoFollow, setAutoFollow] = useState(true);
+  const [autoFollow, setAutoFollow] = useState(false);
   const [tokens, setTokens] = useState<string[]>(DEFAULT_TOY_TOKENS);
   const [inspectedId, setInspectedId] = useState<string | null>(null);
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
@@ -53,6 +60,10 @@ export function App() {
   const [sampledToken, setSampledToken] = useState<TokenCandidate | null>(null);
   const hasAutoOpenedStep19 = React.useRef(false);
 
+  // Camera mode: perspective (default 3D) or orthographic (2.5D)
+  const [cameraMode, setCameraMode] = useState<'perspective' | 'orthographic'>('perspective');
+  const toggleCameraMode = () => setCameraMode(m => m === 'perspective' ? 'orthographic' : 'perspective');
+
   const handleToggleSamplingHUD = useCallback((open?: boolean) => {
     setIsSamplingHUDOpen((prev) => (open !== undefined ? open : !prev));
   }, []);
@@ -69,7 +80,7 @@ export function App() {
   }, []);
 
   const handleToggleNarratorCollapse = useCallback((collapsed?: boolean) => {
-    setIsNarratorCollapsed((prev) => {
+    setIsNarratorCollapsed((prev: boolean) => {
       const next = collapsed !== undefined ? collapsed : !prev;
       localStorage.setItem('marin_narrator_collapsed', String(next));
       return next;
@@ -111,25 +122,24 @@ export function App() {
     }
   }, [activeStep.id]);
 
-  // Camera presets & forced reset trigger
+  // Camera presets & forced reset trigger (calibrated for 55-70% viewport utilization)
   const [cameraOverride, setCameraOverride] = useState<{
     pos: [number, number, number];
     focus: [number, number, number];
-  } | null>(null);
+  } | null>({ ...SINGLE_BLOCK_CAMERA });
   const [resetTrigger, setResetTrigger] = useState(0);
   const [activeBranchFocus, setActiveBranchFocus] = useState<'attn' | 'moe'>('attn');
 
-  // Smooth reset to optimal overview angle (45° elevation)
+  // Smooth reset to optimal overview angle (gentle 14.5° elevation, perfect 1:1 framing)
   const handleResetCamera = useCallback(() => {
     if (viewMode === 'quad_cycle') {
       setCameraOverride({ pos: [-22, 24, 38], focus: [4, 1.5, 0] });
     } else if (viewMode === 'macro_stack') {
       setCameraOverride({ pos: [0, 8, 38], focus: [0, 2, 0] });
     } else {
-      // Single block optimal overview (Iso 45° tilt, clear visibility of all 5 stages)
-      setCameraOverride({ pos: [7, 22, 24], focus: [7, 2, 0] });
+      setCameraOverride({ ...SINGLE_BLOCK_CAMERA });
     }
-    setAutoFollow(true);
+    setAutoFollow(false);
     setResetTrigger((prev) => prev + 1);
   }, [viewMode]);
 
@@ -140,7 +150,7 @@ export function App() {
     } else if (viewMode === 'macro_stack') {
       setCameraOverride({ pos: [0, 42, 0.01], focus: [0, 0, 0] });
     } else {
-      setCameraOverride({ pos: [7, 34, 0.01], focus: [7, 0, 0] });
+      setCameraOverride({ pos: [13.0, 48.0, 0.01], focus: [13.0, 0, 0] });
     }
     setAutoFollow(false);
     setResetTrigger((prev) => prev + 1);
@@ -167,9 +177,9 @@ export function App() {
     const targetBranch = branch || (activeBranchFocus === 'attn' ? 'moe' : 'attn');
     setActiveBranchFocus(targetBranch);
     if (targetBranch === 'attn') {
-      setCameraOverride({ pos: [2, 11, 13], focus: [2, 2.5, -1.5] });
+      setCameraOverride({ pos: [3.5, 12.0, 24.0], focus: [3.5, 2.5, -1.0] });
     } else {
-      setCameraOverride({ pos: [17, 11, 14], focus: [17, 2.5, 1.0] });
+      setCameraOverride({ pos: [26.0, 12.0, 26.0], focus: [26.0, 2.5, 1.0] });
     }
     setAutoFollow(false);
     setResetTrigger((prev) => prev + 1);
@@ -190,10 +200,9 @@ export function App() {
     setCurrentGroupIndex(g);
     if (isolate) {
       setViewMode('single_block');
-      setAutoFollow(true);
+      setAutoFollow(false);
       setCameraOverride({
-        pos: [7, 20, 28],
-        focus: [7, 2, 0],
+        ...SINGLE_BLOCK_CAMERA,
       });
       setResetTrigger((prev) => prev + 1);
     }
@@ -337,11 +346,17 @@ export function App() {
         currentCameraFocus: [0, 2, 0] as [number, number, number],
       };
     }
+    if (!autoFollow) {
+      return {
+        currentCameraPos: SINGLE_BLOCK_CAMERA.pos,
+        currentCameraFocus: SINGLE_BLOCK_CAMERA.focus,
+      };
+    }
     return {
       currentCameraPos: activeStep.cameraPos,
       currentCameraFocus: activeStep.cameraFocus,
     };
-  }, [cameraOverride, viewMode, activeStep.cameraPos, activeStep.cameraFocus]);
+  }, [cameraOverride, viewMode, autoFollow, activeStep.cameraPos, activeStep.cameraFocus]);
 
   const effectiveStep = useMemo(() => {
     return {
@@ -354,7 +369,7 @@ export function App() {
   return (
     <div className="flex flex-col w-screen h-screen bg-[#07090e] text-slate-100 overflow-hidden select-none">
       {/* Top Header Navigation */}
-      <Header config={MARIN_535B_CONFIG} />
+      <Header config={MARIN_535B_CONFIG} currentLayer={currentLayer} viewMode={viewMode} />
 
       <div className="flex flex-1 relative overflow-hidden">
         {/* Center: 3D Stage Viewport */}
@@ -423,6 +438,8 @@ export function App() {
             autoFollow={autoFollow}
             onToggleAutoFollow={handleToggleAutoFollow}
             isSamplingHUDOpen={isSamplingHUDOpen}
+            cameraMode={cameraMode}
+            onToggleCameraMode={toggleCameraMode}
           />
 
           {/* Three.js 3D Scene */}
@@ -447,6 +464,7 @@ export function App() {
             hoveredItemId={hoveredItemId}
             flowSpeedMultiplier={0.5}
             resetTrigger={resetTrigger}
+            cameraMode={cameraMode}
           />
 
           {/* Floating Mathematical Formula / Design Tooltip (Collapsible Pill & Drawer) */}

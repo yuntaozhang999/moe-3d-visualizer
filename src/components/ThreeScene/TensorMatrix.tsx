@@ -1,8 +1,9 @@
 import React, { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
-import { Text, Billboard } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 import { HoveredCellInfo } from '../UI/CellHoverHUD';
+import { ScreenSpaceBillboard } from './ScreenSpaceBillboard';
 
 interface TensorMatrixProps {
   id: string;
@@ -212,8 +213,8 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
   };
 
   const borderColor = isHighlighted
-    ? (colorTheme === 'amber' ? '#f59e0b' : colorTheme === 'emerald' ? '#10b981' : colorTheme === 'purple' ? '#a855f7' : '#38bdf8')
-    : (isWeight ? '#475569' : '#334155');
+    ? (colorTheme === 'amber' ? '#f59e0b' : colorTheme === 'emerald' ? '#10b981' : colorTheme === 'purple' ? '#818cf8' : colorTheme === 'rose' ? '#fb7185' : '#38bdf8')
+    : (isWeight ? '#2e384d' : '#1e2838');
 
   return (
     <group position={position}>
@@ -237,10 +238,10 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
         <boxGeometry args={size} />
         <meshStandardMaterial
           map={texture}
-          roughness={isWeight ? 0.4 : 0.2}
-          metalness={isWeight ? 0.5 : 0.1}
+          roughness={isWeight ? 0.5 : 0.25}
+          metalness={isWeight ? 0.4 : 0.15}
           emissive={isHighlighted ? new THREE.Color(borderColor) : new THREE.Color('#000000')}
-          emissiveIntensity={isHighlighted ? 0.4 : 0}
+          emissiveIntensity={isHighlighted ? 0.35 : 0}
         />
       </mesh>
 
@@ -251,27 +252,26 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
           color={borderColor}
           linewidth={isHighlighted ? 2 : 1}
           transparent
-          opacity={isHighlighted ? 0.95 : 0.4}
+          opacity={isHighlighted ? 0.9 : 0.35}
         />
       </lineSegments>
 
-      {/* 3D Floating Header with High-Contrast Backdrop Pill & Billboard */}
-      <Billboard
-        follow={true}
-        position={[0, size[1] / 2 + (subLabel ? 0.48 : 0.38) + labelYOffset, 0]}
+      {/* 3D Floating Header with Distance-Compensated ScreenSpaceBillboard & High-Contrast Backdrop Pill */}
+      <ScreenSpaceBillboard
+        position={[0, size[1] / 2 + (subLabel ? 0.52 : 0.4) + labelYOffset, 0]}
       >
         {/* High-contrast dark pill backdrop */}
         <mesh position={[0, 0, -0.01]}>
           <planeGeometry
             args={[
-              Math.max(1.3, Math.max(label.length, subLabel?.length || 0) * 0.15 + 0.45),
-              subLabel ? 0.56 : 0.36,
+              Math.min(2.6, Math.max(1.1, Math.max(label.length, subLabel?.length || 0) * 0.105 + 0.34)),
+              subLabel ? 0.52 : 0.34,
             ]}
           />
           <meshBasicMaterial
-            color="#080c16"
+            color="#090c13"
             transparent
-            opacity={0.94}
+            opacity={0.95}
             depthWrite={true}
           />
         </mesh>
@@ -279,21 +279,21 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
           <edgesGeometry
             args={[
               new THREE.PlaneGeometry(
-                Math.max(1.3, Math.max(label.length, subLabel?.length || 0) * 0.15 + 0.45),
-                subLabel ? 0.56 : 0.36
+                Math.min(2.6, Math.max(1.1, Math.max(label.length, subLabel?.length || 0) * 0.105 + 0.34)),
+                subLabel ? 0.52 : 0.34
               ),
             ]}
           />
           <lineBasicMaterial
-            color={isHighlighted ? borderColor : '#334155'}
+            color={isHighlighted ? borderColor : '#243046'}
             transparent
-            opacity={0.8}
+            opacity={0.75}
           />
         </lineSegments>
 
         <Text
-          position={[0, subLabel ? 0.1 : 0, 0.01]}
-          fontSize={0.24}
+          position={[0, subLabel ? 0.12 : 0, 0.01]}
+          fontSize={0.21}
           color={isHighlighted ? '#ffffff' : '#e2e8f0'}
           anchorX="center"
           anchorY="middle"
@@ -305,7 +305,7 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
         {subLabel && (
           <Text
             position={[0, -0.14, 0.01]}
-            fontSize={0.16}
+            fontSize={0.15}
             color={isHighlighted ? '#93c5fd' : '#94a3b8'}
             anchorX="center"
             anchorY="middle"
@@ -313,12 +313,12 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
             {subLabel}
           </Text>
         )}
-      </Billboard>
+      </ScreenSpaceBillboard>
 
       {/* bbycroft-style Type Pill in 3D: [W] for Weight, [A] for Activation */}
       <mesh position={[-size[0] / 2 + 0.2, size[1] / 2 - 0.2, size[2] / 2 + 0.02]}>
         <planeGeometry args={[0.3, 0.25]} />
-        <meshBasicMaterial color={isWeight ? '#334155' : '#0284c7'} />
+        <meshBasicMaterial color={isWeight ? '#243046' : '#4f46e5'} />
       </mesh>
       <Text
         position={[-size[0] / 2 + 0.2, size[1] / 2 - 0.2, size[2] / 2 + 0.04]}

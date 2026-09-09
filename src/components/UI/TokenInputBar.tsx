@@ -40,9 +40,9 @@ export const TokenInputBar: React.FC<TokenInputBarProps> = ({
   };
 
   return (
-    <div className="absolute top-16 left-4 z-20 bg-[#0b0f19]/90 backdrop-blur-md border border-slate-800/80 rounded-xl p-2.5 shadow-xl flex items-center space-x-3 text-xs select-none">
+    <div className="absolute top-16 left-4 z-20 bg-[#090c13]/90 backdrop-blur-md border border-white/10 rounded-xl p-2.5 shadow-xl flex items-center space-x-3 text-xs select-none">
       <div className="flex items-center space-x-1.5 text-slate-400 font-mono pl-1">
-        <Type className="w-3.5 h-3.5 text-sky-400" />
+        <Type className="w-3.5 h-3.5 text-slate-300" />
         <span className="text-[11px] font-semibold text-slate-300">Prompt:</span>
       </div>
 
@@ -54,12 +54,12 @@ export const TokenInputBar: React.FC<TokenInputBarProps> = ({
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleApply()}
             placeholder="Type words..."
-            className="bg-slate-900 border border-sky-500/50 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none w-56"
+            className="bg-[#121620] border border-white/20 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none w-56"
             autoFocus
           />
           <button
             onClick={handleApply}
-            className="px-2 py-1 bg-sky-500 hover:bg-sky-400 text-white rounded font-medium text-[11px]"
+            className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-medium text-[11px] transition-colors"
           >
             Apply
           </button>
@@ -67,13 +67,13 @@ export const TokenInputBar: React.FC<TokenInputBarProps> = ({
       ) : (
         <div
           onClick={() => setIsEditing(true)}
-          className="flex items-center space-x-1.5 cursor-pointer hover:bg-slate-800/60 px-2 py-1 rounded transition-colors"
+          className="flex items-center space-x-1.5 cursor-pointer hover:bg-[#161b26] px-2 py-1 rounded transition-colors"
           title="Click to edit prompt words"
         >
           {tokens.map((tok, idx) => (
             <span
               key={idx}
-              className="px-2 py-0.5 rounded bg-slate-800/90 border border-slate-700 font-mono text-sky-300 text-xs shadow-sm"
+              className="px-2 py-0.5 rounded bg-[#161b26] border border-white/10 font-mono text-slate-200 text-xs shadow-sm"
             >
               {tok}
             </span>
@@ -83,10 +83,10 @@ export const TokenInputBar: React.FC<TokenInputBarProps> = ({
       )}
 
       {/* Predicted Next Token (Argmax baseline) */}
-      <div className="flex items-center space-x-1.5 pl-2 border-l border-slate-800">
+      <div className="flex items-center space-x-1.5 pl-2 border-l border-white/10">
         <ArrowRight className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
         <span className="text-slate-400 text-[11px]">Top Next:</span>
-        <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-600/70 font-mono font-bold text-emerald-300 shadow-sm">
+        <span className="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/40 font-mono font-bold text-emerald-300 shadow-sm">
           "{activationData.nextTokens[0]?.token}"
         </span>
         <span className="text-[10px] font-mono text-emerald-400/80">

@@ -46,11 +46,11 @@ export const Controls: React.FC<ControlsProps> = ({
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-20 bg-[#0b0f19]/95 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 shadow-2xl flex flex-col space-y-2 select-none">
+    <div className="absolute bottom-4 left-4 right-4 z-20 bg-[#090c13]/95 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-2xl flex flex-col space-y-2 select-none">
       {/* Top row: Current Step Name & Progress bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-indigo-950 border border-indigo-700/60 text-indigo-300">
+          <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-[#161b26] border border-white/10 text-indigo-300">
             {currentStep.category}
           </span>
           <h3 className="text-xs font-semibold text-slate-100">
@@ -58,7 +58,7 @@ export const Controls: React.FC<ControlsProps> = ({
           </h3>
         </div>
         <div className="text-xs font-mono text-slate-400">
-          Step <strong className="text-sky-400">{currentStepIndex + 1}</strong> of {steps.length}
+          Step <strong className="text-indigo-400">{currentStepIndex + 1}</strong> of {steps.length}
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export const Controls: React.FC<ControlsProps> = ({
           max={steps.length - 1}
           value={currentStepIndex}
           onChange={(e) => onSelectStep(Number(e.target.value))}
-          className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400 hover:accent-sky-300"
+          className="w-full h-1.5 bg-[#161b26] rounded-lg appearance-none cursor-pointer accent-indigo-400 hover:accent-indigo-300"
         />
       </div>
 
@@ -80,7 +80,7 @@ export const Controls: React.FC<ControlsProps> = ({
         <div className="flex items-center space-x-1.5">
           <button
             onClick={onReset}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+            className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 text-slate-300 hover:text-white transition-colors"
             title="Reset to Beginning"
           >
             <RotateCcw className="w-4 h-4" />
@@ -89,7 +89,7 @@ export const Controls: React.FC<ControlsProps> = ({
           <button
             onClick={onPrevStep}
             disabled={currentStepIndex === 0}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 transition-colors"
+            className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 hover:text-white transition-colors"
             title="Previous Step"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -97,10 +97,10 @@ export const Controls: React.FC<ControlsProps> = ({
 
           <button
             onClick={onTogglePlay}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-lg transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-md transition-all ${
               isPlaying
-                ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-500/20'
-                : 'bg-sky-500 hover:bg-sky-400 text-white shadow-sky-500/20'
+                ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
             }`}
           >
             {isPlaying ? (
@@ -119,7 +119,7 @@ export const Controls: React.FC<ControlsProps> = ({
           <button
             onClick={onNextStep}
             disabled={currentStepIndex === steps.length - 1}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 transition-colors"
+            className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 hover:text-white transition-colors"
             title="Next Step"
           >
             <ChevronRight className="w-4 h-4" />
@@ -135,10 +135,10 @@ export const Controls: React.FC<ControlsProps> = ({
         {onToggleNarrator && (
           <button
             onClick={onToggleNarrator}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all select-none ${
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all select-none border ${
               isNarratorActive
-                ? 'bg-indigo-500/25 border border-indigo-400/80 text-indigo-200 shadow-sm shadow-indigo-500/20'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60'
+                ? 'bg-[#1e2434] border-indigo-500/50 text-indigo-200'
+                : 'bg-[#141924] hover:bg-[#1c2230] border-white/10 text-slate-300 hover:text-white'
             }`}
             title={isNarratorActive ? "Collapse step walkthrough & formula card (Shortcut: M)" : "Expand step walkthrough & formula card (Shortcut: M)"}
           >
@@ -152,16 +152,16 @@ export const Controls: React.FC<ControlsProps> = ({
         {onToggleInspector && (
           <button
             onClick={onToggleInspector}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all select-none ${
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all select-none border ${
               isInspectorActive
-                ? 'bg-sky-500/25 border border-sky-400/80 text-sky-200 shadow-sm shadow-sky-500/20'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60'
+                ? 'bg-[#1e2434] border-indigo-500/50 text-indigo-200'
+                : 'bg-[#141924] hover:bg-[#1c2230] border-white/10 text-slate-300 hover:text-white'
             }`}
             title={isInspectorActive ? "Collapse/Close formula inspector" : "Expand mathematical formula & operator details"}
           >
             <span className="text-xs">📐</span>
             <span>Formulas</span>
-            <span className={`w-1.5 h-1.5 rounded-full ${isInspectorActive ? 'bg-sky-400 animate-pulse' : 'bg-slate-500'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isInspectorActive ? 'bg-indigo-400 animate-pulse' : 'bg-slate-500'}`} />
           </button>
         )}
 
@@ -169,12 +169,12 @@ export const Controls: React.FC<ControlsProps> = ({
         {onToggleSamplingHUD && (
           <button
             onClick={onToggleSamplingHUD}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all select-none ${
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all select-none border ${
               isSamplingHUDOpen
-                ? 'bg-amber-500/25 border border-amber-400/80 text-amber-200 shadow-sm shadow-amber-500/20'
+                ? 'bg-[#1e2434] border-amber-500/50 text-amber-200'
                 : isStep19
-                ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-400/60 shadow-sm shadow-amber-500/30'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60'
+                ? 'bg-[#1e2434] border-amber-500/40 text-amber-300 shadow-sm'
+                : 'bg-[#141924] hover:bg-[#1c2230] border-white/10 text-slate-300 hover:text-white'
             }`}
             title={
               isSamplingHUDOpen

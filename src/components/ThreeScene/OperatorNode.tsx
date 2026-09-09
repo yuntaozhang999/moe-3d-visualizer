@@ -1,6 +1,7 @@
 import React from 'react';
 import * as THREE from 'three';
-import { Text, Billboard } from '@react-three/drei';
+import { Text } from '@react-three/drei';
+import { ScreenSpaceBillboard } from './ScreenSpaceBillboard';
 
 interface OperatorNodeProps {
   id: string;
@@ -45,21 +46,21 @@ export const OperatorNode: React.FC<OperatorNodeProps> = ({
       >
         <cylinderGeometry args={[0.45, 0.45, 0.15, 32]} />
         <meshStandardMaterial
-          color={isHighlighted ? color : '#1e293b'}
+          color={isHighlighted ? color : '#121722'}
           emissive={new THREE.Color(color)}
-          emissiveIntensity={isHighlighted ? 0.7 : 0.2}
-          roughness={0.3}
-          metalness={0.7}
+          emissiveIntensity={isHighlighted ? 0.5 : 0.12}
+          roughness={0.4}
+          metalness={0.6}
         />
       </mesh>
 
       {/* Outer Halo Ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.52, 0.03, 16, 64]} />
+        <torusGeometry args={[0.52, 0.025, 16, 64]} />
         <meshBasicMaterial
           color={color}
           transparent
-          opacity={isHighlighted ? 0.9 : 0.4}
+          opacity={isHighlighted ? 0.75 : 0.25}
         />
       </mesh>
 
@@ -75,21 +76,20 @@ export const OperatorNode: React.FC<OperatorNodeProps> = ({
         {symbol}
       </Text>
 
-      {/* Operator Name with Billboard & High-Contrast Pill Backdrop */}
-      <Billboard
-        follow={true}
+      {/* Operator Name with Distance-Compensated ScreenSpaceBillboard & High-Contrast Pill Backdrop */}
+      <ScreenSpaceBillboard
         position={
           labelOffset
             ? labelOffset
             : labelPosition === 'top'
-            ? [0, 0.72, 0]
-            : [0, -0.72, 0]
+            ? [0, 0.76, 0]
+            : [0, -0.76, 0]
         }
       >
         <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[Math.max(1.0, name.length * 0.14 + 0.38), 0.34]} />
+          <planeGeometry args={[Math.min(2.4, Math.max(1.0, name.length * 0.105 + 0.34)), 0.34]} />
           <meshBasicMaterial
-            color="#080c16"
+            color="#090c13"
             transparent
             opacity={0.94}
             depthWrite={true}
@@ -99,28 +99,28 @@ export const OperatorNode: React.FC<OperatorNodeProps> = ({
           <edgesGeometry
             args={[
               new THREE.PlaneGeometry(
-                Math.max(1.0, name.length * 0.14 + 0.38),
+                Math.min(2.4, Math.max(1.0, name.length * 0.105 + 0.34)),
                 0.34
               ),
             ]}
           />
           <lineBasicMaterial
-            color={isHighlighted ? color : '#334155'}
+            color={isHighlighted ? color : '#243046'}
             transparent
-            opacity={0.75}
+            opacity={0.7}
           />
         </lineSegments>
         <Text
           position={[0, 0, 0.01]}
           fontSize={0.19}
-          color={isHighlighted ? '#ffffff' : '#94a3b8'}
+          color={isHighlighted ? '#ffffff' : '#cbd5e1'}
           anchorX="center"
           anchorY="middle"
           fontWeight={600}
         >
           {name}
         </Text>
-      </Billboard>
+      </ScreenSpaceBillboard>
     </group>
   );
 };

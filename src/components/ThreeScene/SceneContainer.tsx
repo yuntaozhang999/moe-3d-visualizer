@@ -27,6 +27,7 @@ interface SceneContainerProps {
   hoveredItemId?: string | null;
   flowSpeedMultiplier?: number;
   resetTrigger?: number;
+  cameraMode?: 'perspective' | 'orthographic';
 }
 
 export const SceneContainer: React.FC<SceneContainerProps> = ({
@@ -48,21 +49,27 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
   hoveredItemId,
   flowSpeedMultiplier = 0.5,
   resetTrigger,
+  cameraMode = 'perspective',
 }) => {
   // Adjust spatial ground grid height to eliminate clipping with single_block / quad_cycle floor
   const gridY = viewMode === 'macro_stack' ? -2.5 : -0.01;
 
   return (
-    <div className="w-full h-full relative bg-[#07090e]">
+    <div className="w-full h-full relative bg-[#08090e]">
       <Canvas
-        camera={{ position: cameraPos, fov: 42 }}
+        camera={
+          cameraMode === 'orthographic'
+            ? { position: cameraPos, zoom: 28, near: 0.1, far: 200 }
+            : { position: cameraPos, fov: 36 }
+        }
+        orthographic={cameraMode === 'orthographic'}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
         {/* Ambient & Directional Lights */}
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[20, 30, 20]} intensity={1.5} castShadow />
-        <directionalLight position={[-20, -10, -20]} intensity={0.5} color="#38bdf8" />
-        <pointLight position={[4, 15, 0]} intensity={1.0} color="#818cf8" />
+        <ambientLight intensity={1.1} />
+        <directionalLight position={[20, 32, 20]} intensity={1.3} castShadow />
+        <directionalLight position={[-20, -10, -20]} intensity={0.4} color="#818cf8" />
+        <pointLight position={[13, 16, 0]} intensity={0.8} color="#cbd5e1" />
 
         {/* Global Flow Context for synchronized speeds */}
         <FlowProvider speedMultiplier={flowSpeedMultiplier}>
@@ -104,10 +111,10 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
           )}
         </FlowProvider>
 
-        {/* Spatial Ground Grid */}
+        {/* Subtle Obsidian Ground Grid */}
         <gridHelper
-          args={[100, 100, '#1e293b', '#0f172a']}
-          position={[0, gridY, 0]}
+          args={[120, 60, '#141a26', '#0c1018']}
+          position={[13.0, gridY, 0]}
         />
 
         {/* Camera Rig with Smooth Orbit & Position Lerping */}
@@ -117,6 +124,7 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
           autoFollow={autoFollow}
           onUserInteract={onUserInteract}
           resetTrigger={resetTrigger}
+          cameraMode={cameraMode}
         />
       </Canvas>
     </div>

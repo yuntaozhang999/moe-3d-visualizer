@@ -1,7 +1,8 @@
 import React, { useRef, useMemo, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Text, Billboard } from '@react-three/drei';
+import { Text } from '@react-three/drei';
+import { ScreenSpaceBillboard } from './ScreenSpaceBillboard';
 
 export interface FlowContextValue {
   speedMultiplier: number;
@@ -124,10 +125,34 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
 
     if (isResidual) {
-      // Residual connection: maintain high flying arch, supports explicit curveHeight or dynamic calculation
-      mid.y += curveHeight || Math.max(2.6, dist * 0.22);
-      mid.z += 0.5;
-    } else if (curveHeight !== undefined && curveHeight !== 0) {
+      // Filleted Orthogonal Manhattan Residual Bus:
+      // Rises vertically, turns 90° with fillet, runs horizontal parallel to pipeline, turns 90° down into target
+      const yBus = Math.max(start.y, end.y) + (curveHeight ? Math.min(curveHeight, 1.6) : 1.4);
+      const zBus = start.z;
+      const r = 0.35; // Fillet corner radius
+      
+      const p0 = start.clone();
+      const p1 = new THREE.Vector3(start.x, yBus - r, zBus);
+      const c1 = new THREE.Vector3(start.x, yBus, zBus);
+      const p2 = new THREE.Vector3(start.x + r, yBus, zBus);
+      const p3 = new THREE.Vector3(end.x - r, yBus, zBus);
+      const c2 = new THREE.Vector3(end.x, yBus, zBus);
+      const p4 = new THREE.Vector3(end.x, yBus - r, zBus);
+      const p5 = end.clone();
+
+      const path = new THREE.CurvePath<THREE.Vector3>();
+      if (p0.distanceTo(p1) > 0.01) path.add(new THREE.LineCurve3(p0, p1));
+      path.add(new THREE.QuadraticBezierCurve3(p1, c1, p2));
+      if (p2.distanceTo(p3) > 0.01) path.add(new THREE.LineCurve3(p2, p3));
+      path.add(new THREE.QuadraticBezierCurve3(p3, c2, p4));
+      if (p4.distanceTo(p5) > 0.01) path.add(new THREE.LineCurve3(p4, p5));
+
+      const pts = path.getPoints(64);
+      const mid = new THREE.Vector3((start.x + end.x) * 0.5, yBus, zBus);
+      return { curve: path as THREE.Curve<THREE.Vector3>, linePoints: pts, midPoint: mid, distance: dist };
+    }
+
+    if (curveHeight !== undefined && curveHeight !== 0) {
       // Explicit curveHeight passed (supports positive convex arch and negative drop)
       mid.y += curveHeight;
     } else {
@@ -162,7 +187,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
 
     const c = new THREE.QuadraticBezierCurve3(start, mid, end);
     const pts = c.getPoints(40);
-    return { curve: c, linePoints: pts, midPoint: mid, distance: dist };
+    return { curve: c as THREE.Curve<THREE.Vector3>, linePoints: pts, midPoint: mid, distance: dist };
   }, [from, to, isResidual, curveHeight, reverse]);
 
   // Dynamic particle count: more particles for long or highlighted connections
@@ -173,7 +198,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     return Math.max(6, Math.round((isHighlighted ? 14 : 9) * mult));
   }, [particleCount, isResidual, isHighlighted, effectiveDensityMultiplier, distance]);
 
-  const baseColor = isResidual ? '#ff2a5f' : color;
+  const baseColor = isResidual ? '#fb7185' : color;
 
   // Tube geometry for glowing conduit sheath
   const tubeRadius =
@@ -183,8 +208,8 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
       : (isHighlighted ? 0.048 : 0.032));
   const tubeGeometry = useMemo(() => {
     if (!curve) return new THREE.BufferGeometry();
-    return new THREE.TubeGeometry(curve, 36, tubeRadius, 8, false);
-  }, [curve, tubeRadius]);
+    return new THREE.TubeGeometry(curve, isResidual ? 64 : 36, tubeRadius, 8, false);
+  }, [curve, tubeRadius, isResidual]);
 
   // Core fiber line for crisp definition
   const lineObject = useMemo(() => {
@@ -292,11 +317,11 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
           ref={tubeMatRef}
           color={baseColor}
           emissive={baseColor}
-          emissiveIntensity={isHighlighted ? 1.4 : (isHovered ? 0.9 : (isResidual ? 0.85 : 0.55))}
+          emissiveIntensity={isHighlighted ? 1.0 : (isHovered ? 0.7 : (isResidual ? 0.5 : 0.3))}
           transparent={true}
-          opacity={isHighlighted ? 0.75 : (isHovered ? 0.6 : (isResidual ? 0.46 : 0.32))}
-          roughness={0.2}
-          metalness={0.1}
+          opacity={isHighlighted ? 0.7 : (isHovered ? 0.5 : (isResidual ? 0.4 : 0.28))}
+          roughness={0.25}
+          metalness={0.15}
           depthWrite={false}
         />
       </mesh>
@@ -313,7 +338,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
         <meshBasicMaterial
           color={baseColor}
           transparent={true}
-          opacity={isResidual ? (isHighlighted ? 1.0 : 0.88) : (isHighlighted ? 0.95 : 0.78)}
+          opacity={isResidual ? (isHighlighted ? 0.95 : 0.8) : (isHighlighted ? 0.9 : 0.7)}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           toneMapped={false}
@@ -331,7 +356,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
           <meshBasicMaterial
             color={baseColor}
             transparent={true}
-            opacity={0.5}
+            opacity={0.4}
             side={THREE.DoubleSide}
             depthWrite={false}
           />
@@ -340,15 +365,14 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
 
       {/* Filtered & De-noised Floating 3D Tag: Only render if highlighted, residual, or hovered */}
       {label && (isHighlighted || isResidual || isHovered) && (
-        <Billboard
-          follow={true}
-          position={[midPoint.x, midPoint.y + (isResidual ? 0.72 : 0.45), midPoint.z]}
+        <ScreenSpaceBillboard
+          position={[midPoint.x, midPoint.y + (isResidual ? 0.38 : 0.45), midPoint.z]}
         >
           {/* Semi-transparent dark pill backdrop for ultra-high contrast */}
           <mesh position={[0, 0, -0.01]}>
-            <planeGeometry args={[Math.max(1.1, label.length * 0.15 + 0.42), 0.38]} />
+            <planeGeometry args={[Math.max(1.1, label.length * 0.15 + 0.42), 0.36]} />
             <meshBasicMaterial
-              color="#070a12"
+              color="#090c13"
               transparent
               opacity={0.94}
               depthWrite={true}
@@ -359,27 +383,27 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
               args={[
                 new THREE.PlaneGeometry(
                   Math.max(1.1, label.length * 0.15 + 0.42),
-                  0.38
+                  0.36
                 ),
               ]}
             />
             <lineBasicMaterial
-              color={isHighlighted ? '#38bdf8' : (isResidual ? '#ff2a5f' : '#334155')}
+              color={isHighlighted ? '#38bdf8' : (isResidual ? '#fb7185' : '#243046')}
               transparent
-              opacity={0.75}
+              opacity={0.7}
             />
           </lineSegments>
           <Text
             position={[0, 0, 0.01]}
-            fontSize={0.24}
-            color={isHighlighted ? '#ffffff' : (isResidual ? '#fda4af' : '#cbd5e1')}
+            fontSize={0.21}
+            color={isHighlighted ? '#ffffff' : (isResidual ? '#fecdd3' : '#cbd5e1')}
             anchorX="center"
             anchorY="middle"
             fontWeight={600}
           >
             {label}
           </Text>
-        </Billboard>
+        </ScreenSpaceBillboard>
       )}
     </group>
   );
