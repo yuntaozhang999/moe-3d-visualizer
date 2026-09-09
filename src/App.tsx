@@ -10,7 +10,6 @@ import { LayerDetailModal } from './components/UI/LayerDetailModal';
 import { WalkthroughNarrator } from './components/UI/WalkthroughNarrator';
 import { CellHoverHUD, HoveredCellInfo } from './components/UI/CellHoverHUD';
 import { CameraPresetsBar } from './components/UI/CameraPresetsBar';
-import { FlowDynamicsHUD } from './components/UI/FlowDynamicsHUD';
 import { SceneContainer } from './components/ThreeScene/SceneContainer';
 import { IsolatedLayerBanner } from './components/UI/IsolatedLayerBanner';
 import {
@@ -98,17 +97,6 @@ export function App() {
     localStorage.setItem('marin_inspector_collapsed', 'false');
   }, [currentStepIndex]);
 
-  // Flow dynamics & particle swarm control
-  const [flowSpeedMultiplier, setFlowSpeedMultiplier] = useState(1.0);
-  const [flowDensity, setFlowDensity] = useState<'normal' | 'dense' | 'ultra'>('dense');
-  const [isBurstActive, setIsBurstActive] = useState(false);
-
-  const handleTriggerTokenBurst = useCallback(() => {
-    setIsBurstActive(true);
-    setTimeout(() => {
-      setIsBurstActive(false);
-    }, 2400);
-  }, []);
 
   // Synchronize group and selected layer
   const currentGroup = layerGroups[currentGroupIndex] || layerGroups[0];
@@ -451,16 +439,6 @@ export function App() {
             onToggleAutoFollow={() => setAutoFollow(!autoFollow)}
           />
 
-          {/* Interactive Flow Dynamics HUD */}
-          <FlowDynamicsHUD
-            flowSpeedMultiplier={flowSpeedMultiplier}
-            onChangeFlowSpeed={setFlowSpeedMultiplier}
-            flowDensity={flowDensity}
-            onChangeFlowDensity={setFlowDensity}
-            onTriggerTokenBurst={handleTriggerTokenBurst}
-            isBurstActive={isBurstActive}
-          />
-
           {/* Three.js 3D Scene */}
           <SceneContainer
             viewMode={viewMode}
@@ -481,9 +459,7 @@ export function App() {
             onUserInteract={() => setAutoFollow(false)}
             inspectedId={inspectedId}
             hoveredItemId={hoveredItemId}
-            flowSpeedMultiplier={flowSpeedMultiplier}
-            flowDensity={flowDensity}
-            isBurstActive={isBurstActive}
+            flowSpeedMultiplier={0.5}
             resetTrigger={resetTrigger}
           />
 

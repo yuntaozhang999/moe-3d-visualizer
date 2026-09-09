@@ -10,7 +10,7 @@ export interface FlowContextValue {
 }
 
 export const FlowContext = React.createContext<FlowContextValue>({
-  speedMultiplier: 1.0,
+  speedMultiplier: 0.5,
   densityMultiplier: 1.0,
   isBurstActive: false,
 });
@@ -20,7 +20,7 @@ export const FlowProvider: React.FC<{
   densityMultiplier?: number;
   isBurstActive?: boolean;
   children: React.ReactNode;
-}> = ({ speedMultiplier = 1.0, densityMultiplier = 1.0, isBurstActive = false, children }) => {
+}> = ({ speedMultiplier = 0.5, densityMultiplier = 1.0, isBurstActive = false, children }) => {
   const value = useMemo(
     () => ({ speedMultiplier, densityMultiplier, isBurstActive }),
     [speedMultiplier, densityMultiplier, isBurstActive]
@@ -100,7 +100,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
   reverse = false,
 }) => {
   const context = React.useContext(FlowContext);
-  const effectiveSpeedMultiplier = (propSpeedMultiplier ?? context.speedMultiplier ?? 1.0) * (context.isBurstActive ? 2.2 : 1.0);
+  const effectiveSpeedMultiplier = propSpeedMultiplier ?? context.speedMultiplier ?? 0.5;
   const effectiveDensityMultiplier = propDensityMultiplier ?? context.densityMultiplier ?? 1.0;
 
   const instancedRef = useRef<THREE.InstancedMesh>(null);
@@ -109,13 +109,6 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  // Dynamic particle count: more particles for long or highlighted connections
-  const actualParticleCount = useMemo(() => {
-    const mult = effectiveDensityMultiplier;
-    if (particleCount) return Math.max(2, Math.round(particleCount * mult));
-    if (isResidual) return Math.max(4, Math.round(14 * mult));
-    return Math.max(3, Math.round((isHighlighted ? 10 : 7) * mult));
-  }, [particleCount, isResidual, isHighlighted, effectiveDensityMultiplier]);
   // Generate 3D curve with natural arch
   const { curve, linePoints, midPoint, distance } = useMemo(() => {
     const start = new THREE.Vector3(...(reverse ? to : from));
@@ -172,10 +165,22 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     return { curve: c, linePoints: pts, midPoint: mid, distance: dist };
   }, [from, to, isResidual, curveHeight, reverse]);
 
-  const baseColor = isResidual ? '#f43f5e' : color;
+  // Dynamic particle count: more particles for long or highlighted connections
+  const actualParticleCount = useMemo(() => {
+    const mult = effectiveDensityMultiplier;
+    if (particleCount) return Math.max(2, Math.round(particleCount * mult));
+    if (isResidual) return Math.max(22, Math.round(distance * 2.0 * mult));
+    return Math.max(6, Math.round((isHighlighted ? 14 : 9) * mult));
+  }, [particleCount, isResidual, isHighlighted, effectiveDensityMultiplier, distance]);
+
+  const baseColor = isResidual ? '#ff2a5f' : color;
 
   // Tube geometry for glowing conduit sheath
-  const tubeRadius = customTubeRadius || (isHighlighted ? 0.042 : 0.024);
+  const tubeRadius =
+    customTubeRadius ||
+    (isResidual
+      ? (isHighlighted ? 0.062 : 0.045)
+      : (isHighlighted ? 0.048 : 0.032));
   const tubeGeometry = useMemo(() => {
     if (!curve) return new THREE.BufferGeometry();
     return new THREE.TubeGeometry(curve, 36, tubeRadius, 8, false);
@@ -187,7 +192,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     const mat = new THREE.LineBasicMaterial({
       color: isHighlighted ? '#ffffff' : baseColor,
       transparent: true,
-      opacity: isHighlighted ? 0.95 : (isResidual ? 0.55 : 0.35),
+      opacity: isHighlighted ? 0.95 : (isResidual ? 0.82 : 0.60),
       linewidth: isHighlighted ? 2 : 1,
     });
     return new THREE.Line(geom, mat);
@@ -216,14 +221,24 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     if (tubeMatRef.current) {
       const burstBoost = context.isBurstActive ? 0.8 : 0.0;
       const pulse = 0.5 + 0.5 * Math.sin(clockTime * (isHighlighted ? 4.5 : 2.2));
-      tubeMatRef.current.emissiveIntensity = (isHighlighted ? (0.9 + 0.5 * pulse) : (0.22 + 0.12 * pulse)) + burstBoost;
-      tubeMatRef.current.opacity = Math.min(1.0, (isHighlighted ? (0.6 + 0.18 * pulse) : (isResidual ? 0.28 : 0.18)) + burstBoost * 0.3);
+      tubeMatRef.current.emissiveIntensity =
+        (isHighlighted
+          ? 1.4 + 0.6 * pulse
+          : (isResidual ? 0.85 : 0.55) + 0.25 * pulse) + burstBoost;
+      tubeMatRef.current.opacity = Math.min(
+        1.0,
+        (isHighlighted
+          ? 0.75 + 0.15 * pulse
+          : (isResidual ? 0.46 : 0.32) + 0.15 * pulse) + burstBoost * 0.3
+      );
     }
 
     // 2. Continuous uniform micro-particle dataflow stream
     if (instancedRef.current) {
       const count = Math.max(1, actualParticleCount);
-      const baseS = isHighlighted ? 0.035 : 0.022;
+      const baseS = isResidual
+        ? (isHighlighted ? 0.068 : 0.052)
+        : (isHighlighted ? 0.055 : 0.040);
       for (let i = 0; i < actualParticleCount; i++) {
         // Spaced evenly along the curve: offset = i / actualParticleCount
         const offset = i / count;
@@ -277,9 +292,9 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
           ref={tubeMatRef}
           color={baseColor}
           emissive={baseColor}
-          emissiveIntensity={isHighlighted ? 1.2 : (isHovered ? 0.8 : 0.3)}
+          emissiveIntensity={isHighlighted ? 1.4 : (isHovered ? 0.9 : (isResidual ? 0.85 : 0.55))}
           transparent={true}
-          opacity={isHighlighted ? 0.65 : (isHovered ? 0.5 : (isResidual ? 0.28 : 0.18))}
+          opacity={isHighlighted ? 0.75 : (isHovered ? 0.6 : (isResidual ? 0.46 : 0.32))}
           roughness={0.2}
           metalness={0.1}
           depthWrite={false}
@@ -298,7 +313,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
         <meshBasicMaterial
           color={baseColor}
           transparent={true}
-          opacity={isHighlighted ? 0.85 : 0.35}
+          opacity={isResidual ? (isHighlighted ? 1.0 : 0.88) : (isHighlighted ? 0.95 : 0.78)}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           toneMapped={false}
@@ -349,7 +364,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
               ]}
             />
             <lineBasicMaterial
-              color={isHighlighted ? '#38bdf8' : (isResidual ? '#f43f5e' : '#334155')}
+              color={isHighlighted ? '#38bdf8' : (isResidual ? '#ff2a5f' : '#334155')}
               transparent
               opacity={0.75}
             />

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { MicroBlockView } from './MicroBlockView';
 import { QuadCycleView } from './QuadCycleView';
@@ -26,8 +26,6 @@ interface SceneContainerProps {
   inspectedId: string | null;
   hoveredItemId?: string | null;
   flowSpeedMultiplier?: number;
-  flowDensity?: 'normal' | 'dense' | 'ultra';
-  isBurstActive?: boolean;
   resetTrigger?: number;
 }
 
@@ -48,15 +46,9 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
   onUserInteract,
   inspectedId,
   hoveredItemId,
-  flowSpeedMultiplier = 1.0,
-  flowDensity = 'dense',
-  isBurstActive = false,
+  flowSpeedMultiplier = 0.5,
   resetTrigger,
 }) => {
-  const densityMultiplier = useMemo(() => {
-    return flowDensity === 'ultra' ? 1.5 : (flowDensity === 'dense' ? 1.1 : 0.8);
-  }, [flowDensity]);
-
   // Adjust spatial ground grid height to eliminate clipping with single_block / quad_cycle floor
   const gridY = viewMode === 'macro_stack' ? -2.5 : -0.01;
 
@@ -72,12 +64,8 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
         <directionalLight position={[-20, -10, -20]} intensity={0.5} color="#38bdf8" />
         <pointLight position={[4, 15, 0]} intensity={1.0} color="#818cf8" />
 
-        {/* Global Flow Context for synchronized speeds, densities, and bursts */}
-        <FlowProvider
-          speedMultiplier={flowSpeedMultiplier}
-          densityMultiplier={densityMultiplier}
-          isBurstActive={isBurstActive}
-        >
+        {/* Global Flow Context for synchronized speeds */}
+        <FlowProvider speedMultiplier={flowSpeedMultiplier}>
           {/* Dynamic 3D Scene View */}
           {viewMode === 'quad_cycle' && (
             <QuadCycleView
