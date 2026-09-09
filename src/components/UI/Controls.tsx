@@ -46,7 +46,7 @@ export const Controls: React.FC<ControlsProps> = ({
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="absolute bottom-4 left-4 right-[430px] z-20 bg-[#0b0f19]/95 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 shadow-2xl flex flex-col space-y-2 select-none">
+    <div className="absolute bottom-4 left-4 right-4 z-20 bg-[#0b0f19]/95 backdrop-blur-md border border-slate-800/80 rounded-xl p-3 shadow-2xl flex flex-col space-y-2 select-none">
       {/* Top row: Current Step Name & Progress bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
