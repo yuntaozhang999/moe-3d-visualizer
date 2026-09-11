@@ -34,3 +34,16 @@ We implemented "Plan A", resolving this discrepancy by introducing conditional r
     *   Smooth camera focus rerouting for bypassed stages to prevent out-of-bounds rendering or crashing the UI.
 3.  **Data Definitions (`equationData.ts`):**
     *   Integrated definitions for `node_residual_in` and `node_residual_out` metadata cards with LaTeX formulas ($x^{(l)} = x^{(l-1)} + \text{Attn}(x) + \text{MoE}(x)$) to maintain tooltip integrity during 3D inspections.
+
+## 5. Embed Vector Centralization (Layer 0 Alignment)
+
+In Layer 0, the `Embed Vector` (`node_embed`) and its adjacent flow connections were originally offset at $z=0.8$, causing the primary data pipeline (`Prompt Tokens` -> `Embed Vector` -> `Embed GatedNorm`) to appear bent and disjointed.
+
+To resolve this, the node position and associated coordinate links were moved to the central axis ($z=0$):
+- `node_embed` centered from $z=0.8$ to $z=0$.
+- `Lookup` and `Embed Vector -> Embed GatedNorm` flow connections realigned to $z=0$.
+- `W_embed Weight Flow` connection realigned seamlessly to $z=-0.35$ to avoid clipping into the centered vector.
+
+### Visual Comparison
+*   ![Before: Embed Vector Offset](./screenshots/before_embed_vector_offset.png)
+*   ![After: Embed Vector Centered](./screenshots/after_embed_vector_centered.png)

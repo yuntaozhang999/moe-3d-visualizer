@@ -30,7 +30,7 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: '[1, 4096, 6144]',
     visualShape: '[1, 6, 64]',
     hardwareSignificance: 'Embedding is fully replicated across data shards for zero-communication local lookup.',
-    cameraFocus: [-11.5, 2, 0.8],
+    cameraFocus: [-11.5, 2, 0],
     cameraPos: [-11.5, 6, 9],
     activeNodeIds: ['node_embed'],
   },

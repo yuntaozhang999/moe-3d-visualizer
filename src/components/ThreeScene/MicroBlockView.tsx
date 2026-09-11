@@ -150,7 +150,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           {/* Input Tokens -> Embed Vector */}
           <FlowConnection
             from={[-15.8, 2.0, 0]}
-            to={[-13.15, 2.0, 0.8]}
+            to={[-13.15, 2.0, 0]}
             color="#38bdf8"
             isHighlighted={isFlowActive(isStep('input_tokens') || isStep('token_embed'), ['node_tokens', 'node_embed'])}
             label="Lookup"
@@ -176,7 +176,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           {/* W_embed Weight Flow */}
           <FlowConnection
             from={[-14.0, 2.0, -1.95]}
-            to={[-11.5, 2.0, 0.45]}
+            to={[-11.5, 2.0, -0.35]}
             color="#64748b"
             tubeRadius={0.018}
             particleCount={4}
@@ -188,7 +188,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
             id="node_embed"
             label="Embed Vector"
             subLabel={`S × 6144 (shown ${activationData.tokens.length} × 64)`}
-            position={[-11.5, 2.0, 0.8]}
+            position={[-11.5, 2.0, 0]}
             size={[64 * DIM_W, 3.2, 0.6]}
             gridRows={activationData.tokens.length}
             gridCols={64}
@@ -202,7 +202,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
           {/* Embed Vector -> Embed GatedNorm */}
           <FlowConnection
-            from={[-9.85, 2.0, 0.8]}
+            from={[-9.85, 2.0, 0]}
             to={[-9.35, 2.0, 0]}
             color="#10b981"
             isHighlighted={isFlowActive(isStep('token_embed') || isStep('embed_gated_norm'), ['node_embed', 'op_embed_gn'])}
