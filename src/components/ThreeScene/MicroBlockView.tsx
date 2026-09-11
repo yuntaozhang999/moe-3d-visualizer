@@ -145,6 +145,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
             onHover={onHoverItem}
             onClick={onClickItem}
             onHoverCell={onHoverCell}
+            tokenLabels={activationData.tokens}
           />
 
           {/* Input Tokens -> Embed Vector */}

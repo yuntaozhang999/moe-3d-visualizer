@@ -22,6 +22,7 @@ interface TensorMatrixProps {
   onClick?: (id: string) => void;
   onHoverCell?: (cellInfo: HoveredCellInfo | null) => void;
   labelYOffset?: number;
+  tokenLabels?: string[];
 }
 
 export const TensorMatrix: React.FC<TensorMatrixProps> = ({
@@ -41,6 +42,7 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
   onClick,
   onHoverCell,
   labelYOffset = 0,
+  tokenLabels,
 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -158,6 +160,17 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
 
         ctx.fillStyle = getColor(val, r, c);
         ctx.fillRect(c * cellW + 0.5, r * cellH + 0.5, cellW - 1, cellH - 1);
+
+        if (tokenLabels && tokenLabels[r] && gridCols === 1) {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(0,0,0,0.8)';
+          ctx.shadowBlur = 4;
+          ctx.fillText(tokenLabels[r], c * cellW + cellW / 2, r * cellH + cellH / 2);
+          ctx.shadowBlur = 0;
+        }
       }
     }
 
@@ -178,7 +191,7 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
     }
 
     texture.needsUpdate = true;
-  }, [canvas, texture, gridRows, gridCols, data, colorTheme, isWeight, isHighlighted]);
+  }, [canvas, texture, gridRows, gridCols, data, colorTheme, isWeight, isHighlighted, tokenLabels]);
 
   // Pointer move handler to inspect exact cell
   const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
@@ -216,6 +229,30 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
     ? (colorTheme === 'amber' ? '#f59e0b' : colorTheme === 'emerald' ? '#10b981' : colorTheme === 'purple' ? '#818cf8' : colorTheme === 'rose' ? '#fb7185' : '#38bdf8')
     : (isWeight ? '#2e384d' : '#1e2838');
 
+  const { sideMaterial, frontMaterial } = useMemo(() => {
+    const sideColor = new THREE.Color(isWeight ? '#0d131f' : '#080d16');
+    const emissiveColor = isHighlighted ? new THREE.Color(borderColor) : new THREE.Color('#000000');
+    const emissiveIntensity = isHighlighted ? 0.35 : 0;
+    
+    const side = new THREE.MeshStandardMaterial({
+      color: sideColor,
+      roughness: 0.4,
+      metalness: 0.3,
+      emissive: emissiveColor,
+      emissiveIntensity: emissiveIntensity * 0.5,
+    });
+
+    const front = new THREE.MeshStandardMaterial({
+      map: texture,
+      roughness: isWeight ? 0.5 : 0.25,
+      metalness: isWeight ? 0.4 : 0.15,
+      emissive: emissiveColor,
+      emissiveIntensity: emissiveIntensity,
+    });
+
+    return { sideMaterial: side, frontMaterial: front };
+  }, [isWeight, isHighlighted, borderColor, texture]);
+
   return (
     <group position={position}>
       {/* 3D Volumetric Box */}
@@ -234,15 +271,9 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
           e.stopPropagation();
           onClick?.(id);
         }}
+        material={[sideMaterial, sideMaterial, sideMaterial, sideMaterial, frontMaterial, frontMaterial]}
       >
         <boxGeometry args={size} />
-        <meshStandardMaterial
-          map={texture}
-          roughness={isWeight ? 0.5 : 0.25}
-          metalness={isWeight ? 0.4 : 0.15}
-          emissive={isHighlighted ? new THREE.Color(borderColor) : new THREE.Color('#000000')}
-          emissiveIntensity={isHighlighted ? 0.35 : 0}
-        />
       </mesh>
 
       {/* 3D Edge Wireframe */}

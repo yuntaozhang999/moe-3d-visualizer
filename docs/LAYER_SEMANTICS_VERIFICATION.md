@@ -47,3 +47,15 @@ To resolve this, the node position and associated coordinate links were moved to
 ### Visual Comparison
 *   ![Before: Embed Vector Offset](./screenshots/before_embed_vector_offset.png)
 *   ![After: Embed Vector Centered](./screenshots/after_embed_vector_centered.png)
+
+## 6. Prompt Tokens UV Artifact Elimination & Text Labeling
+
+Previously, the `Prompt Tokens` box geometry exhibited misleading stretch artifacts (stripes) on its top face (+Y) because the 6-row front canvas texture was mapped uniformly across the entire cube. To viewers, this incorrectly suggested a 3D depth slice. Additionally, the front faces were solid color blocks devoid of lexical meaning.
+
+We resolved this by:
+- Employing a **Multi-Material array** for the `BoxGeometry` `[side, side, side, side, front, front]`. The top, bottom, and side faces now use a pristine, dark solid material, entirely eliminating the UV stretching artifacts.
+- Dynamically rendering the actual token strings (e.g., "The", "marin", "535b", "moe", "hero", "run") directly onto the front-facing canvas grid with high-contrast drop shadows, providing immediate lexical context.
+
+### Visual Comparison
+*   ![Before: Token UV Artifacts](./screenshots/before_token_uv_artifact.png)
+*   ![After: Token Text Close-up](./screenshots/after_token_closeup.png)
