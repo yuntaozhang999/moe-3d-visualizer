@@ -10,6 +10,56 @@ export interface EnrichedEquationData extends IntuitiveFormulaData {
 }
 
 export const EQUATION_DEFINITIONS: Record<string, EnrichedEquationData> = {
+  node_residual_in: {
+    id: 'node_residual_in',
+    title: 'Input from Previous Layer',
+    category: 'Input',
+    formula: 'x^{(l)} = x^{(l-1)} + \\text{Attn}(x^{(l-1)}) + \\text{MoE}(x^{(l-1)})',
+    intuitiveMeaning: 'The residual stream is the central highway of the Transformer. It carries the accumulated representations from all previous layers. Instead of computing entirely new representations, each layer reads from this stream, computes updates, and adds them back.',
+    dataflow: {
+      inputShape: 'Residual Stream',
+      operation: 'Identity Passthrough',
+      outputShape: '[1, 4096, 6144]',
+      transformationNote: 'Receives the output of the previous layer.',
+      stages: [
+        { label: 'Input', name: 'Layer N-1 Out', shape: '[1, 4096, 6144]', type: 'input' },
+        { label: 'Highway', name: 'Residual Stream', shape: '[1, 4096, 6144]', type: 'op' },
+        { label: 'Output', name: 'Layer N In', shape: '[1, 4096, 6144]', type: 'output' },
+      ],
+    },
+    variables: [
+      { symbol: 'x^{(l-1)}', name: 'Previous Layer Output', shape: '[1, 4096, 6144]', description: 'The accumulated representation up to layer l-1.', hardwareContext: 'Stored in GPU HBM.', color: 'sky' },
+    ],
+    realShape: '[1, 4096, 6144]',
+    visualShape: '[1, 6, 64]',
+    codeSnippet: 'x = previous_layer_output',
+  },
+
+  node_residual_out: {
+    id: 'node_residual_out',
+    title: 'Output to Next Layer',
+    category: 'Output',
+    formula: 'x^{(l+1)} = x^{(l)} + \\text{Attn}(x^{(l)}) + \\text{MoE}(x^{(l)})',
+    intuitiveMeaning: 'The final state of the residual stream for this layer, after the Attention and MoE updates have been added. This state is passed directly to the next layer as its input.',
+    dataflow: {
+      inputShape: 'Residual Stream',
+      operation: 'Identity Passthrough',
+      outputShape: '[1, 4096, 6144]',
+      transformationNote: 'Passes the accumulated state to the next layer.',
+      stages: [
+        { label: 'Input', name: 'Layer N Out', shape: '[1, 4096, 6144]', type: 'input' },
+        { label: 'Highway', name: 'Residual Stream', shape: '[1, 4096, 6144]', type: 'op' },
+        { label: 'Output', name: 'Layer N+1 In', shape: '[1, 4096, 6144]', type: 'output' },
+      ],
+    },
+    variables: [
+      { symbol: 'x^{(l)}', name: 'Current Layer Output', shape: '[1, 4096, 6144]', description: 'The accumulated representation including this layer\'s updates.', hardwareContext: 'Stored in GPU HBM.', color: 'sky' },
+    ],
+    realShape: '[1, 4096, 6144]',
+    visualShape: '[1, 6, 64]',
+    codeSnippet: 'return x',
+  },
+
   input_tokens: {
     id: 'input_tokens',
     title: 'Input Tokens & Sequence IDs',

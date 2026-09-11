@@ -36,7 +36,16 @@ export function App() {
   // View mode: default to 'single_block' (the comprehensive isolated layer architecture)
   const [viewMode, setViewMode] = useState<ViewMode>('single_block');
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
-  const [selectedLayerIndex, setSelectedLayerIndex] = useState(0);
+  const [selectedLayerIndex, setSelectedLayerIndex] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const param = new URLSearchParams(window.location.search).get('layer');
+      if (param !== null) {
+        const val = parseInt(param, 10);
+        if (!isNaN(val)) return val;
+      }
+    }
+    return 0;
+  });
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -95,22 +104,54 @@ export function App() {
     });
   }, []);
 
+  const dynamicSteps = useMemo(() => {
+    return FORWARD_STEPS.map((step) => {
+      const newStep = { ...step };
+      if (selectedLayerIndex > 0) {
+        if (['input_tokens', 'token_embed', 'embed_gated_norm'].includes(step.id)) {
+          if (step.id === 'input_tokens') {
+            newStep.name = '1. Previous Layer Residual Input';
+            newStep.shortDesc = 'Residual stream [S × 6144] from the previous layer.';
+            newStep.longDesc = `Receives the accumulated hidden state from Layer ${selectedLayerIndex - 1}.`;
+          } else {
+            newStep.name = step.name.replace(/^\d+\.\s*/, `${step.order}. `) + ' (Bypassed)';
+            newStep.shortDesc = 'Bypassed. Tokens already embedded.';
+            newStep.longDesc = 'Embedding only happens on the first layer. This block directly receives the residual stream.';
+          }
+        }
+      }
+      if (selectedLayerIndex < layers.length - 1) {
+        if (['final_gated_norm', 'untied_lm_head'].includes(step.id)) {
+          if (step.id === 'final_gated_norm') {
+            newStep.name = '18. Residual Stream Forwarding';
+            newStep.shortDesc = 'Pass [S × 6144] hidden states to the next layer.';
+            newStep.longDesc = `Forwarding the updated residual stream to Layer ${selectedLayerIndex + 1}.`;
+          } else {
+            newStep.name = step.name.replace(/^\d+\.\s*/, `${step.order}. `) + ' (Bypassed)';
+            newStep.shortDesc = 'Bypassed. LM Head only active on final layer.';
+            newStep.longDesc = 'The untied LM head projection and softmax only run after the final layer.';
+          }
+        }
+      }
+      return newStep;
+    });
+  }, [selectedLayerIndex, layers.length]);
+
   const handleOpenInspector = useCallback((nodeId?: string) => {
     if (nodeId) {
       setInspectedId(nodeId);
     } else {
-      const primaryNode = FORWARD_STEPS[currentStepIndex]?.activeNodeIds[0] || 'node_tokens';
+      const primaryNode = dynamicSteps[currentStepIndex]?.activeNodeIds[0] || 'node_tokens';
       setInspectedId(primaryNode);
     }
     setIsInspectorCollapsed(false);
     localStorage.setItem('marin_inspector_collapsed', 'false');
-  }, [currentStepIndex]);
-
+  }, [currentStepIndex, dynamicSteps]);
 
   // Synchronize group and selected layer
   const currentGroup = layerGroups[currentGroupIndex] || layerGroups[0];
   const currentLayer = layers[selectedLayerIndex] || layers[0];
-  const activeStep = FORWARD_STEPS[currentStepIndex];
+  const activeStep = dynamicSteps[currentStepIndex];
 
   // Auto-open Sampling HUD when user advances to Step 19 (untied_lm_head)
   useEffect(() => {
@@ -222,7 +263,7 @@ export function App() {
   const handleNextStep = useCallback(() => {
     setCameraOverride(null);
     setCurrentStepIndex((prev) => {
-      if (prev < FORWARD_STEPS.length - 1) {
+      if (prev < dynamicSteps.length - 1) {
         return prev + 1;
       } else {
         // Advance to next layer or loop
@@ -234,7 +275,7 @@ export function App() {
         return 0;
       }
     });
-  }, [layers.length]);
+  }, [layers.length, dynamicSteps.length]);
 
   const handlePrevStep = useCallback(() => {
     setCameraOverride(null);
@@ -328,6 +369,20 @@ export function App() {
 
   // Compute active camera target coordinates
   const { currentCameraPos, currentCameraFocus } = useMemo(() => {
+    const isFirst = selectedLayerIndex === 0;
+    const isLast = selectedLayerIndex === layers.length - 1;
+    let basePos = activeStep.cameraPos;
+    let baseFocus = activeStep.cameraFocus;
+
+    if (!isFirst && ['input_tokens', 'token_embed', 'embed_gated_norm'].includes(activeStep.id)) {
+      basePos = [-11.5, 5, 8];
+      baseFocus = [-11.5, 2, 0];
+    }
+    if (!isLast && ['final_gated_norm', 'untied_lm_head'].includes(activeStep.id)) {
+      basePos = [39.5, 5, 8];
+      baseFocus = [39.5, 2, 0];
+    }
+
     if (cameraOverride) {
       return {
         currentCameraPos: cameraOverride.pos,
@@ -353,18 +408,30 @@ export function App() {
       };
     }
     return {
-      currentCameraPos: activeStep.cameraPos,
-      currentCameraFocus: activeStep.cameraFocus,
+      currentCameraPos: basePos,
+      currentCameraFocus: baseFocus,
     };
-  }, [cameraOverride, viewMode, autoFollow, activeStep.cameraPos, activeStep.cameraFocus]);
+  }, [cameraOverride, viewMode, autoFollow, activeStep.cameraPos, activeStep.cameraFocus, activeStep.id, selectedLayerIndex, layers.length]);
 
   const effectiveStep = useMemo(() => {
+    const isFirst = selectedLayerIndex === 0;
+    const isLast = selectedLayerIndex === layers.length - 1;
+    let patchedNodeIds = [...activeStep.activeNodeIds];
+    
+    if (!isFirst && ['input_tokens', 'token_embed', 'embed_gated_norm'].includes(activeStep.id)) {
+      patchedNodeIds = ['node_residual_in'];
+    }
+    if (!isLast && ['final_gated_norm', 'untied_lm_head'].includes(activeStep.id)) {
+      patchedNodeIds = ['node_residual_out'];
+    }
+
     return {
       ...activeStep,
+      activeNodeIds: patchedNodeIds,
       cameraPos: currentCameraPos,
       cameraFocus: currentCameraFocus,
     };
-  }, [activeStep, currentCameraPos, currentCameraFocus]);
+  }, [activeStep, currentCameraPos, currentCameraFocus, selectedLayerIndex, layers.length]);
 
   return (
     <div className="flex flex-col w-screen h-screen bg-[#07090e] text-slate-100 overflow-hidden select-none">
@@ -408,7 +475,7 @@ export function App() {
           <WalkthroughNarrator
             currentStep={activeStep}
             stepIndex={currentStepIndex}
-            totalSteps={FORWARD_STEPS.length}
+            totalSteps={dynamicSteps.length}
             onPrevStep={handlePrevStep}
             onNextStep={handleNextStep}
             onOpenDetails={() => handleOpenInspector(activeStep.activeNodeIds[0] || 'node_tokens')}
@@ -490,7 +557,7 @@ export function App() {
 
           {/* Bottom Playback & Step Controls */}
           <Controls
-            steps={FORWARD_STEPS}
+            steps={dynamicSteps}
             currentStepIndex={currentStepIndex}
             isPlaying={isPlaying}
             onPrevStep={handlePrevStep}

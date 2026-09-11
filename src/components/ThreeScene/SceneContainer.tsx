@@ -99,6 +99,7 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
               onHoverCell={onHoverCell}
               inspectedId={inspectedId}
               hoveredItemId={hoveredItemId}
+              totalLayers={allLayers.length}
             />
           )}
 

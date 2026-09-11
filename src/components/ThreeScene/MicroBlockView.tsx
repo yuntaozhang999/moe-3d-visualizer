@@ -17,6 +17,7 @@ interface MicroBlockViewProps {
   onHoverCell?: (cellInfo: HoveredCellInfo | null) => void;
   inspectedId: string | null;
   hoveredItemId?: string | null;
+  totalLayers?: number;
 }
 
 export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
@@ -28,6 +29,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
   onHoverCell,
   inspectedId,
   hoveredItemId,
+  totalLayers = 48,
 }) => {
   const isStep = (stepId: string) => activeStep.id === stepId;
   const isHighlighted = (nodeId: string) =>
@@ -43,6 +45,8 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
   const isGlobal = layer.isGlobal;
   const kvHeads = layer.kvHeads;
+  const isFirstLayer = layer.index === 0;
+  const isLastLayer = layer.index === totalLayers - 1;
   const windowLabel = isGlobal ? 'Full Causal [4096]' : 'Sliding Window [2048]';
   const ropeLabel = isGlobal ? 'NoPE (Disabled)' : 'Half-RoPE (64/128)';
   const DIM_W = 0.05;
@@ -76,7 +80,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           anchorX="center"
           anchorY="middle"
         >
-          STAGE 1: EMBEDDING & NORM
+          {isFirstLayer ? 'STAGE 1: EMBEDDING & NORM' : `STAGE 1: RESIDUAL INPUT (FROM L${layer.index - 1})`}
         </Text>
         <Text
           position={[3.5, 0, 0]}
@@ -118,111 +122,140 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           anchorX="center"
           anchorY="middle"
         >
-          STAGE 4: LM HEAD
+          {isLastLayer ? 'STAGE 4: UNEMBEDDING / LM HEAD' : `STAGE 4: RESIDUAL OUTPUT (TO L${layer.index + 1})`}
         </Text>
       </group>
 
       {/* ========================================================
           STAGE 1: INPUT & EMBEDDING
           ======================================================== */}
-      {/* Input Tokens */}
-      <TensorMatrix
-        id="node_tokens"
-        label="Prompt Tokens"
-        subLabel={`S=${activationData.tokens.length}`}
-        position={[-16.5, 2.0, 0]}
-        size={[1.3, 3.2, 0.6]}
-        gridRows={activationData.tokens.length}
-        gridCols={1}
-        colorTheme="cyan"
-        isHighlighted={isHighlighted('node_tokens')}
-        onHover={onHoverItem}
-        onClick={onClickItem}
-        onHoverCell={onHoverCell}
-      />
+      {isFirstLayer ? (
+        <group>
+          {/* Input Tokens */}
+          <TensorMatrix
+            id="node_tokens"
+            label="Prompt Tokens"
+            subLabel={`S=${activationData.tokens.length}`}
+            position={[-16.5, 2.0, 0]}
+            size={[1.3, 3.2, 0.6]}
+            gridRows={activationData.tokens.length}
+            gridCols={1}
+            colorTheme="cyan"
+            isHighlighted={isHighlighted('node_tokens')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            onHoverCell={onHoverCell}
+          />
 
-      {/* Input Tokens -> Embed Vector */}
-      <FlowConnection
-        from={[-15.8, 2.0, 0]}
-        to={[-13.15, 2.0, 0.8]}
-        color="#38bdf8"
-        isHighlighted={isFlowActive(isStep('input_tokens') || isStep('token_embed'), ['node_tokens', 'node_embed'])}
-        label="Lookup"
-      />
+          {/* Input Tokens -> Embed Vector */}
+          <FlowConnection
+            from={[-15.8, 2.0, 0]}
+            to={[-13.15, 2.0, 0.8]}
+            color="#38bdf8"
+            isHighlighted={isFlowActive(isStep('input_tokens') || isStep('token_embed'), ['node_tokens', 'node_embed'])}
+            label="Lookup"
+          />
 
-      {/* Token Embed Matrix W_embed (Weight) */}
-      <TensorMatrix
-        id="node_w_embed"
-        label="W_embed (128k × 6144)"
-        subLabel="Untied Embedding"
-        position={[-14.0, 2.0, -2.4]}
-        size={[1.4, 3.2, 0.8]}
-        gridRows={activationData.tokens.length}
-        gridCols={16}
-        isWeight={true}
-        colorTheme="slate"
-        isHighlighted={isHighlighted('node_w_embed') || isHighlighted('node_embed')}
-        onHover={onHoverItem}
-        onClick={onClickItem}
-        onHoverCell={onHoverCell}
-      />
+          {/* Token Embed Matrix W_embed (Weight) */}
+          <TensorMatrix
+            id="node_w_embed"
+            label="W_embed (128k × 6144)"
+            subLabel="Untied Embedding"
+            position={[-14.0, 2.0, -2.4]}
+            size={[1.4, 3.2, 0.8]}
+            gridRows={activationData.tokens.length}
+            gridCols={16}
+            isWeight={true}
+            colorTheme="slate"
+            isHighlighted={isHighlighted('node_w_embed') || isHighlighted('node_embed')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            onHoverCell={onHoverCell}
+          />
 
-      {/* W_embed Weight Flow */}
-      <FlowConnection
-        from={[-14.0, 2.0, -1.95]}
-        to={[-11.5, 2.0, 0.45]}
-        color="#64748b"
-        tubeRadius={0.018}
-        particleCount={4}
-        isHighlighted={isFlowActive(isStep('token_embed'), ['node_w_embed', 'node_embed'])}
-      />
+          {/* W_embed Weight Flow */}
+          <FlowConnection
+            from={[-14.0, 2.0, -1.95]}
+            to={[-11.5, 2.0, 0.45]}
+            color="#64748b"
+            tubeRadius={0.018}
+            particleCount={4}
+            isHighlighted={isFlowActive(isStep('token_embed'), ['node_w_embed', 'node_embed'])}
+          />
 
-      {/* Embed Activation Vector */}
-      <TensorMatrix
-        id="node_embed"
-        label="Embed Vector"
-        subLabel={`S × 6144 (shown ${activationData.tokens.length} × 64)`}
-        position={[-11.5, 2.0, 0.8]}
-        size={[64 * DIM_W, 3.2, 0.6]}
-        gridRows={activationData.tokens.length}
-        gridCols={64}
-        data={activationData.embeddings}
-        colorTheme="cyan"
-        isHighlighted={isHighlighted('node_embed')}
-        onHover={onHoverItem}
-        onClick={onClickItem}
-        onHoverCell={onHoverCell}
-      />
+          {/* Embed Activation Vector */}
+          <TensorMatrix
+            id="node_embed"
+            label="Embed Vector"
+            subLabel={`S × 6144 (shown ${activationData.tokens.length} × 64)`}
+            position={[-11.5, 2.0, 0.8]}
+            size={[64 * DIM_W, 3.2, 0.6]}
+            gridRows={activationData.tokens.length}
+            gridCols={64}
+            data={activationData.embeddings}
+            colorTheme="cyan"
+            isHighlighted={isHighlighted('node_embed')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            onHoverCell={onHoverCell}
+          />
 
-      {/* Embed Vector -> Embed GatedNorm */}
-      <FlowConnection
-        from={[-9.85, 2.0, 0.8]}
-        to={[-9.35, 2.0, 0]}
-        color="#10b981"
-        isHighlighted={isFlowActive(isStep('token_embed') || isStep('embed_gated_norm'), ['node_embed', 'op_embed_gn'])}
-      />
+          {/* Embed Vector -> Embed GatedNorm */}
+          <FlowConnection
+            from={[-9.85, 2.0, 0.8]}
+            to={[-9.35, 2.0, 0]}
+            color="#10b981"
+            isHighlighted={isFlowActive(isStep('token_embed') || isStep('embed_gated_norm'), ['node_embed', 'op_embed_gn'])}
+          />
 
-      {/* Embed GatedNorm */}
-      <OperatorNode
-        id="op_embed_gn"
-        name="Embed GatedNorm"
-        symbol="GN"
-        position={[-8.8, 2.0, 0]}
-        color="#10b981"
-        isHighlighted={isHighlighted('op_embed_gn')}
-        onHover={onHoverItem}
-        onClick={onClickItem}
-        labelPosition="bottom"
-      />
+          {/* Embed GatedNorm */}
+          <OperatorNode
+            id="op_embed_gn"
+            name="Embed GatedNorm"
+            symbol="GN"
+            position={[-8.8, 2.0, 0]}
+            color="#10b981"
+            isHighlighted={isHighlighted('op_embed_gn')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            labelPosition="bottom"
+          />
 
-      {/* Embed GN -> Pre-Attn GN */}
-      <FlowConnection
-        from={[-8.25, 2.0, 0]}
-        to={[-7.35, 2.0, 0]}
-        color="#10b981"
-        isHighlighted={isFlowActive(isStep('embed_gated_norm') || isStep('pre_attn_gated_norm'), ['op_embed_gn', 'op_attn_gn'])}
-        label="Pre-Attn Stream"
-      />
+          {/* Embed GN -> Pre-Attn GN */}
+          <FlowConnection
+            from={[-8.25, 2.0, 0]}
+            to={[-7.35, 2.0, 0]}
+            color="#10b981"
+            isHighlighted={isFlowActive(isStep('embed_gated_norm') || isStep('pre_attn_gated_norm'), ['op_embed_gn', 'op_attn_gn'])}
+            label="Pre-Attn Stream"
+          />
+        </group>
+      ) : (
+        <group>
+          <TensorMatrix
+            id="node_residual_in"
+            label={`Input from L${layer.index - 1}`}
+            subLabel="Residual Stream [S × 6144]"
+            position={[-11.5, 2.0, 0]}
+            size={[64 * DIM_W, 3.2, 0.6]}
+            gridRows={activationData.tokens.length}
+            gridCols={64}
+            data={activationData.embeddings}
+            colorTheme="cyan"
+            isHighlighted={isHighlighted('node_residual_in')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            onHoverCell={onHoverCell}
+          />
+          <FlowConnection
+            from={[-9.85, 2.0, 0]}
+            to={[-7.35, 2.0, 0]}
+            label="Residual Flow [6144]"
+            color="#00f3ff"
+            isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('input_tokens') || isStep('token_embed') || isStep('embed_gated_norm'), ['node_residual_in', 'op_attn_gn'])}
+          />
+        </group>
+      )}
 
       {/* ========================================================
           STAGE 2: PRE-ATTENTION GATEDNORM & QKV PROJECTIONS
@@ -854,80 +887,109 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       {/* ========================================================
           STAGE 4: FINAL NORM & UNTIED LM HEAD
           ======================================================== */}
-      <FlowConnection
-        from={[35.55, 2.0, 0]}
-        to={[36.95, 2.0, 0]}
-        color="#10b981"
-        isHighlighted={isFlowActive(isStep('moe_aggregation_residual') || isStep('final_gated_norm'), ['op_moe_add', 'op_final_gn'])}
-      />
+      {isLastLayer ? (
+        <group>
+          <FlowConnection
+            from={[35.55, 2.0, 0]}
+            to={[36.95, 2.0, 0]}
+            color="#10b981"
+            isHighlighted={isFlowActive(isStep('moe_aggregation_residual') || isStep('final_gated_norm'), ['op_moe_add', 'op_final_gn'])}
+          />
 
-      {/* Final GatedNorm */}
-      <OperatorNode
-        id="op_final_gn"
-        name="Final GatedNorm"
-        symbol="GN"
-        position={[37.5, 2.0, 0]}
-        color="#10b981"
-        isHighlighted={isHighlighted('op_final_gn')}
-        onHover={onHoverItem}
-        onClick={onClickItem}
-        labelPosition="bottom"
-      />
+          {/* Final GatedNorm */}
+          <OperatorNode
+            id="op_final_gn"
+            name="Final GatedNorm"
+            symbol="GN"
+            position={[37.5, 2.0, 0]}
+            color="#10b981"
+            isHighlighted={isHighlighted('op_final_gn')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            labelPosition="bottom"
+          />
 
-      {/* Final GN to LM Head Logits */}
-      <FlowConnection
-        from={[38.05, 2.0, 0]}
-        to={[41.55, 2.0, 0.8]}
-        color="#fb7185"
-        isHighlighted={isFlowActive(isStep('final_gated_norm') || isStep('untied_lm_head'), ['op_final_gn', 'node_lm_head'])}
-        label="Predict"
-      />
+          {/* Final GN to LM Head Logits */}
+          <FlowConnection
+            from={[38.05, 2.0, 0]}
+            to={[41.55, 2.0, 0.8]}
+            color="#fb7185"
+            isHighlighted={isFlowActive(isStep('final_gated_norm') || isStep('untied_lm_head'), ['op_final_gn', 'node_lm_head'])}
+            label="Predict"
+          />
 
-      {/* Untied LM Head Weight W_out */}
-      <TensorMatrix
-        id="node_w_lm_head"
-        label="W_out [6144 × 128k]"
-        subLabel="Untied Output Projection"
-        position={[40.0, 2.0, -2.5]}
-        size={[1.4, 3.2, 0.8]}
-        gridRows={16}
-        gridCols={16}
-        isWeight={true}
-        colorTheme="slate"
-        isHighlighted={isHighlighted('node_w_lm_head') || isHighlighted('node_lm_head')}
-        onHover={onHoverItem}
-        onClick={onClickItem}
-        onHoverCell={onHoverCell}
-        labelYOffset={0.2}
-      />
+          {/* Untied LM Head Weight W_out */}
+          <TensorMatrix
+            id="node_w_lm_head"
+            label="W_out [6144 × 128k]"
+            subLabel="Untied Output Projection"
+            position={[40.0, 2.0, -2.5]}
+            size={[1.4, 3.2, 0.8]}
+            gridRows={16}
+            gridCols={16}
+            isWeight={true}
+            colorTheme="slate"
+            isHighlighted={isHighlighted('node_w_lm_head') || isHighlighted('node_lm_head')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            onHoverCell={onHoverCell}
+            labelYOffset={0.2}
+          />
 
-      {/* W_lm_head weight into LM Head */}
-      <FlowConnection
-        from={[40.0, 2.0, -2.05]}
-        to={[42.4, 2.0, 0.45]}
-        color="#64748b"
-        tubeRadius={0.02}
-        particleCount={5}
-        isHighlighted={isFlowActive(isStep('untied_lm_head'), ['node_w_lm_head', 'node_lm_head'])}
-        label="Untied W_out"
-      />
+          {/* W_lm_head weight into LM Head */}
+          <FlowConnection
+            from={[40.0, 2.0, -2.05]}
+            to={[42.4, 2.0, 0.45]}
+            color="#64748b"
+            tubeRadius={0.02}
+            particleCount={5}
+            isHighlighted={isFlowActive(isStep('untied_lm_head'), ['node_w_lm_head', 'node_lm_head'])}
+            label="Untied W_out"
+          />
 
-      {/* LM Head Output Logits */}
-      <TensorMatrix
-        id="node_lm_head"
-        label="Logits & Top-1 Token"
-        subLabel="Vocab: 128,256"
-        position={[42.4, 2.0, 0.8]}
-        size={[1.6, 3.2, 0.6]}
-        gridRows={activationData.tokens.length}
-        gridCols={20}
-        colorTheme="rose"
-        isHighlighted={isHighlighted('node_lm_head')}
-        onHover={onHoverItem}
-        onClick={onClickItem}
-        onHoverCell={onHoverCell}
-        labelYOffset={0.2}
-      />
+          {/* LM Head Output Logits */}
+          <TensorMatrix
+            id="node_lm_head"
+            label="Logits & Top-1 Token"
+            subLabel="Vocab: 128,256"
+            position={[42.4, 2.0, 0.8]}
+            size={[1.6, 3.2, 0.6]}
+            gridRows={activationData.tokens.length}
+            gridCols={20}
+            colorTheme="rose"
+            isHighlighted={isHighlighted('node_lm_head')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            onHoverCell={onHoverCell}
+            labelYOffset={0.2}
+          />
+        </group>
+      ) : (
+        <group>
+          <TensorMatrix
+            id="node_residual_out"
+            label={`Output to L${layer.index + 1}`}
+            subLabel="Residual Stream [S × 6144]"
+            position={[39.5, 2.0, 0]}
+            size={[64 * DIM_W, 3.2, 0.6]}
+            gridRows={activationData.tokens.length}
+            gridCols={64}
+            data={activationData.embeddings}
+            colorTheme="cyan"
+            isHighlighted={isHighlighted('node_residual_out')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            onHoverCell={onHoverCell}
+          />
+          <FlowConnection
+            from={[35.55, 2.0, 0]}
+            to={[37.85, 2.0, 0]}
+            label="Residual Stream [6144]"
+            color="#a855f7"
+            isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['op_moe_add', 'node_residual_out'])}
+          />
+        </group>
+      )}
     </group>
   );
 };
