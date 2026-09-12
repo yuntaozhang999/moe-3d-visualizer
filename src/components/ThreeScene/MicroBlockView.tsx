@@ -333,38 +333,61 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.2}
       />
 
-      {/* W_QKV Weights projection flow */}
+      {/* QKV Proj Node */}
+      <OperatorNode
+        id="op_qkv_proj"
+        name="QKV Proj (@)"
+        symbol="@"
+        position={[-4.6, 2.0, -2.0]}
+        color="#818cf8"
+        isHighlighted={isHighlighted('op_qkv_proj') || isHighlighted('node_w_qkv')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        labelPosition="bottom"
+      />
+
+      {/* Pre-Attn GN -> QKV Proj */}
       <FlowConnection
         from={[-6.3, 2.0, -2.0]}
-        to={[-5.35, 4.6, -4.5]}
+        to={[-5.15, 2.0, -2.0]}
+        color="#10b981"
+        label="Normed [6144]"
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'op_qkv_proj'])}
+      />
+
+      {/* W_QKV Weights projection flow */}
+      <FlowConnection
+        from={[-4.6, 3.4, -4.5]}
+        to={[-4.6, 2.0, -2.4]}
         color="#64748b"
         tubeRadius={0.02}
         particleCount={5}
-        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'node_w_qkv'])}
+        label="W_QKV"
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['node_w_qkv', 'op_qkv_proj'])}
       />
 
-      {/* Pre-Attn GN -> Q */}
+      {/* op_qkv_proj -> Q */}
       <FlowConnection
-        from={[-6.3, 2.0, -2.0]}
+        from={[-4.6, 2.0, -2.0]}
         to={[-3.25, 4.8, -2.0]}
         color="#818cf8"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_q'])}
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_qkv_proj', 'node_q'])}
         label="Q (48h)"
       />
-      {/* Pre-Attn GN -> K */}
+      {/* op_qkv_proj -> K */}
       <FlowConnection
-        from={[-6.3, 2.0, -2.0]}
+        from={[-4.6, 2.0, -2.0]}
         to={[isGlobal ? -1.85 : -2.05, 2.0, -2.0]}
         color="#818cf8"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_k'])}
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_qkv_proj', 'node_k'])}
         label={`K (${kvHeads}h)`}
       />
-      {/* Pre-Attn GN -> V */}
+      {/* op_qkv_proj -> V */}
       <FlowConnection
-        from={[-6.3, 2.0, -2.0]}
+        from={[-4.6, 2.0, -2.0]}
         to={[isGlobal ? -1.85 : -2.05, -0.8, -2.0]}
         color="#818cf8"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_v'])}
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_qkv_proj', 'node_v'])}
         label={`V (${kvHeads}h)`}
       />
 
@@ -558,12 +581,12 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelPosition="bottom"
       />
 
-      {/* Head Gate to Attn Add */}
+      {/* Head Gate to W_O Proj */}
       <FlowConnection
         from={[10.95, 2.2, -2.0]}
-        to={[13.0, 2.0, 0]}
+        to={[11.0, 2.2, -2.0]}
         color="#38bdf8"
-        isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['op_head_gate', 'op_attn_add'])}
+        isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['op_head_gate', 'op_wo_proj'])}
       />
 
       {/* W_O Output Projection Weight */}
@@ -571,28 +594,50 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_w_o"
         label="W_O Weight Matrix"
         subLabel="[6144 × 6144]"
-        position={[10.4, 4.8, -2.0]}
+        position={[11.5, 4.2, -4.5]}
         size={[1.3, 1.5, 0.6]}
         gridRows={8}
         gridCols={12}
         isWeight={true}
         colorTheme="slate"
-        isHighlighted={isHighlighted('node_w_o') || isHighlighted('op_attn_add')}
+        isHighlighted={isHighlighted('node_w_o') || isHighlighted('op_wo_proj')}
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
         labelYOffset={0.2}
       />
 
-      {/* W_O Weight into Attn Add */}
+      {/* W_O Proj Node */}
+      <OperatorNode
+        id="op_wo_proj"
+        name="W_O Proj (@)"
+        symbol="@"
+        position={[11.5, 2.2, -2.0]}
+        color="#38bdf8"
+        isHighlighted={isHighlighted('op_wo_proj') || isHighlighted('node_w_o')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        labelPosition="bottom"
+      />
+
+      {/* W_O Weight into W_O Proj */}
       <FlowConnection
-        from={[10.4, 4.0, -2.0]}
-        to={[13.3, 2.5, 0]}
+        from={[11.5, 4.2, -4.5]}
+        to={[11.5, 2.2, -2.4]}
         color="#64748b"
         tubeRadius={0.02}
         particleCount={5}
-        isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['node_w_o', 'op_attn_add'])}
-        label="W_O Proj"
+        label="W_O"
+        isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['node_w_o', 'op_wo_proj'])}
+      />
+
+      {/* W_O Proj to Attn Add */}
+      <FlowConnection
+        from={[12.05, 2.2, -2.0]}
+        to={[13.0, 2.0, 0]}
+        color="#38bdf8"
+        label="Attn Out [6144]"
+        isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['op_wo_proj', 'op_attn_add'])}
       />
 
       {/* Attn Add Node */}
@@ -903,13 +948,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.15}
       />
 
-      {/* Routed Experts → W_latent_up (matrix multiply 3072→6144) */}
+      {/* Routed Experts → Latent Up Proj */}
       <FlowConnection
         from={[32.7, 1.4, -2.5]}
-        to={[34.1, 1.4, -2.5]}
+        to={[33.95, 1.4, -2.5]}
         color="#f59e0b"
-        isHighlighted={isFlowActive(isStep('routed_experts_swiglu') || isStep('moe_aggregation_residual'), ['node_experts_routed', 'node_w_latent_up'])}
-        label="Routed [3072] → W↑"
+        isHighlighted={isFlowActive(isStep('routed_experts_swiglu') || isStep('moe_aggregation_residual'), ['node_experts_routed', 'op_latent_up_proj'])}
+        label="Routed [3072]"
       />
 
       {/* W_latent_up Weight Matrix */}
@@ -917,27 +962,49 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_w_latent_up"
         label="W_latent_up"
         subLabel="[3072 × 6144]"
-        position={[34.8, 1.4, -2.5]}
+        position={[34.5, 1.4, -4.5]}
         size={[1.3, 1.4, 0.6]}
         gridRows={12}
         gridCols={12}
         isWeight={true}
         colorTheme="slate"
-        isHighlighted={isHighlighted('node_w_latent_up') || isHighlighted('op_moe_add')}
+        isHighlighted={isHighlighted('node_w_latent_up') || isHighlighted('op_latent_up_proj')}
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
-        labelYOffset={0.15}
+        labelYOffset={-0.15}
       />
 
-      {/* W_latent_up projected output → MoE Merge */}
+      {/* Latent Up Proj Node */}
+      <OperatorNode
+        id="op_latent_up_proj"
+        name="einsum (tl,ld->td)"
+        symbol="@"
+        position={[34.5, 1.4, -2.5]}
+        color="#f59e0b"
+        isHighlighted={isHighlighted('op_latent_up_proj') || isHighlighted('node_w_latent_up')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        labelPosition="bottom"
+      />
+
+      {/* W_latent_up Weight into Latent Up Proj */}
       <FlowConnection
-        from={[35.5, 1.4, -2.5]}
+        from={[34.5, 1.4, -4.2]}
+        to={[34.5, 1.4, -2.9]}
+        color="#64748b"
+        isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['node_w_latent_up', 'op_latent_up_proj'])}
+        label="W_up"
+      />
+
+      {/* Up-projection Output → MoE Merge */}
+      <FlowConnection
+        from={[35.05, 1.4, -2.5]}
         to={[37.0, 1.8, 0]}
         color="#f59e0b"
         tubeRadius={0.035}
         particleCount={8}
-        isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['node_w_latent_up', 'op_moe_add'])}
+        isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['op_latent_up_proj', 'op_moe_add'])}
         label="Up-Projected [6144]"
       />
 
@@ -988,13 +1055,12 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
             labelPosition="bottom"
           />
 
-          {/* Final GN to LM Head Logits */}
+          {/* Final GN to LM Head Proj */}
           <FlowConnection
             from={[40.05, 2.0, 0]}
-            to={[43.55, 2.0, 0.8]}
+            to={[40.95, 2.0, 0]}
             color="#fb7185"
-            isHighlighted={isFlowActive(isStep('final_gated_norm') || isStep('untied_lm_head'), ['op_final_gn', 'node_lm_head'])}
-            label="Predict"
+            isHighlighted={isFlowActive(isStep('final_gated_norm') || isStep('untied_lm_head'), ['op_final_gn', 'op_lm_head_proj'])}
           />
 
           {/* Untied LM Head Weight W_out */}
@@ -1002,28 +1068,50 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
             id="node_w_lm_head"
             label="W_out [6144 × 128k]"
             subLabel="Untied Output Projection"
-            position={[42.0, 2.0, -2.5]}
+            position={[41.5, 2.0, -3.5]}
             size={[1.4, 3.2, 0.8]}
             gridRows={16}
             gridCols={16}
             isWeight={true}
             colorTheme="slate"
-            isHighlighted={isHighlighted('node_w_lm_head') || isHighlighted('node_lm_head')}
+            isHighlighted={isHighlighted('node_w_lm_head') || isHighlighted('op_lm_head_proj')}
             onHover={onHoverItem}
             onClick={onClickItem}
             onHoverCell={onHoverCell}
             labelYOffset={0.2}
           />
 
-          {/* W_lm_head weight into LM Head */}
+          {/* LM Head Proj Node */}
+          <OperatorNode
+            id="op_lm_head_proj"
+            name="LM Head Proj (@)"
+            symbol="@"
+            position={[41.5, 2.0, 0]}
+            color="#fb7185"
+            isHighlighted={isHighlighted('op_lm_head_proj') || isHighlighted('node_w_lm_head')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            labelPosition="bottom"
+          />
+
+          {/* W_lm_head weight into LM Head Proj */}
           <FlowConnection
-            from={[42.0, 2.0, -2.05]}
-            to={[44.4, 2.0, 0.45]}
+            from={[41.5, 2.0, -3.0]}
+            to={[41.5, 2.0, -0.4]}
             color="#64748b"
             tubeRadius={0.02}
             particleCount={5}
-            isHighlighted={isFlowActive(isStep('untied_lm_head'), ['node_w_lm_head', 'node_lm_head'])}
-            label="Untied W_out"
+            isHighlighted={isFlowActive(isStep('untied_lm_head'), ['node_w_lm_head', 'op_lm_head_proj'])}
+            label="W_out"
+          />
+
+          {/* LM Head Proj Output Logits */}
+          <FlowConnection
+            from={[42.05, 2.0, 0]}
+            to={[43.5, 2.0, 0.8]}
+            color="#fb7185"
+            isHighlighted={isFlowActive(isStep('untied_lm_head'), ['op_lm_head_proj', 'node_lm_head'])}
+            label="Logits [128k]"
           />
 
           {/* LM Head Output Logits */}
