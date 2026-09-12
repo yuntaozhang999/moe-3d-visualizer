@@ -642,13 +642,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       />
 
       {/* --- LANE A: ROUTER & SHARED EXPERTS (UPPER LATERAL TIER) --- */}
-      {/* Flow to Router */}
+      {/* Token to op_router_proj */}
       <FlowConnection
         from={[16.55, 2.0, 0]}
-        to={[25.2, 3.4, -4.5]}
+        to={[25.95, 3.4, -2.5]}
         color="#f59e0b"
-        isHighlighted={isFlowActive(isStep('router_qb_selection'), ['op_moe_gn', 'node_w_router'])}
-        label="Router In"
+        isHighlighted={isFlowActive(isStep('router_qb_selection'), ['op_moe_gn', 'op_router_proj'])}
+        label="Token [6144]"
       />
 
       {/* W_router Weight Matrix */}
@@ -656,28 +656,50 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_w_router"
         label="W_router [6144 × 384]"
         subLabel="QB Router Projection"
-        position={[26.0, 3.4, -4.5]}
+        position={[26.5, 3.4, -4.5]}
         size={[1.4, 1.6, 0.6]}
         gridRows={12}
         gridCols={16}
         isWeight={true}
         colorTheme="slate"
-        isHighlighted={isHighlighted('node_w_router') || isHighlighted('node_router')}
+        isHighlighted={isHighlighted('node_w_router') || isHighlighted('op_router_proj')}
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
         labelYOffset={0.15}
       />
 
-      {/* W_router Weight into Router */}
+      {/* W_router -> op_router_proj */}
       <FlowConnection
-        from={[26.0, 3.4, -4.2]}
-        to={[26.0, 3.4, -2.8]}
-        color="#f59e0b"
-        tubeRadius={0.025}
+        from={[26.5, 3.4, -4.2]}
+        to={[26.5, 3.4, -2.9]}
+        color="#64748b"
+        tubeRadius={0.02}
         particleCount={4}
-        label="Projection [384]"
-        isHighlighted={isFlowActive(isStep('router_qb_selection'), ['node_w_router', 'node_router'])}
+        label="W_router"
+        isHighlighted={isFlowActive(isStep('router_qb_selection'), ['node_w_router', 'op_router_proj'])}
+      />
+
+      {/* Router Projection Operator */}
+      <OperatorNode
+        id="op_router_proj"
+        name="einsum (td,de->te)"
+        symbol="@"
+        position={[26.5, 3.4, -2.5]}
+        color="#f59e0b"
+        isHighlighted={isHighlighted('op_router_proj') || isHighlighted('node_w_router')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        labelPosition="top"
+      />
+
+      {/* op_router_proj -> node_router */}
+      <FlowConnection
+        from={[27.05, 3.4, -2.5]}
+        to={[27.25, 3.4, -2.5]}
+        color="#f59e0b"
+        isHighlighted={isFlowActive(isStep('router_qb_selection'), ['op_router_proj', 'node_router'])}
+        label="Logits [384]"
       />
 
       {/* Router Logits & QB Selection */}
@@ -685,7 +707,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_router"
         label="Router (Top-8 of 384)"
         subLabel="QB Threshold & Sigmoid"
-        position={[26.0, 3.4, -2.5]}
+        position={[28.2, 3.4, -2.5]}
         size={[1.8, 1.4, 0.5]}
         gridRows={activationData.tokens.length}
         gridCols={16}
@@ -697,10 +719,10 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.15}
       />
 
-      {/* Router Matrix to QB Operator */}
+      {/* node_router -> op_router_qb */}
       <FlowConnection
-        from={[27.0, 3.4, -2.5]}
-        to={[28.3, 3.4, -2.5]}
+        from={[29.15, 3.4, -2.5]}
+        to={[29.65, 3.4, -2.5]}
         color="#f59e0b"
         isHighlighted={isFlowActive(isStep('router_qb_selection'), ['node_router', 'op_router_qb'])}
       />
@@ -710,7 +732,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="op_router_qb"
         name="QB Routing (Top 8)"
         symbol="QB"
-        position={[28.8, 3.4, -2.5]}
+        position={[30.2, 3.4, -2.5]}
         color="#f59e0b"
         isHighlighted={isHighlighted('op_router_qb')}
         onHover={onHoverItem}
@@ -723,7 +745,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_experts_shared"
         label="2 Shared Experts"
         subLabel="6144 → 3072 → 6144 (each)"
-        position={[19.0, 2.2, 2.5]}
+        position={[18.5, 2.2, 2.5]}
         size={[64 * DIM_W, 1.6, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={64}
@@ -746,13 +768,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       />
 
       {/* --- LANE B: LATENT COMPRESSION & ROUTED EXPERTS (LOWER LATERAL TIER) --- */}
-      {/* Branch to Latent Down */}
+      {/* Branch to Latent Down (Token -> op_latent_proj) */}
       <FlowConnection
         from={[16.55, 2.0, 0]}
-        to={[20.2, 1.0, -4.5]}
+        to={[19.95, 1.0, -2.5]}
         color="#38bdf8"
-        isHighlighted={isFlowActive(isStep('latent_compression'), ['op_moe_gn', 'node_w_latent_down'])}
-        label="Compress 6144→3072"
+        isHighlighted={isFlowActive(isStep('latent_compression'), ['op_moe_gn', 'op_latent_proj'])}
+        label="Token [6144]"
       />
 
       {/* W_latent_down Weight Matrix */}
@@ -760,28 +782,50 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_w_latent_down"
         label="W_latent_down [6144 × 3072]"
         subLabel="Compression Matrix"
-        position={[21.0, 1.0, -4.5]}
+        position={[20.5, 1.0, -4.5]}
         size={[1.4, 1.4, 0.6]}
         gridRows={12}
         gridCols={12}
         isWeight={true}
         colorTheme="slate"
-        isHighlighted={isHighlighted('node_w_latent_down') || isHighlighted('node_latent_down')}
+        isHighlighted={isHighlighted('node_w_latent_down') || isHighlighted('op_latent_proj')}
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
         labelYOffset={-0.15}
       />
 
-      {/* W_latent_down Weight into Latent Down Matrix */}
+      {/* W_down -> op_latent_proj */}
       <FlowConnection
-        from={[21.0, 1.0, -4.2]}
-        to={[21.0, 1.0, -2.8]}
-        color="#38bdf8"
-        tubeRadius={0.025}
+        from={[20.5, 1.0, -4.2]}
+        to={[20.5, 1.0, -2.9]}
+        color="#64748b"
+        tubeRadius={0.02}
         particleCount={4}
-        label="Latent Proj"
-        isHighlighted={isFlowActive(isStep('latent_compression'), ['node_w_latent_down', 'node_latent_down'])}
+        label="W_down"
+        isHighlighted={isFlowActive(isStep('latent_compression'), ['node_w_latent_down', 'op_latent_proj'])}
+      />
+
+      {/* Latent Projection Operator */}
+      <OperatorNode
+        id="op_latent_proj"
+        name="einsum (td,dl->tl)"
+        symbol="@"
+        position={[20.5, 1.0, -2.5]}
+        color="#38bdf8"
+        isHighlighted={isHighlighted('op_latent_proj') || isHighlighted('node_w_latent_down')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        labelPosition="bottom"
+      />
+
+      {/* op_latent_proj -> node_latent_down */}
+      <FlowConnection
+        from={[21.05, 1.0, -2.5]}
+        to={[21.65, 1.0, -2.5]}
+        color="#38bdf8"
+        isHighlighted={isFlowActive(isStep('latent_compression'), ['op_latent_proj', 'node_latent_down'])}
+        label="Latent [3072]"
       />
 
       {/* Compressed Latent Vector */}
@@ -789,7 +833,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_latent_down"
         label="Latent Vector (3072)"
         subLabel="50% Comms Reduction"
-        position={[21.0, 1.0, -2.5]}
+        position={[22.5, 1.0, -2.5]}
         size={[32 * DIM_W, 1.4, 0.5]}
         gridRows={activationData.tokens.length}
         gridCols={32}
@@ -804,11 +848,10 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* Latent Down to Latent RMSNorm */}
       <FlowConnection
-        from={[21.9, 1.0, -2.5]}
-        to={[23.3, 1.0, -2.5]}
+        from={[23.35, 1.0, -2.5]}
+        to={[24.45, 1.0, -2.5]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('latent_compression'), ['node_latent_down', 'op_latent_norm'])}
-        label="RMSNorm"
       />
 
       {/* Latent RMSNorm Node */}
@@ -816,7 +859,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="op_latent_norm"
         name="Latent RMSNorm"
         symbol="LN"
-        position={[23.8, 1.0, -2.5]}
+        position={[25.0, 1.0, -2.5]}
         color="#38bdf8"
         isHighlighted={isHighlighted('op_latent_norm')}
         onHover={onHoverItem}
@@ -826,21 +869,21 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* QB Router to 8 Routed Experts: Gating dispatch */}
       <FlowConnection
-        from={[29.3, 3.4, -2.5]}
-        to={[31.0, 1.8, -2.5]}
+        from={[30.75, 3.4, -2.5]}
+        to={[31.2, 1.8, -2.5]}
         color="#f59e0b"
-        curveHeight={0.35}
+        curveHeight={0.3}
         isHighlighted={isFlowActive(isStep('router_qb_selection') || isStep('routed_experts_swiglu'), ['op_router_qb', 'node_experts_routed'])}
         label="Top-8 Gating Beam"
       />
 
       {/* Latent RMSNorm into 8 Routed Experts */}
       <FlowConnection
-        from={[24.3, 1.0, -2.5]}
-        to={[30.7, 1.0, -2.5]}
+        from={[25.55, 1.0, -2.5]}
+        to={[30.7, 1.2, -2.5]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('routed_experts_swiglu'), ['op_latent_norm', 'node_experts_routed'])}
-        label="Latent [3072]"
+        label="Normed [3072]"
       />
 
       {/* 8 Routed Half-Width Experts */}
@@ -848,7 +891,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_experts_routed"
         label="8 Routed Experts"
         subLabel="Top-8 Active SwiGLU (3072)"
-        position={[31.5, 1.4, -2.5]}
+        position={[31.8, 1.4, -2.5]}
         size={[32 * DIM_W, 1.8, 0.6]}
         gridRows={8}
         gridCols={32}
@@ -860,12 +903,21 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         labelYOffset={0.15}
       />
 
+      {/* Routed Experts → W_latent_up (matrix multiply 3072→6144) */}
+      <FlowConnection
+        from={[32.7, 1.4, -2.5]}
+        to={[34.1, 1.4, -2.5]}
+        color="#f59e0b"
+        isHighlighted={isFlowActive(isStep('routed_experts_swiglu') || isStep('moe_aggregation_residual'), ['node_experts_routed', 'node_w_latent_up'])}
+        label="Routed [3072] → W↑"
+      />
+
       {/* W_latent_up Weight Matrix */}
       <TensorMatrix
         id="node_w_latent_up"
         label="W_latent_up"
         subLabel="[3072 × 6144]"
-        position={[34.5, 1.4, -2.5]}
+        position={[34.8, 1.4, -2.5]}
         size={[1.3, 1.4, 0.6]}
         gridRows={12}
         gridCols={12}
@@ -880,22 +932,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* W_latent_up projected output → MoE Merge */}
       <FlowConnection
-        from={[35.2, 1.4, -2.5]}
+        from={[35.5, 1.4, -2.5]}
         to={[37.0, 1.8, 0]}
         color="#f59e0b"
         tubeRadius={0.035}
         particleCount={8}
         isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['node_w_latent_up', 'op_moe_add'])}
         label="Up-Projected [6144]"
-      />
-
-      {/* Routed Experts → W_latent_up (matrix multiply 3072→6144) */}
-      <FlowConnection
-        from={[32.4, 1.4, -2.5]}
-        to={[33.8, 1.4, -2.5]}
-        color="#f59e0b"
-        isHighlighted={isFlowActive(isStep('routed_experts_swiglu') || isStep('moe_aggregation_residual'), ['node_experts_routed', 'node_w_latent_up'])}
-        label="Routed [3072] → W↑"
       />
 
       {/* Shared Experts to MoE Add */}

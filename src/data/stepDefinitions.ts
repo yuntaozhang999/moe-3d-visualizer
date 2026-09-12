@@ -208,7 +208,7 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     hardwareSignificance: 'QB (Quantile Balancing) dynamically balances load across GPU nodes without intrusive auxiliary balance loss penalties.',
     cameraFocus: [27.0, 3.4, -2.5],
     cameraPos: [27.0, 7.0, 5.0],
-    activeNodeIds: ['node_router', 'op_router_qb'],
+    activeNodeIds: ['op_router_proj', 'node_w_router', 'node_router', 'op_router_qb'],
   },
   {
     id: 'latent_compression',
@@ -222,9 +222,9 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: '[1, 4096, 3072]',
     visualShape: '[1, 6, 32]',
     hardwareSignificance: 'Cuts EP all-to-all cross-node network bandwidth in HALF (150 GB/s -> 75 GB/s), preventing network bottlenecks on 11-rack clusters.',
-    cameraFocus: [22.5, 1.0, -2.5],
-    cameraPos: [22.5, 4.5, 5.0],
-    activeNodeIds: ['node_latent_down', 'op_latent_norm'],
+    cameraFocus: [22.0, 1.0, -2.5],
+    cameraPos: [22.0, 5.0, 4.0],
+    activeNodeIds: ['op_latent_proj', 'node_w_latent_down', 'node_latent_down', 'op_latent_norm'],
   },
   {
     id: 'routed_experts_swiglu',

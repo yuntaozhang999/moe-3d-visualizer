@@ -631,6 +631,46 @@ export const EQUATION_DEFINITIONS: Record<string, EnrichedEquationData> = {
     codeSnippet: 'hidden = self.final_gated_norm(self.final_norm(hidden))',
   },
 
+  op_latent_proj: {
+    id: 'op_latent_proj',
+    title: 'Latent Projection Operator',
+    category: 'Operator',
+    formula: '\\text{routed\\_input} = \\text{jnp.einsum}("td,dl\\rightarrow tl", x, W_{\\text{down}})',
+    intuitiveMeaning: 'Projects the 6144-dimensional token down to a 3072-dimensional latent representation to save cross-node bandwidth.',
+    dataflow: {
+      inputShape: '[T, 6144]',
+      operation: 'Einsum Tensor Contraction',
+      weightShape: '[6144, 3072]',
+      outputShape: '[T, 3072]',
+      transformationNote: 'Source Line: 1046',
+      stages: []
+    },
+    variables: [],
+    realShape: '[T, 3072]',
+    visualShape: '[T, 32]',
+    codeSnippet: 'routed_input = jnp.einsum("td,dl->tl", x, W_down)',
+  },
+
+  op_router_proj: {
+    id: 'op_router_proj',
+    title: 'Router Projection Operator',
+    category: 'Operator',
+    formula: '\\text{router\\_logits} = \\text{jnp.einsum}("td,de\\rightarrow te", x, W_{\\text{router}})',
+    intuitiveMeaning: 'Projects the 6144-dimensional token to expert logits for the Query-Based Router.',
+    dataflow: {
+      inputShape: '[T, 6144]',
+      operation: 'Einsum Tensor Contraction',
+      weightShape: '[6144, 384]',
+      outputShape: '[T, 384]',
+      transformationNote: 'Source Line: 977',
+      stages: []
+    },
+    variables: [],
+    realShape: '[T, 384]',
+    visualShape: '[T, 4]',
+    codeSnippet: 'router_logits = jnp.einsum("td,de->te", x, W_router)',
+  },
+
   untied_lm_head: {
     id: 'untied_lm_head',
     title: 'Untied Language Model Head & Softmax',
@@ -685,8 +725,10 @@ export const NODE_EQUATION_MAP: Record<string, string> = {
   op_attn_add: 'attn_proj_residual',
   node_pre_moe_norm: 'pre_moe_gated_norm',
   op_moe_gn: 'pre_moe_gated_norm',
+  op_router_proj: 'op_router_proj',
   node_router: 'router_qb_selection',
   op_router_qb: 'router_qb_selection',
+  op_latent_proj: 'op_latent_proj',
   node_latent_down: 'latent_compression',
   op_latent_norm: 'latent_compression',
   node_experts_routed: 'routed_experts_swiglu',
