@@ -291,44 +291,16 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
       <ScreenSpaceBillboard
         position={[0, size[1] / 2 + (subLabel ? 0.52 : 0.4) + labelYOffset, 0]}
       >
-        {/* High-contrast dark pill backdrop */}
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry
-            args={[
-              Math.min(2.6, Math.max(1.1, Math.max(label.length, subLabel?.length || 0) * 0.105 + 0.34)),
-              subLabel ? 0.52 : 0.34,
-            ]}
-          />
-          <meshBasicMaterial
-            color="#090c13"
-            transparent
-            opacity={0.95}
-            depthWrite={true}
-          />
-        </mesh>
-        <lineSegments position={[0, 0, 0]}>
-          <edgesGeometry
-            args={[
-              new THREE.PlaneGeometry(
-                Math.min(2.6, Math.max(1.1, Math.max(label.length, subLabel?.length || 0) * 0.105 + 0.34)),
-                subLabel ? 0.52 : 0.34
-              ),
-            ]}
-          />
-          <lineBasicMaterial
-            color={isHighlighted ? borderColor : '#243046'}
-            transparent
-            opacity={0.75}
-          />
-        </lineSegments>
-
         <Text
           position={[0, subLabel ? 0.12 : 0, 0.01]}
           fontSize={0.21}
-          color={isHighlighted ? '#ffffff' : '#e2e8f0'}
+          color={isHighlighted ? '#ffffff' : '#f8fafc'}
           anchorX="center"
           anchorY="middle"
           fontWeight={600}
+          outlineWidth={0.024}
+          outlineColor="#090c13"
+          outlineBlur={0.006}
         >
           {label}
         </Text>
@@ -337,9 +309,12 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
           <Text
             position={[0, -0.14, 0.01]}
             fontSize={0.15}
-            color={isHighlighted ? '#93c5fd' : '#94a3b8'}
+            color={isHighlighted ? '#38bdf8' : '#94a3b8'}
             anchorX="center"
             anchorY="middle"
+            outlineWidth={0.02}
+            outlineColor="#090c13"
+            outlineBlur={0.005}
           >
             {subLabel}
           </Text>

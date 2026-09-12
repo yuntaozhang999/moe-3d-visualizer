@@ -86,37 +86,16 @@ export const OperatorNode: React.FC<OperatorNodeProps> = ({
             : [0, -0.76, 0]
         }
       >
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[Math.min(2.4, Math.max(1.0, name.length * 0.105 + 0.34)), 0.34]} />
-          <meshBasicMaterial
-            color="#090c13"
-            transparent
-            opacity={0.94}
-            depthWrite={true}
-          />
-        </mesh>
-        <lineSegments position={[0, 0, 0]}>
-          <edgesGeometry
-            args={[
-              new THREE.PlaneGeometry(
-                Math.min(2.4, Math.max(1.0, name.length * 0.105 + 0.34)),
-                0.34
-              ),
-            ]}
-          />
-          <lineBasicMaterial
-            color={isHighlighted ? color : '#243046'}
-            transparent
-            opacity={0.7}
-          />
-        </lineSegments>
         <Text
           position={[0, 0, 0.01]}
-          fontSize={0.19}
-          color={isHighlighted ? '#ffffff' : '#cbd5e1'}
+          fontSize={0.17}
+          color={isHighlighted ? '#ffffff' : '#e2e8f0'}
           anchorX="center"
           anchorY="middle"
           fontWeight={600}
+          outlineWidth={0.022}
+          outlineColor="#090c13"
+          outlineBlur={0.006}
         >
           {name}
         </Text>

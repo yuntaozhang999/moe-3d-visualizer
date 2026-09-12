@@ -173,6 +173,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
             onHover={onHoverItem}
             onClick={onClickItem}
             onHoverCell={onHoverCell}
+            labelYOffset={0.35}
           />
 
           {/* token_embed -> _embedding_gather */}
