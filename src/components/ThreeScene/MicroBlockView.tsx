@@ -1150,10 +1150,12 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           />
           <FlowConnection
             from={[37.15, 2.0, 0]}
-            to={[37.2, 2.0, 0]}
+            to={[39.35, 2.0, 0]}
             label="Residual Stream [6144]"
             color="#a855f7"
-            isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['op_moe_add', 'node_residual_out'])}
+            tubeRadius={0.03}
+            particleCount={6}
+            isHighlighted={isFlowActive(isStep('moe_aggregation_residual') || isStep('final_gated_norm') || isStep('untied_lm_head'), ['op_moe_add', 'node_residual_out'])}
           />
         </group>
       )}
