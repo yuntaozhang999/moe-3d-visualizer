@@ -645,9 +645,9 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       {/* Flow to Router */}
       <FlowConnection
         from={[16.55, 2.0, 0]}
-        to={[20.7, 3.2, -4.5]}
+        to={[20.8, 3.4, -4.5]}
         color="#f59e0b"
-        isHighlighted={isFlowActive(isStep('router_qb_selection'), ['op_moe_gn', 'node_router'])}
+        isHighlighted={isFlowActive(isStep('router_qb_selection'), ['op_moe_gn', 'node_w_router'])}
         label="Router In"
       />
 
@@ -656,7 +656,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_w_router"
         label="W_router [6144 × 384]"
         subLabel="QB Router Projection"
-        position={[21.5, 3.2, -4.5]}
+        position={[21.5, 3.4, -4.5]}
         size={[1.4, 1.6, 0.6]}
         gridRows={12}
         gridCols={16}
@@ -671,8 +671,8 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* W_router Weight into Router */}
       <FlowConnection
-        from={[21.5, 3.2, -4.2]}
-        to={[21.5, 3.2, -2.8]}
+        from={[21.5, 3.4, -4.2]}
+        to={[21.5, 3.4, -2.8]}
         color="#f59e0b"
         tubeRadius={0.025}
         particleCount={4}
@@ -685,7 +685,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_router"
         label="Router (Top-8 of 384)"
         subLabel="QB Threshold & Sigmoid"
-        position={[21.5, 3.2, -2.5]}
+        position={[21.5, 3.4, -2.5]}
         size={[1.8, 1.4, 0.5]}
         gridRows={activationData.tokens.length}
         gridCols={16}
@@ -694,13 +694,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
-        labelYOffset={-0.1}
+        labelYOffset={0.15}
       />
 
       {/* Router Matrix to QB Operator */}
       <FlowConnection
-        from={[22.5, 3.2, -2.5]}
-        to={[23.9, 3.2, -2.5]}
+        from={[22.4, 3.4, -2.5]}
+        to={[25.0, 3.4, -2.5]}
         color="#f59e0b"
         isHighlighted={isFlowActive(isStep('router_qb_selection'), ['node_router', 'op_router_qb'])}
       />
@@ -710,7 +710,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="op_router_qb"
         name="QB Routing (Top 8)"
         symbol="QB"
-        position={[24.5, 3.2, -2.5]}
+        position={[25.5, 3.4, -2.5]}
         color="#f59e0b"
         isHighlighted={isHighlighted('op_router_qb')}
         onHover={onHoverItem}
@@ -749,7 +749,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       {/* Branch to Latent Down */}
       <FlowConnection
         from={[16.55, 2.0, 0]}
-        to={[23.2, 1.0, -4.5]}
+        to={[20.8, 0.8, -4.5]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('latent_compression'), ['op_moe_gn', 'node_w_latent_down'])}
         label="Compress 6144→3072"
@@ -760,7 +760,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_w_latent_down"
         label="W_latent_down [6144 × 3072]"
         subLabel="Compression Matrix"
-        position={[24.0, 1.0, -4.5]}
+        position={[21.5, 0.8, -4.5]}
         size={[1.4, 1.4, 0.6]}
         gridRows={12}
         gridCols={12}
@@ -770,13 +770,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
-        labelYOffset={0.15}
+        labelYOffset={-0.15}
       />
 
       {/* W_latent_down Weight into Latent Down Matrix */}
       <FlowConnection
-        from={[24.0, 1.0, -4.2]}
-        to={[24.0, 1.0, -2.8]}
+        from={[21.5, 0.8, -4.2]}
+        to={[21.5, 0.8, -2.8]}
         color="#38bdf8"
         tubeRadius={0.025}
         particleCount={4}
@@ -789,7 +789,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_latent_down"
         label="Latent Vector (3072)"
         subLabel="50% Comms Reduction"
-        position={[24.0, 1.0, -2.5]}
+        position={[21.5, 0.8, -2.5]}
         size={[32 * DIM_W, 1.4, 0.5]}
         gridRows={activationData.tokens.length}
         gridCols={32}
@@ -799,13 +799,13 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
-        labelYOffset={0.15}
+        labelYOffset={-0.15}
       />
 
       {/* Latent Down to Latent RMSNorm */}
       <FlowConnection
-        from={[24.9, 1.0, -2.5]}
-        to={[26.4, 1.0, -2.5]}
+        from={[22.3, 0.8, -2.5]}
+        to={[25.0, 0.8, -2.5]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('latent_compression'), ['node_latent_down', 'op_latent_norm'])}
         label="RMSNorm"
@@ -816,7 +816,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="op_latent_norm"
         name="Latent RMSNorm"
         symbol="LN"
-        position={[27.0, 1.0, -2.5]}
+        position={[25.5, 0.8, -2.5]}
         color="#38bdf8"
         isHighlighted={isHighlighted('op_latent_norm')}
         onHover={onHoverItem}
@@ -826,19 +826,20 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* QB Router to 8 Routed Experts: Gating dispatch */}
       <FlowConnection
-        from={[25.1, 3.2, -2.5]}
-        to={[30.2, 1.6, -2.5]}
+        from={[26.0, 3.4, -2.5]}
+        to={[30.2, 1.8, -2.5]}
         color="#f59e0b"
-        curveHeight={0.5}
+        curveHeight={0.4}
         isHighlighted={isFlowActive(isStep('router_qb_selection') || isStep('routed_experts_swiglu'), ['op_router_qb', 'node_experts_routed'])}
         label="Top-8 Gating Beam"
       />
 
       {/* Latent RMSNorm into 8 Routed Experts */}
       <FlowConnection
-        from={[27.6, 1.0, -2.5]}
+        from={[26.0, 0.8, -2.5]}
         to={[30.2, 1.2, -2.5]}
         color="#38bdf8"
+        curveHeight={0.2}
         isHighlighted={isFlowActive(isStep('routed_experts_swiglu'), ['op_latent_norm', 'node_experts_routed'])}
         label="Latent [3072]"
       />
