@@ -206,8 +206,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: 'Logits: [4096, 384], Selected: [4096, 8]',
     visualShape: 'Logits: [6, 24], Selected: [6, 8]',
     hardwareSignificance: 'QB (Quantile Balancing) dynamically balances load across GPU nodes without intrusive auxiliary balance loss penalties.',
-    cameraFocus: [19.2, 4.2, 3.5],
-    cameraPos: [19.2, 8.0, 11],
+    cameraFocus: [26.8, 4.2, 2.5],
+    cameraPos: [26.8, 8.0, 9.5],
     activeNodeIds: ['node_router', 'op_router_qb'],
   },
   {
@@ -254,8 +254,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: '2 x [6144 -> 3072 -> 6144]',
     visualShape: '2 x [64 -> 32 -> 64]',
     hardwareSignificance: 'Ensures fundamental syntactic & reasoning patterns are shared across all tokens without occupying routing capacity.',
-    cameraFocus: [27.0, 7.2, 2.5],
-    cameraPos: [27.0, 11.0, 10],
+    cameraFocus: [19.5, 4.2, 2.5],
+    cameraPos: [19.5, 8.0, 9.5],
     activeNodeIds: ['node_experts_shared'],
   },
   {

@@ -234,3 +234,16 @@ To correct this and achieve a pristine floating architectural design, a global "
     ![After: Stage 2 node_v Cleared](./screenshots/after_elevation_attn_v.png)
 *   **Stage 3 (Latent MoE) - Ground Clearance Validation**:
     ![After: Stage 3 Latent Norm Cleared](./screenshots/after_elevation_moe_ground.png)
+
+## 16. MoE Logic Reordering: Shared Experts Upfront & Direct Gating Dispatch
+
+In order to intuitively reflect the causal relationship of the MoE dispatch logic and further prevent visual occlusion, the sequence of modules within Lane A (Z = +2.5) was critically reordered.
+
+- **Shared Experts Relocated Upfront**: The high-capacity `2 Shared Experts` block was advanced to the very front of the processing line (`X=19.5`), representing the unconditional processing path that triggers concurrently with routing.
+- **Router Array Moved Downstream**: The conditional routing logic (`W_router`, `Router Logits`, and `QB Routing`) was shifted downstream (`X=24.5` to `28.8`), physically aligning it with the dynamically dispatched `Routed Experts` located across the aisle.
+- **Horizontal Unrolling**: The `W_router` projection matrix and the `Router` activation matrix were unrolled horizontally rather than stacked vertically. This layout choice eliminates vertical occlusion from overhead cameras, allowing every computational step to breathe.
+- **Direct Cross-Axis Gating**: As a result of this realignment, the `QB Router` now sits almost exactly opposite the `8 Routed Experts` on the Z-axis. The resulting Gating Beam now blasts straight across the primary channel (`curveHeight=1.4`) with near-perfect orthogonality, establishing a visceral visual connection between the gating logic and its target computational payload.
+
+### Visual Comparison
+*   **Focus: Reordered Lane A and Direct Gating**:
+    ![After: Shared Experts Front & Center](./screenshots/after_shared_experts_front.png)

@@ -26,39 +26,22 @@ async function run() {
   const docsDir = path.join(process.cwd(), 'docs', 'screenshots');
   const artifactDir = '/Users/yuntao/.gemini/antigravity-cli/brain/84684cf6-e539-4da2-9c3d-d1655979527c';
 
-  // 1. Stage 2 Attn node_v Focus
-  console.log('Setting Attn focus view...');
+  // MoE Overview Focus
+  console.log('Setting MoE Shared Experts Front view...');
   await page.evaluate(() => {
     if (window.__threeCamera && window.__threeControls) {
-      window.__threeCamera.position.set(2.0, 3.0, 6.0);
-      window.__threeControls.target.set(2.0, 1.0, -2.0);
+      window.__threeCamera.position.set(24.0, 12.0, 14.0);
+      window.__threeControls.target.set(24.0, 2.0, 0);
       window.__threeControls.update();
     }
   });
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  const attnDocs = path.join(docsDir, 'after_elevation_attn_v.png');
-  const attnArtifact = path.join(artifactDir, 'after_elevation_attn_v.png');
-  await page.screenshot({ path: attnDocs });
-  await page.screenshot({ path: attnArtifact });
-  console.log(`Saved Attn view.`);
-
-  // 2. Stage 3 MoE Latent RMSNorm Focus
-  console.log('Setting MoE focus view...');
-  await page.evaluate(() => {
-    if (window.__threeCamera && window.__threeControls) {
-      window.__threeCamera.position.set(25.5, 3.0, 6.0);
-      window.__threeControls.target.set(25.5, 1.0, -2.5);
-      window.__threeControls.update();
-    }
-  });
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  const moeDocs = path.join(docsDir, 'after_elevation_moe_ground.png');
-  const moeArtifact = path.join(artifactDir, 'after_elevation_moe_ground.png');
-  await page.screenshot({ path: moeDocs });
-  await page.screenshot({ path: moeArtifact });
-  console.log(`Saved MoE view.`);
+  const docsPath = path.join(docsDir, 'after_shared_experts_front.png');
+  const artifactPath = path.join(artifactDir, 'after_shared_experts_front.png');
+  await page.screenshot({ path: docsPath });
+  await page.screenshot({ path: artifactPath });
+  console.log(`Saved screenshot.`);
 
   await browser.close();
   server.kill();
