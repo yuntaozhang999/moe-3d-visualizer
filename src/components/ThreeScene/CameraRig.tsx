@@ -24,6 +24,11 @@ export const CameraRig: React.FC<CameraRigProps> = ({
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const { camera } = useThree();
 
+  useEffect(() => {
+    (window as any).__threeCamera = camera;
+    (window as any).__threeControls = controlsRef.current;
+  });
+
   const targetVec = useRef(new THREE.Vector3(...cameraFocus));
   const posVec = useRef(new THREE.Vector3(...cameraPos));
   const isTransitioning = useRef(false);

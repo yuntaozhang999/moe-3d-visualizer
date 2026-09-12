@@ -130,5 +130,25 @@ To decouple the primary backbone highway from the attention side-branch, we shif
 *   ![Before: Pre-Attn GatedNorm on Residual Backbone (Top Down)](./screenshots/before_preattn_offset_topdown.png)
 *   ![After: Pre-Attn GatedNorm Offset to Z=-2.0 (Top Down)](./screenshots/after_preattn_offset_topdown.png)
 
+## 10. Residual Bus & Unified Split Hub (Corner De-uglification)
+
+In non-first layers ($l > 0$), `Residual Skip 1` was previously anchored directly to the right edge of `node_residual_in` (`[-9.85, 2.45, 0]`). Because the tensor matrix is tall ($Y \in [0.4, 3.6]$), the high-altitude skip arch climbed vertically immediately adjacent to the box's top-right corner, resembling a cramped, awkward "chimney pipe" that collided with the `Input from L...` HUD banner. Concurrently, a second pipe branched diagonally downward from the same surface, creating visual clutter and eliminating breathing room.
+
+### Rectifications Implemented:
+1. **Single Pristine Residual Bus**:
+   - The right face of `node_residual_in` (`[-9.85, 2.0, 0]`) now emits a **single, horizontal cyan backbone bus** (`Residual Bus`) extending 1.05 units to a dedicated split junction at `[-8.8, 2.0, 0]`.
+   - Eliminates all cramped corner pipes and keeps the tensor label completely un-clipped.
+
+2. **Unified High-Altitude Arch Anchor ($X = -8.8$)**:
+   - Across **all layers** (Layer 0 through Layer 47), `Residual Skip 1` now launches consistently from $X = -8.8$ (`[-8.8, 2.45, 0]`), providing stable architectural continuity when switching layers.
+
+3. **Diagonal Pre-Attn Branch**:
+   - From the split junction (`[-8.8, 2.0, 0]`), a single diagonal pipe branches smoothly toward `op_attn_gn` at `[-7.35, 2.0, -2.0]`, delivering pristine geometric symmetry and industrial pipeline clarity.
+
+### Visual Comparison
+*   ![Before: Awkward Corner Pipe & Label Clipping](./screenshots/before_ugly_corner.png)
+*   ![After: Pristine Residual Bus & Unified Split Hub](./screenshots/after_ugly_corner.png)
+
+
 
 

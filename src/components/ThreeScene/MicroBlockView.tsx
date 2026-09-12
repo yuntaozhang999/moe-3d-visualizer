@@ -270,12 +270,21 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
             onClick={onClickItem}
             onHoverCell={onHoverCell}
           />
+          {/* Main Residual Bus out of node_residual_in */}
           <FlowConnection
             from={[-9.85, 2.0, 0]}
-            to={[-7.35, 2.0, -2.0]}
-            label="Residual Flow [6144]"
+            to={[-8.8, 2.0, 0]}
+            label="Residual Bus"
             color="#00f3ff"
-            isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('input_tokens') || isStep('token_embed') || isStep('embed_gated_norm'), ['node_residual_in', 'op_attn_gn'])}
+            isHighlighted={isFlowActive(isStep('input_tokens') || isStep('pre_attn_gated_norm') || isStep('token_embed') || isStep('embed_gated_norm'), ['node_residual_in', 'op_attn_gn'])}
+          />
+          {/* Branching into Pre-Attn GN */}
+          <FlowConnection
+            from={[-8.8, 2.0, 0]}
+            to={[-7.35, 2.0, -2.0]}
+            label="Pre-Attn Branch"
+            color="#10b981"
+            isHighlighted={isFlowActive(isStep('pre_attn_gated_norm'), ['node_residual_in', 'op_attn_gn'])}
           />
         </group>
       )}
@@ -297,7 +306,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* High-Altitude Residual Bypass 1 (Attention Residual) */}
       <FlowConnection
-        from={[isFirstLayer ? -8.8 : -9.85, 2.45, 0]}
+        from={[-8.8, 2.45, 0]}
         to={[13.5, 2.45, 0]}
         isResidual={true}
         curveHeight={5.5}
