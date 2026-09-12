@@ -26,8 +26,8 @@ async function run() {
   const docsDir = path.join(process.cwd(), 'docs', 'screenshots');
   const artifactDir = '/Users/yuntao/.gemini/antigravity-cli/brain/84684cf6-e539-4da2-9c3d-d1655979527c';
 
-  // MoE Overview Focus
-  console.log('Setting MoE Shared Experts Front view...');
+  // MoE Overview Focus Clean
+  console.log('Setting MoE Shared Experts Front Clean view...');
   await page.evaluate(() => {
     if (window.__threeCamera && window.__threeControls) {
       window.__threeCamera.position.set(24.0, 12.0, 14.0);
@@ -37,8 +37,8 @@ async function run() {
   });
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  const docsPath = path.join(docsDir, 'after_shared_experts_front.png');
-  const artifactPath = path.join(artifactDir, 'after_shared_experts_front.png');
+  const docsPath = path.join(docsDir, 'after_shared_front_focus_clean.png');
+  const artifactPath = path.join(artifactDir, 'after_shared_front_focus_clean.png');
   await page.screenshot({ path: docsPath });
   await page.screenshot({ path: artifactPath });
   console.log(`Saved screenshot.`);
