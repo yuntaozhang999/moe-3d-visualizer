@@ -202,3 +202,18 @@ This "butterfly" configuration prevents routing flows from colliding. Furthermor
 
 ### Visual Comparison
 *   ![After: MoE Dual-Wing Z-Alignment](./screenshots/after_moe_aligned_matched.png)
+
+## 14. MoE Spatial Spread & Staggered Footprint Refactoring
+
+Building upon the strict Z-axis symmetry established in Section 13, a subsequent pass was executed to fully utilize the X-axis dimensional space (`X = 16.0` to `36.5`), permanently resolving any lingering visual congestion or component overlapping within the Latent MoE branch.
+
+- **Alternating Staggered Layout**: Components within Lane A (Z = +2.5) and Lane B (Z = -2.5) are now physically staggered along the X-axis rather than tightly clustered. The Lane A `Router` components are positioned earlier (X=19.5 to 23.5), while the Lane B `Latent Down` and `Routed Experts` components are shifted further downstream (X=22.0 to 29.5).
+- **Clearance and Interleaving**: This precise horizontal spacing guarantees that no two heavy tensor matrices overlap diagonally when viewed from a perspective angle. The structural void created by Lane A's earlier completion elegantly accommodates Lane B's sprawling 8-expert matrix block.
+- **Dynamic Gating Beam Extension**: The `QB Router` cross-axis gating beam (dispatched from X=23.5) now naturally stretches further downstream to reach the `Routed Experts` (X=29.5), creating a majestic, sweeping rainbow arch (`curveHeight=1.4`) that vividly illustrates conditional routing dispatch without intersecting physical modules.
+- **Synchronized Convergence Point**: The final convergence location `op_moe_add` was micro-adjusted to `X=36.5` (zeroed at Z=0) to act as the perfect terminal basin for the sprawling upstream parallel flow, ensuring all high-altitude (`MoE Residual Skip`) and symmetric branch flows dock immaculately.
+
+### Visual Comparison
+*   **Focus MoE / Perspective**:
+    ![After: MoE Spread Perspective](./screenshots/after_moe_spread_perspective.png)
+*   **Top-Down Orthographic View**:
+    ![After: MoE Spread Top-Down](./screenshots/after_moe_spread_topdown.png)
