@@ -665,7 +665,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
-        labelYOffset={0.2}
+        labelYOffset={0.25}
       />
 
       {/* W_router Weight into Router */}
@@ -713,7 +713,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isHighlighted('op_router_qb')}
         onHover={onHoverItem}
         onClick={onClickItem}
-        labelPosition="bottom"
+        labelPosition="top"
       />
 
       {/* 2 Concurrent Shared Experts (Elevated High-Capacity Highway) */}
@@ -768,7 +768,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
-        labelYOffset={-0.1}
+        labelYOffset={0.25}
       />
 
       {/* W_latent_down Weight into Latent Down Matrix */}
@@ -854,7 +854,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
-        labelYOffset={0.1}
+        labelYOffset={-0.3}
       />
 
       {/* W_latent_up Weight Matrix */}

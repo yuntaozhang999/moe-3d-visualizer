@@ -37,8 +37,8 @@ async function run() {
   });
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  const perspectiveDocs = path.join(docsDir, 'after_moe_spread_perspective.png');
-  const perspectiveArtifact = path.join(artifactDir, 'after_moe_spread_perspective.png');
+  const perspectiveDocs = path.join(docsDir, 'after_moe_spread_focus.png');
+  const perspectiveArtifact = path.join(artifactDir, 'after_moe_spread_focus.png');
   await page.screenshot({ path: perspectiveDocs });
   await page.screenshot({ path: perspectiveArtifact });
   console.log(`Saved perspective view.`);
