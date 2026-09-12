@@ -247,3 +247,18 @@ In order to intuitively reflect the causal relationship of the MoE dispatch logi
 ### Visual Comparison
 *   **Focus: Reordered Lane A and Direct Gating**:
     ![After: Shared Experts Front & Center](./screenshots/after_shared_experts_front.png)
+
+## 17. Plan A: Stereo Dual-Track MoE Layout (Z = -4.5 Decision Track + Z = -2.5 Expert Data Track)
+
+To establish an unequivocally clear separation between routing logic and expert computation, the Latent MoE branch has been split into a negative Z-depth stereo dual-track architecture. The overarching goal is to achieve 100% visibility for the foreground components while providing a structured, tiered background for the decision-making logic.
+
+- **Foreground Clear Zone (Z = +2.5)**: Only the `2 Shared Experts` remain in the positive Z-axis. By pulling the shared experts into the spotlight and moving all routing logic behind the main backbone, the viewer's foreground field-of-vision is completely unoccluded. This emphasizes the unconditional, "always-on" nature of the Shared Experts.
+- **Midground Expert Data Track (Z = -2.5)**: The computationally heavy components—`Latent Down`, `Latent RMSNorm`, `8 Routed Experts`, and `W_up`—are laid out linearly along the `Z = -2.5` plane. This establishes a continuous processing highway that parallels the residual backbone.
+- **Background Decision Track (Z = -4.5)**: The entire routing control mechanism (`W_router`, `Router Logits`, and `QB Routing`) has been sunk deeper into the background at `Z = -4.5`. This physical layering explicitly visually segregates "Control" from "Data".
+- **Cross-Track Gating Beam**: The `QB Router` now fires its conditional selection beam from the deep background (`Z = -4.5`) forward into the midground `Routed Experts` (`Z = -2.5`). The beam features a pronounced curve (`curveHeight=1.2`), visibly leaping over tracks to hit its target.
+
+### Visual Comparison
+*   **Focus: Stereo Dual-Track Perspective**:
+    ![After: Router Negative Z Focus](./screenshots/after_router_neg_z_focus.png)
+*   **Top-Down Orthographic View**:
+    ![After: Router Negative Z Top-Down](./screenshots/after_router_neg_z_topdown.png)

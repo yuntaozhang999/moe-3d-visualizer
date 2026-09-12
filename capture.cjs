@@ -26,22 +26,39 @@ async function run() {
   const docsDir = path.join(process.cwd(), 'docs', 'screenshots');
   const artifactDir = '/Users/yuntao/.gemini/antigravity-cli/brain/84684cf6-e539-4da2-9c3d-d1655979527c';
 
-  // MoE Overview Focus Clean
-  console.log('Setting MoE Shared Experts Front Clean view...');
+  // MoE Overview Focus Neg Z
+  console.log('Setting Focus Neg Z view...');
   await page.evaluate(() => {
     if (window.__threeCamera && window.__threeControls) {
-      window.__threeCamera.position.set(24.0, 12.0, 14.0);
-      window.__threeControls.target.set(24.0, 2.0, 0);
+      window.__threeCamera.position.set(25.0, 10.0, 16.0);
+      window.__threeControls.target.set(25.0, 2.0, -1.0);
       window.__threeControls.update();
     }
   });
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  const docsPath = path.join(docsDir, 'after_shared_front_focus_clean.png');
-  const artifactPath = path.join(artifactDir, 'after_shared_front_focus_clean.png');
-  await page.screenshot({ path: docsPath });
-  await page.screenshot({ path: artifactPath });
-  console.log(`Saved screenshot.`);
+  const focusDocs = path.join(docsDir, 'after_router_neg_z_focus.png');
+  const focusArtifact = path.join(artifactDir, 'after_router_neg_z_focus.png');
+  await page.screenshot({ path: focusDocs });
+  await page.screenshot({ path: focusArtifact });
+  console.log(`Saved focus view.`);
+
+  // Top-Down View
+  console.log('Setting top-down view...');
+  await page.evaluate(() => {
+    if (window.__threeCamera && window.__threeControls) {
+      window.__threeCamera.position.set(25.0, 25.0, -0.01);
+      window.__threeControls.target.set(25.0, 0, 0);
+      window.__threeControls.update();
+    }
+  });
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  const topdownDocs = path.join(docsDir, 'after_router_neg_z_topdown.png');
+  const topdownArtifact = path.join(artifactDir, 'after_router_neg_z_topdown.png');
+  await page.screenshot({ path: topdownDocs });
+  await page.screenshot({ path: topdownArtifact });
+  console.log(`Saved top-down view.`);
 
   await browser.close();
   server.kill();

@@ -206,8 +206,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: 'Logits: [4096, 384], Selected: [4096, 8]',
     visualShape: 'Logits: [6, 24], Selected: [6, 8]',
     hardwareSignificance: 'QB (Quantile Balancing) dynamically balances load across GPU nodes without intrusive auxiliary balance loss penalties.',
-    cameraFocus: [26.8, 4.2, 2.5],
-    cameraPos: [26.8, 8.0, 9.5],
+    cameraFocus: [25.5, 4.2, -4.5],
+    cameraPos: [25.5, 8.0, 3.0],
     activeNodeIds: ['node_router', 'op_router_qb'],
   },
   {
@@ -222,8 +222,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: '[1, 4096, 3072]',
     visualShape: '[1, 6, 32]',
     hardwareSignificance: 'Cuts EP all-to-all cross-node network bandwidth in HALF (150 GB/s -> 75 GB/s), preventing network bottlenecks on 11-rack clusters.',
-    cameraFocus: [19.8, 2.0, -1],
-    cameraPos: [19.8, 6.0, 7],
+    cameraFocus: [21.5, 3.0, -2.5],
+    cameraPos: [21.5, 7.0, 4.5],
     activeNodeIds: ['node_latent_down', 'op_latent_norm'],
   },
   {
@@ -238,8 +238,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: '8 experts x [3072, 3072]',
     visualShape: '8 active tiles x [16, 16]',
     hardwareSignificance: 'Half-width experts (hidden/2) maximize parameter diversity across the 384-expert pool while keeping memory within HBM budgets.',
-    cameraFocus: [28.2, 3.0, -1.2],
-    cameraPos: [28.2, 7.0, 8],
+    cameraFocus: [31.0, 3.0, -2.5],
+    cameraPos: [31.0, 7.0, 4.5],
     activeNodeIds: ['node_experts_routed'],
   },
   {
@@ -254,8 +254,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: '2 x [6144 -> 3072 -> 6144]',
     visualShape: '2 x [64 -> 32 -> 64]',
     hardwareSignificance: 'Ensures fundamental syntactic & reasoning patterns are shared across all tokens without occupying routing capacity.',
-    cameraFocus: [19.5, 4.2, 2.5],
-    cameraPos: [19.5, 8.0, 9.5],
+    cameraFocus: [26.5, 4.2, 2.5],
+    cameraPos: [26.5, 8.0, 9.5],
     activeNodeIds: ['node_experts_shared'],
   },
   {
