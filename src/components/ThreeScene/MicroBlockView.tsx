@@ -306,7 +306,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* High-Altitude Residual Bypass 1 (Attention Residual) */}
       <FlowConnection
-        from={[-8.8, 2.45, 0]}
+        from={[-8.8, isFirstLayer ? 2.45 : 2.0, 0]}
         to={[13.5, 2.45, 0]}
         isResidual={true}
         curveHeight={5.5}
@@ -361,7 +361,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       {/* Pre-Attn GN -> V */}
       <FlowConnection
         from={[-6.3, 2.0, -2.0]}
-        to={[isGlobal ? -1.85 : -2.05, -0.8, -1.5]}
+        to={[isGlobal ? -1.85 : -2.05, -0.8, -2.0]}
         color="#818cf8"
         isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_v'])}
         label={`V (${kvHeads}h)`}
@@ -408,7 +408,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_v"
         label={`V (${kvHeads} KV Heads)`}
         subLabel={isGlobal ? "GQA 8:1 (6 KV Heads)" : "GQA 4:1 (12 KV Heads)"}
-        position={[-1.6, -0.8, -1.5]}
+        position={[-1.6, -0.8, -2.0]}
         size={isGlobal ? [8 * DIM_W, 1.3, 0.3] : [16 * DIM_W, 1.3, 0.6]}
         gridRows={activationData.tokens.length}
         gridCols={isGlobal ? 8 : 16}
@@ -485,7 +485,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* V to Attention Score Map */}
       <FlowConnection
-        from={[isGlobal ? -1.35 : -1.15, -0.8, -1.5]}
+        from={[isGlobal ? -1.35 : -1.15, -0.8, -2.0]}
         to={[4.25, 2.0, -1.8]}
         color="#818cf8"
         isHighlighted={isFlowActive(isStep('attention_weights') || isStep('attention_output'), ['node_v', 'node_attn_matrix'])}

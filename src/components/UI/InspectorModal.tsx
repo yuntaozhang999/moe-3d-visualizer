@@ -178,6 +178,24 @@ export const INSPECTION_DATA: {
     codeSnippet: "output_proj = reshard(_init_weight(out_key, (6144, 128256)), _LM_HEAD_PARTITION_SPEC)",
     rationale: "Untied from embedding weights, giving maximum expressivity for the final next-token prediction across 18 Trillion tokens.",
   },
+  node_residual_in: {
+    title: "Residual Stream Input",
+    category: "Residual Highway",
+    formula: "x^{(l-1)} \\in \\mathbb{R}^{S \\times 6144}",
+    realShape: "[1, 4096, 6144]",
+    visualShape: "[1, 6, 64]",
+    codeSnippet: "# Incoming hidden state from previous Transformer block\nx: Array  # [B, S, 6144]",
+    rationale: "Carries the accumulated identity representations from all preceding layers. Each block reads from this highway, applies Pre-Norm Attention and MoE updates, and adds them back.",
+  },
+  node_residual_out: {
+    title: "Residual Stream Output",
+    category: "Residual Highway",
+    formula: "x^{(l)} = x^{(l-1)} + \\text{Attn}(\\text{GatedNorm}_1(\\text{RMSNorm}(x))) + \\text{MoE}(\\text{GatedNorm}_2(\\text{RMSNorm}(x + \\dots)))",
+    realShape: "[1, 4096, 6144]",
+    visualShape: "[1, 6, 64]",
+    codeSnippet: "return x  # Forwarded to next layer or final norm",
+    rationale: "Forwarding the updated residual stream with accumulated multi-head attention and latent MoE expert contributions to the subsequent layer.",
+  },
 };
 
 interface InspectorModalProps {

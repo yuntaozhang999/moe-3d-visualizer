@@ -14,7 +14,7 @@ export const EQUATION_DEFINITIONS: Record<string, EnrichedEquationData> = {
     id: 'node_residual_in',
     title: 'Input from Previous Layer',
     category: 'Input',
-    formula: 'x^{(l)} = x^{(l-1)} + \\text{Attn}(x^{(l-1)}) + \\text{MoE}(x^{(l-1)})',
+    formula: 'x^{(l)} = x^{(l-1)} + \\text{Attn}(\\text{GatedNorm}_1(\\text{RMSNorm}(x^{(l-1)}))) + \\text{MoE}(\\text{GatedNorm}_2(\\text{RMSNorm}(x^{(l-1)} + \\dots)))',
     intuitiveMeaning: 'The residual stream is the central highway of the Transformer. It carries the accumulated representations from all previous layers. Instead of computing entirely new representations, each layer reads from this stream, computes updates, and adds them back.',
     dataflow: {
       inputShape: 'Residual Stream',

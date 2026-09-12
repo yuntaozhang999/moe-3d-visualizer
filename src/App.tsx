@@ -304,7 +304,7 @@ export function App() {
       const primaryNode = activeStep.activeNodeIds[0] || 'node_tokens';
       setInspectedId(primaryNode);
     }
-  }, [currentStepIndex]);
+  }, [currentStepIndex, selectedLayerIndex, activeStep.activeNodeIds]);
 
   // Keyboard shortcuts
   useEffect(() => {

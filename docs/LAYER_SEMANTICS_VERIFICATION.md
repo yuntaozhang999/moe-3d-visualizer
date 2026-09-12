@@ -152,3 +152,26 @@ In non-first layers ($l > 0$), `Residual Skip 1` was previously anchored directl
 
 
 
+
+## 11. Final Geometric Realignments & Inspector Synchronization
+
+Following intensive review, three critical spatial and conceptual inconsistencies were identified and resolved to achieve perfect industrial-grade geometric precision and rigorous mathematical formulation:
+
+### 11.1 Residual Bus Elevation Gap Closure
+In intermediate layers, the `Residual Skip 1` high-altitude bypass connection exhibited a noticeable 0.45-unit vertical disconnection from the main `Residual Bus` (originating at `Y=2.45` while the bus was at `Y=2.0`). This caused the connection line to appear floating and disjointed.
+- **Fix:** We dynamically adjusted the Y-coordinate of the `from` vector in `Residual Skip 1` based on the layer index: `from={[-8.8, isFirstLayer ? 2.45 : 2.0, 0]}`. This guarantees that for non-first layers, the bridge roots itself perfectly onto the horizontal backbone highway.
+
+### 11.2 Attention Branch Coplanarity
+The `node_v` (Value projection matrix) was previously situated at `Z = -1.5`, while `node_q` and `node_k` were aligned at `Z = -2.0`. This broke the coplanar symmetry of the Attention mechanism's QKV projection stage.
+- **Fix:** We unified the spatial layout by shifting `node_v` and its incoming connections to `Z = -2.0`. The entire QKV processing manifold now resides cleanly within a single 2D plane offset from the main residual backbone, eliminating any diagonal distortion when viewed from orthographic angles.
+
+### 11.3 Strict Pre-Norm Formulation and Inspector Synchronization
+The mathematical definitions defining the residual boundaries were lacking rigorous notation. Furthermore, navigating between layers caused the `InspectorModal` to stall on stale node references due to missing React Hook dependencies.
+- **Fix:** We introduced `node_residual_in` and `node_residual_out` into the `INSPECTION_DATA` dictionary, detailing their roles in carrying accumulated identity representations.
+- **Fix:** We updated the `node_residual_out` metadata in `equationData.ts` to explicitly define the mathematically precise Pre-Norm Transformer formulation: 
+  $x^{(l)} = x^{(l-1)} + \text{Attn}(\text{GatedNorm}_1(\text{RMSNorm}(x))) + \text{MoE}(\text{GatedNorm}_2(\text{RMSNorm}(x + \dots)))$.
+- **Fix:** We patched the synchronization `useEffect` inside `App.tsx` by including `selectedLayerIndex` and `activeStep.activeNodeIds` in its dependency array. The inspector HUD now reliably refreshes and binds to the active node upon layer transition without ghostly retention of bypassed structures.
+
+### Visual Comparison
+*   ![After: Residual Bus Gap Closure](./screenshots/after_review_fix_bus.png)
+*   ![After: QKV Coplanar Alignment](./screenshots/after_review_fix_coplanar.png)
