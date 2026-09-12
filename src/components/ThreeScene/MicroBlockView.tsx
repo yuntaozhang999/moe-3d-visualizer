@@ -297,11 +297,11 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* High-Altitude Residual Bypass 1 (Attention Residual) */}
       <FlowConnection
-        from={[-6.8, 2.45, 0]}
+        from={[isFirstLayer ? -8.8 : -9.85, 2.45, 0]}
         to={[13.5, 2.45, 0]}
         isResidual={true}
         curveHeight={5.5}
-        isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['op_attn_gn', 'op_attn_add'])}
+        isHighlighted={isFlowActive(isStep('attn_proj_residual'), [isFirstLayer ? 'op_embed_gn' : 'node_residual_in', 'op_attn_add'])}
         label="Residual Skip 1 [6144]"
       />
 
@@ -623,11 +623,11 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* MoE Bypass Residual High Arch */}
       <FlowConnection
-        from={[16.1, 2.45, 0]}
+        from={[13.5, 2.45, 0]}
         to={[35.0, 2.45, 0]}
         isResidual={true}
         curveHeight={5.5}
-        isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['op_moe_gn', 'op_moe_add'])}
+        isHighlighted={isFlowActive(isStep('moe_aggregation_residual'), ['op_attn_add', 'op_moe_add'])}
         label="MoE Residual Skip [6144]"
       />
 

@@ -81,3 +81,27 @@ To strictly align with the ground truth architecture in `marin-main` (`experimen
 *   ![Before: Misleading Embedding Lookup Pipeline](./screenshots/before_gather_topology.png)
 *   ![After: True Gather Convergence Operator Topology](./screenshots/after_gather_topology.png)
 
+## 8. Residual Skip Bridge Anchoring & Pre-Norm Mathematical Rectification
+
+In standard Pre-Norm Transformers ($x \leftarrow x + \text{Attention}(\text{Norm}(x))$ and $x \leftarrow x + \text{MoE}(\text{Norm}(x))$), the identity residual skip path must carry the **un-normalized primary backbone signal**. 
+
+Previously, both residual skip arches in `MicroBlockView.tsx` were incorrectly anchored:
+- `Residual Skip 1` was anchored to `Pre-Attn GatedNorm` ($x = -6.8$), implying normalized activation was passed down the skip connection.
+- `MoE Residual Skip` was anchored to `Pre-MoE GatedNorm` ($x = 16.1$), violating the post-attention un-normalized identity invariant.
+
+### Rectifications Implemented:
+1. **Attention Residual Skip (`Residual Skip 1`)**:
+   - In Layer 0 (`isFirstLayer`): Re-anchored to takeoff directly from the output of `Embed GatedNorm` (`op_embed_gn`, $x = -8.8$).
+   - In Layers 1-47 (`!isFirstLayer`): Re-anchored to takeoff directly from `node_residual_in` ($x = -9.85$).
+   - Coordinates: `from={[isFirstLayer ? -8.8 : -9.85, 2.45, 0]}`.
+   - Highlighting bounds: `[isFirstLayer ? 'op_embed_gn' : 'node_residual_in', 'op_attn_add']`.
+2. **MoE Residual Skip (`MoE Residual Skip`)**:
+   - Re-anchored to takeoff from the Attention aggregation adder `op_attn_add` ($x = 13.5$), carrying the accumulated post-attention backbone stream.
+   - Coordinates: `from={[13.5, 2.45, 0]}` to `[35.0, 2.45, 0]`.
+   - Highlighting bounds: `['op_attn_add', 'op_moe_add']`.
+
+### Visual Comparison
+*   ![Before: Residual Skip Erroneously Anchored to Pre-Attn Norm](./screenshots/before_residual_skip.png)
+*   ![After: Residual Skip Correctly Anchored to Embed GatedNorm](./screenshots/after_residual_skip.png)
+
+
