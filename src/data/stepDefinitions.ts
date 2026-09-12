@@ -206,8 +206,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: 'Logits: [4096, 384], Selected: [4096, 8]',
     visualShape: 'Logits: [6, 24], Selected: [6, 8]',
     hardwareSignificance: 'QB (Quantile Balancing) dynamically balances load across GPU nodes without intrusive auxiliary balance loss penalties.',
-    cameraFocus: [26.5, 4.2, -4.5],
-    cameraPos: [26.5, 8.0, 3.0],
+    cameraFocus: [23.0, 3.2, -2.5],
+    cameraPos: [23.0, 6.5, 5.0],
     activeNodeIds: ['node_router', 'op_router_qb'],
   },
   {
@@ -222,8 +222,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: '[1, 4096, 3072]',
     visualShape: '[1, 6, 32]',
     hardwareSignificance: 'Cuts EP all-to-all cross-node network bandwidth in HALF (150 GB/s -> 75 GB/s), preventing network bottlenecks on 11-rack clusters.',
-    cameraFocus: [21.5, 3.0, -2.5],
-    cameraPos: [21.5, 7.0, 4.5],
+    cameraFocus: [25.5, 1.2, -2.5],
+    cameraPos: [25.5, 4.5, 5.0],
     activeNodeIds: ['node_latent_down', 'op_latent_norm'],
   },
   {
