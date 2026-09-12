@@ -104,4 +104,31 @@ Previously, both residual skip arches in `MicroBlockView.tsx` were incorrectly a
 *   ![Before: Residual Skip Erroneously Anchored to Pre-Attn Norm](./screenshots/before_residual_skip.png)
 *   ![After: Residual Skip Correctly Anchored to Embed GatedNorm](./screenshots/after_residual_skip.png)
 
+## 9. Pre-Attn GatedNorm Depth Offset & Residual Backbone Decoupling
+
+Previously, `Pre-Attn GatedNorm` (`op_attn_gn`) was positioned at `[-6.8, 2.0, 0]` directly along the primary central axis ($Z=0$). In both perspective and top-down views, the main residual highway bridge (`Residual Skip 1 [6144]`) directly superimposed over the node, obscuring visual hierarchy and falsely suggesting the residual stream flowed into or through the pre-attention normalizer.
+
+To decouple the primary backbone highway from the attention side-branch, we shifted `op_attn_gn` deeper along the Z-axis:
+
+1. **Spatial Depth Offset**:
+   - `op_attn_gn` shifted from $Z=0$ to $Z=-2.0$ (`position={[-6.8, 2.0, -2.0]}`).
+   - Centered $Z=0$ is now exclusively reserved for the primary residual stream and its overhead skip connection.
+
+2. **Branching Off Dataflow Alignment**:
+   - **Layer 0 (`isFirstLayer`)**: Signal diverges from `op_embed_gn` (`[-8.25, 2.0, 0]`) and branches off diagonally into `op_attn_gn` (`[-7.35, 2.0, -2.0]`), labeled `Pre-Attn Stream`.
+   - **Layers 1-47 (`!isFirstLayer`)**: Signal diverges from `node_residual_in` (`[-9.85, 2.0, 0]`) into `[-7.35, 2.0, -2.0]`.
+
+3. **Coplanar Projection Alignment with QKV**:
+   - Downstream connections to `node_q` ($Z=-2.0$) and `node_k` ($Z=-2.0$) now travel strictly coplanar in the $Z=-2.0$ 2D slice, providing pristine geometric cleanliness.
+
+4. **Camera Tracking Calibration**:
+   - In `stepDefinitions.ts`, Step 4 camera focus updated to `[-6.8, 2.0, -2.0]` and position to `[-6.8, 5.0, 6.0]`.
+
+### Visual Comparison
+*   ![Before: Pre-Attn GatedNorm on Residual Backbone (Perspective)](./screenshots/before_preattn_offset_perspective.png)
+*   ![After: Pre-Attn GatedNorm Offset to Z=-2.0 (Perspective)](./screenshots/after_preattn_offset_perspective.png)
+*   ![Before: Pre-Attn GatedNorm on Residual Backbone (Top Down)](./screenshots/before_preattn_offset_topdown.png)
+*   ![After: Pre-Attn GatedNorm Offset to Z=-2.0 (Top Down)](./screenshots/after_preattn_offset_topdown.png)
+
+
 

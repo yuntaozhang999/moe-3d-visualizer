@@ -62,8 +62,8 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     realShape: '[1, 4096, 6144]',
     visualShape: '[1, 6, 64]',
     hardwareSignificance: 'Prevents inter-layer residual stream blowup in deep 48-layer stack.',
-    cameraFocus: [-6.8, 2, 0],
-    cameraPos: [-6.8, 5, 8],
+    cameraFocus: [-6.8, 2, -2.0],
+    cameraPos: [-6.8, 5, 6.0],
     activeNodeIds: ['node_pre_attn_norm', 'op_attn_gn'],
   },
   {

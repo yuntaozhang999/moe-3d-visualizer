@@ -247,7 +247,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           {/* Embed GN -> Pre-Attn GN */}
           <FlowConnection
             from={[-8.25, 2.0, 0]}
-            to={[-7.35, 2.0, 0]}
+            to={[-7.35, 2.0, -2.0]}
             color="#10b981"
             isHighlighted={isFlowActive(isStep('embed_gated_norm') || isStep('pre_attn_gated_norm'), ['op_embed_gn', 'op_attn_gn'])}
             label="Pre-Attn Stream"
@@ -272,7 +272,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           />
           <FlowConnection
             from={[-9.85, 2.0, 0]}
-            to={[-7.35, 2.0, 0]}
+            to={[-7.35, 2.0, -2.0]}
             label="Residual Flow [6144]"
             color="#00f3ff"
             isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('input_tokens') || isStep('token_embed') || isStep('embed_gated_norm'), ['node_residual_in', 'op_attn_gn'])}
@@ -287,7 +287,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="op_attn_gn"
         name="Pre-Attn GatedNorm"
         symbol="GN"
-        position={[-6.8, 2.0, 0]}
+        position={[-6.8, 2.0, -2.0]}
         color="#10b981"
         isHighlighted={isHighlighted('op_attn_gn')}
         onHover={onHoverItem}
@@ -325,7 +325,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* W_QKV Weights projection flow */}
       <FlowConnection
-        from={[-6.3, 2.0, 0]}
+        from={[-6.3, 2.0, -2.0]}
         to={[-5.35, 4.6, -4.5]}
         color="#64748b"
         tubeRadius={0.02}
@@ -335,7 +335,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* Pre-Attn GN -> Q */}
       <FlowConnection
-        from={[-6.3, 2.0, 0]}
+        from={[-6.3, 2.0, -2.0]}
         to={[-3.25, 4.8, -2.0]}
         color="#818cf8"
         isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_q'])}
@@ -343,7 +343,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       />
       {/* Pre-Attn GN -> K */}
       <FlowConnection
-        from={[-6.3, 2.0, 0]}
+        from={[-6.3, 2.0, -2.0]}
         to={[isGlobal ? -1.85 : -2.05, 2.0, -2.0]}
         color="#818cf8"
         isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_k'])}
@@ -351,7 +351,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       />
       {/* Pre-Attn GN -> V */}
       <FlowConnection
-        from={[-6.3, 2.0, 0]}
+        from={[-6.3, 2.0, -2.0]}
         to={[isGlobal ? -1.85 : -2.05, -0.8, -1.5]}
         color="#818cf8"
         isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_attn_gn', 'node_v'])}
