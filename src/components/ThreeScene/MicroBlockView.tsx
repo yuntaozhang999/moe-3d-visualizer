@@ -477,7 +477,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       {/* RoPE to Attention Score Map */}
       <FlowConnection
         from={[2.65, 3.4, -2.0]}
-        to={[4.25, 2.4, -1.8]}
+        to={[4.25, 2.4, -2.0]}
         color="#818cf8"
         isHighlighted={isFlowActive(isStep('attention_weights'), ['op_rope', 'node_attn_matrix'])}
         label="Q · K^T / √d"
@@ -486,7 +486,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       {/* V to Attention Score Map */}
       <FlowConnection
         from={[isGlobal ? -1.35 : -1.15, -0.8, -2.0]}
-        to={[4.25, 2.0, -1.8]}
+        to={[4.25, 2.0, -2.0]}
         color="#818cf8"
         isHighlighted={isFlowActive(isStep('attention_weights') || isStep('attention_output'), ['node_v', 'node_attn_matrix'])}
         label="Attn · V"
@@ -500,7 +500,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_attn_matrix"
         label="Attention Score Map"
         subLabel={windowLabel}
-        position={[5.5, 2.2, -1.8]}
+        position={[5.5, 2.2, -2.0]}
         size={[2.4, 2.4, 0.4]}
         gridRows={activationData.tokens.length}
         gridCols={activationData.tokens.length}
@@ -515,8 +515,8 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* Attn Output to XSA */}
       <FlowConnection
-        from={[6.75, 2.2, -1.8]}
-        to={[7.75, 2.2, -1.4]}
+        from={[6.75, 2.2, -2.0]}
+        to={[7.75, 2.2, -2.0]}
         color="#c084fc"
         isHighlighted={isFlowActive(isStep('xsa_decorrelation'), ['node_attn_matrix', 'op_xsa'])}
         label="XSA Decorr"
@@ -527,7 +527,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="op_xsa"
         name="XSA (Decorrelate)"
         symbol="XSA"
-        position={[8.3, 2.2, -1.4]}
+        position={[8.3, 2.2, -2.0]}
         color="#c084fc"
         isHighlighted={isHighlighted('op_xsa')}
         onHover={onHoverItem}
@@ -537,8 +537,8 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* XSA to Head Gate */}
       <FlowConnection
-        from={[8.85, 2.2, -1.4]}
-        to={[9.85, 2.2, -0.8]}
+        from={[8.85, 2.2, -2.0]}
+        to={[9.85, 2.2, -2.0]}
         color="#fb7185"
         isHighlighted={isFlowActive(isStep('head_gating'), ['op_xsa', 'op_head_gate'])}
         label="Gate 2·σ"
@@ -549,7 +549,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="op_head_gate"
         name="Head Gate (2·σ)"
         symbol="HG"
-        position={[10.4, 2.2, -0.8]}
+        position={[10.4, 2.2, -2.0]}
         color="#fb7185"
         isHighlighted={isHighlighted('op_head_gate')}
         onHover={onHoverItem}
@@ -559,7 +559,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* Head Gate to Attn Add */}
       <FlowConnection
-        from={[10.95, 2.2, -0.8]}
+        from={[10.95, 2.2, -2.0]}
         to={[13.0, 2.0, 0]}
         color="#38bdf8"
         isHighlighted={isFlowActive(isStep('attn_proj_residual'), ['op_head_gate', 'op_attn_add'])}
@@ -570,7 +570,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         id="node_w_o"
         label="W_O Weight Matrix"
         subLabel="[6144 × 6144]"
-        position={[10.4, 4.8, -2.4]}
+        position={[10.4, 4.8, -2.0]}
         size={[1.3, 1.5, 0.6]}
         gridRows={8}
         gridCols={12}
@@ -585,7 +585,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
 
       {/* W_O Weight into Attn Add */}
       <FlowConnection
-        from={[10.4, 4.0, -2.4]}
+        from={[10.4, 4.0, -2.0]}
         to={[13.3, 2.5, 0]}
         color="#64748b"
         tubeRadius={0.02}

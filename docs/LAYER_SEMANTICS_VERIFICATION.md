@@ -175,3 +175,16 @@ The mathematical definitions defining the residual boundaries were lacking rigor
 ### Visual Comparison
 *   ![After: Residual Bus Gap Closure](./screenshots/after_review_fix_bus.png)
 *   ![After: QKV Coplanar Alignment](./screenshots/after_review_fix_coplanar.png)
+
+## 12. Attention Pipeline Coplanar Alignment (Z = -2.0 Dual-Lane Highway)
+
+Subsequent visual verification identified a fragmented, stair-step spatial offset in the latter half of the Attention processing pipeline. Specifically, the operators and tensors were drifting across the Z-axis: the Attention Score Map was at Z = -1.8, XSA (Exclusive Self-Attention) at Z = -1.4, Head Gate at Z = -0.8, and the W_O projection weight at Z = -2.4.
+
+To eliminate this clutter and establish pristine industrial-grade geometric order, the entire pipeline was collapsed into a strict coplanar alignment:
+- All operators and tensors in the downstream Attention branch (`node_attn_matrix`, `op_xsa`, `op_head_gate`, `node_w_o`) were unified and anchored exclusively at Z = -2.0.
+- All interconnected dataflow pipelines now traverse in perfect horizontal parallelism along the Z = -2.0 plane before their final diagonal convergence into the residual backbone at Z = 0.
+
+This introduces a "Dual-Lane Parallel Highway" paradigm, providing viewers with an unobstructed, side-by-side comparison of the pure identity backbone against the active processing branch.
+
+### Visual Comparison
+*   ![After: Attention Branch Coplanar Alignment](./screenshots/after_attention_align_matched.png)
