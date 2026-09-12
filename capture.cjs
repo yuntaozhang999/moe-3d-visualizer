@@ -26,12 +26,12 @@ async function run() {
   const docsDir = path.join(process.cwd(), 'docs', 'screenshots');
   const artifactDir = '/Users/yuntao/.gemini/antigravity-cli/brain/84684cf6-e539-4da2-9c3d-d1655979527c';
 
-  // MoE Focus Z-Projection Twin Vise
-  console.log('Setting Focus Twin Vise view...');
+  // MoE Focus Z-Projection staggered view
+  console.log('Setting Focus Z-Projection view...');
   await page.evaluate(() => {
     if (window.__threeCamera && window.__threeControls) {
-      window.__threeCamera.position.set(23.0, 10.0, 14.0);
-      window.__threeControls.target.set(23.0, 2.0, -2.5);
+      window.__threeCamera.position.set(24.5, 12.0, 14.0);
+      window.__threeControls.target.set(24.5, 2.0, -2.5);
       window.__threeControls.update();
     }
   });
@@ -47,8 +47,8 @@ async function run() {
   console.log('Setting top-down view...');
   await page.evaluate(() => {
     if (window.__threeCamera && window.__threeControls) {
-      window.__threeCamera.position.set(25.0, 25.0, -0.01);
-      window.__threeControls.target.set(25.0, 0, 0);
+      window.__threeCamera.position.set(24.5, 25.0, -0.01);
+      window.__threeControls.target.set(24.5, 0, 0);
       window.__threeControls.update();
     }
   });
