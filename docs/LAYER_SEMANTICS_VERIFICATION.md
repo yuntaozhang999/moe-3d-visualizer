@@ -59,3 +59,25 @@ We resolved this by:
 ### Visual Comparison
 *   ![Before: Token UV Artifacts](./screenshots/before_token_uv_artifact.png)
 *   ![After: Token Text Close-up](./screenshots/after_token_closeup.png)
+
+## 7. Stage 1 Embedding Gather Convergence Topology & Pre-training Semantics
+
+The previous Stage 1 visualization depicted an ambiguous data pipeline: `Prompt Tokens` were connected directly to `Embed Vector` through an opaque `Lookup` label, while `W_embed` hovered in the background with an oblique connection. This obscured how index gathering actually functions and created conceptual confusion.
+
+To strictly align with the ground truth architecture in `marin-main` (`experiments/grug/moe/model.py` and `lib/levanter/.../snowball.py`), we reconstructed Stage 1 into a canonical dual-input gather convergence topology:
+
+1. **Dual-Input Convergence Topology**:
+   - **Indices Input (`token_ids`)**: At `[-16.5, 2.0, 0]`, representing discrete sequence IDs $t \in \{0, \dots, 128255\}^S$. Connects horizontally via the `indices` flow pipeline into the gather operator.
+   - **Weight Table (`token_embed`)**: At `[-14.0, 2.0, -2.4]`, representing the untied embedding weight table of shape $[128256, 6144]$. Connects perpendicularly along the Z-axis via the `table` flow pipeline into the gather operator.
+   - **Core Operator (`op_embed_gather`)**: Centered at `[-14.0, 2.0, 0]`, an explicit operator node labeled `_embedding_gather` executing $\text{hidden} = \text{Gather}(\text{token\_embed}, \text{token\_ids})$.
+   - **Output Tensor (`hidden`)**: Centered at `[-11.5, 2.0, 0]`, receiving the gathered dense representations ($[S \times 6144]$) before flowing into `Embed GatedNorm`.
+
+2. **Pre-training Attribution & Parameter Sizing**:
+   - The embedding table comprises $128,256 \times 6,144 = 787,998,720$ parameters (~788M params).
+   - In contrast to the static, rule-based BPE tokenizer vocabulary, these 788M continuous parameters are **randomly initialized and trained end-to-end via gradient backpropagation across 18 Trillion tokens during pre-training**.
+   - The UI sublabel explicitly displays `[128k × 6144] · Pre-trained Weights (788M)` and is synchronized across `InspectorModal`, `equationData`, and the `Narrator`.
+
+### Visual Comparison
+*   ![Before: Misleading Embedding Lookup Pipeline](./screenshots/before_gather_topology.png)
+*   ![After: True Gather Convergence Operator Topology](./screenshots/after_gather_topology.png)
+

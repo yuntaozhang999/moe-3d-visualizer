@@ -60,11 +60,40 @@ export const EQUATION_DEFINITIONS: Record<string, EnrichedEquationData> = {
     codeSnippet: 'return x',
   },
 
+  op_embed_gather: {
+    id: 'op_embed_gather',
+    title: '_embedding_gather (Token Embedding Gather)',
+    category: 'Input',
+    formula: '\\text{hidden} = \\text{Gather}(\\text{token\\_embed}, \\text{token\\_ids})',
+    intuitiveMeaning: 'A zero-compute memory lookup mapping each discrete token ID into a dense 6144-dimensional continuous feature space. Trainable in Pre-training: Unlike the static BPE tokenizer vocabulary, these 787,998,720 parameters (~788M) start from random initialization and are learned end-to-end via gradient backpropagation across 18 Trillion pre-training tokens to form rich continuous semantic representations. Fully untied from output projection.',
+    dataflow: {
+      inputShape: '[1, 4096]',
+      operation: 'Embedding Gather / Index Lookup',
+      weightShape: 'token_embed [128256, 6144] (788M params)',
+      outputShape: '[1, 4096, 6144]',
+      transformationNote: 'Discrete IDs mapped to continuous 6144-dim latent vectors via JAX _embedding_gather',
+      stages: [
+        { label: 'Input IDs', name: 'token_ids', shape: '[1, 4096]', type: 'input' },
+        { label: 'Weight', name: 'token_embed Table', shape: '[128256, 6144]', type: 'weight' },
+        { label: 'Lookup', name: 'Gather', shape: 'Index Lookup', type: 'op' },
+        { label: 'Output', name: 'hidden', shape: '[1, 4096, 6144]', type: 'output' },
+      ],
+    },
+    variables: [
+      { symbol: '\\text{token\\_ids}', name: 'Token Sequence IDs', shape: '[1, 4096]', description: 'Input sequence of token indices.', hardwareContext: 'Index buffer passed to gather kernel.', color: 'sky' },
+      { symbol: '\\text{token\\_embed}', name: 'Embedding Table', shape: '[128256, 6144]', description: 'Dense weight matrix mapping token IDs to hidden representations. Trainable in Pre-training: Unlike the static BPE tokenizer vocabulary, these 787,998,720 parameters (~788M) start from random initialization and are learned end-to-end via gradient backpropagation across 18 Trillion pre-training tokens.', hardwareContext: 'Replicated across data shards for zero-communication local lookup.', color: 'purple' },
+      { symbol: '\\text{hidden}', name: 'Embedded Hidden States', shape: '[1, 4096, 6144]', description: 'Continuous token representation entering the first Transformer block.', hardwareContext: 'Resides in GPU HBM, feeding residual stream.', color: 'emerald' },
+    ],
+    realShape: '[1, 4096, 6144]',
+    visualShape: '[1, 6, 64]',
+    codeSnippet: 'hidden = _embedding_gather(self.token_embed, token_ids)',
+  },
+
   input_tokens: {
     id: 'input_tokens',
-    title: 'Input Tokens & Sequence IDs',
+    title: 'Input Tokens & token_ids',
     category: 'Input',
-    formula: 'x_{\\text{tokens}} = [t_1, t_2, \\dots, t_S], \\quad t_i \\in \\{0, 1, \\dots, V-1\\}',
+    formula: '\\text{token\\_ids} = [t_1, t_2, \\dots, t_S], \\quad t_i \\in \\{0, 1, \\dots, V-1\\}',
     intuitiveMeaning: 'Before neural compute begins, raw text is tokenized into discrete integer IDs using byte-pair encoding. Marin\'s expanded 128,256 vocabulary provides dramatically higher compression efficiency across multilingual text, complex reasoning, and code than older 32k vocabularies.',
     dataflow: {
       inputShape: 'Raw Text Stream',
@@ -75,7 +104,7 @@ export const EQUATION_DEFINITIONS: Record<string, EnrichedEquationData> = {
       stages: [
         { label: 'Input', name: 'Prompt String', shape: 'UTF-8 Text', type: 'input' },
         { label: 'Tokenizer', name: 'Marin 128k BPE', shape: '128,256 Vocab', type: 'op' },
-        { label: 'Output', name: 'Token IDs', shape: '[1, 4096]', type: 'output' },
+        { label: 'Output', name: 'token_ids', shape: '[1, 4096]', type: 'output' },
       ],
     },
     variables: [
@@ -90,14 +119,14 @@ export const EQUATION_DEFINITIONS: Record<string, EnrichedEquationData> = {
 
   token_embed: {
     id: 'token_embed',
-    title: 'Token Embedding Table Gather',
+    title: 'Embedding Gather (_embedding_gather)',
     category: 'Input',
-    formula: 'E = \\text{Gather}(W_{\\text{embed}}, t), \\quad W_{\\text{embed}} \\in \\mathbb{R}^{128256 \\times 6144}',
-    intuitiveMeaning: 'A zero-compute memory lookup mapping each discrete token ID into a dense 6144-dimensional continuous feature space. Marin\'s embedding table is untied from the output head, allowing input semantic representations to evolve without being constrained by output logit distributions.',
+    formula: '\\text{hidden} = \\text{Gather}(\\text{token\\_embed}, \\text{token\\_ids})',
+    intuitiveMeaning: 'A zero-compute memory lookup mapping each discrete token ID into a dense 6144-dimensional continuous feature space. Trainable in Pre-training: Unlike the static BPE tokenizer vocabulary, these 787,998,720 parameters (~788M) start from random initialization and are learned end-to-end via gradient backpropagation across 18 Trillion pre-training tokens to form rich continuous semantic representations. Fully untied from output projection.',
     dataflow: {
       inputShape: '[1, 4096]',
       operation: 'Embedding Gather / Index Lookup',
-      weightShape: 'W_embed [128256, 6144] (788M params)',
+      weightShape: 'token_embed [128256, 6144] (788M params)',
       outputShape: '[1, 4096, 6144]',
       transformationNote: 'Discrete IDs mapped to continuous 6144-dim latent vectors',
       stages: [

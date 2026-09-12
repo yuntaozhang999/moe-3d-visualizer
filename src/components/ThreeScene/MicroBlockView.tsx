@@ -134,8 +134,8 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           {/* Input Tokens */}
           <TensorMatrix
             id="node_tokens"
-            label="Prompt Tokens"
-            subLabel={`S=${activationData.tokens.length}`}
+            label="token_ids"
+            subLabel="Input IDs [S=6]"
             position={[-16.5, 2.0, 0]}
             size={[1.3, 3.2, 0.6]}
             gridRows={activationData.tokens.length}
@@ -148,20 +148,20 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
             tokenLabels={activationData.tokens}
           />
 
-          {/* Input Tokens -> Embed Vector */}
+          {/* token_ids -> _embedding_gather */}
           <FlowConnection
-            from={[-15.8, 2.0, 0]}
-            to={[-13.15, 2.0, 0]}
+            from={[-15.85, 2.0, 0]}
+            to={[-14.55, 2.0, 0]}
             color="#38bdf8"
-            isHighlighted={isFlowActive(isStep('input_tokens') || isStep('token_embed'), ['node_tokens', 'node_embed'])}
-            label="Lookup"
+            isHighlighted={isFlowActive(isStep('input_tokens') || isStep('token_embed'), ['node_tokens', 'op_embed_gather'])}
+            label="indices"
           />
 
           {/* Token Embed Matrix W_embed (Weight) */}
           <TensorMatrix
             id="node_w_embed"
-            label="W_embed (128k × 6144)"
-            subLabel="Untied Embedding"
+            label="token_embed"
+            subLabel="[128k × 6144] · Pre-trained Weights (788M)"
             position={[-14.0, 2.0, -2.4]}
             size={[1.4, 3.2, 0.8]}
             gridRows={activationData.tokens.length}
@@ -174,21 +174,43 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
             onHoverCell={onHoverCell}
           />
 
-          {/* W_embed Weight Flow */}
+          {/* token_embed -> _embedding_gather */}
           <FlowConnection
             from={[-14.0, 2.0, -1.95]}
-            to={[-11.5, 2.0, -0.35]}
+            to={[-14.0, 2.0, -0.45]}
             color="#64748b"
             tubeRadius={0.018}
             particleCount={4}
-            isHighlighted={isFlowActive(isStep('token_embed'), ['node_w_embed', 'node_embed'])}
+            isHighlighted={isFlowActive(isStep('token_embed'), ['node_w_embed', 'op_embed_gather'])}
+            label="table"
+          />
+
+          {/* _embedding_gather Operator */}
+          <OperatorNode
+            id="op_embed_gather"
+            name="_embedding_gather"
+            symbol="G"
+            position={[-14.0, 2.0, 0]}
+            color="#38bdf8"
+            isHighlighted={isHighlighted('op_embed_gather') || isStep('token_embed')}
+            onHover={onHoverItem}
+            onClick={onClickItem}
+            labelPosition="bottom"
+          />
+
+          {/* _embedding_gather -> hidden */}
+          <FlowConnection
+            from={[-13.45, 2.0, 0]}
+            to={[-13.15, 2.0, 0]}
+            color="#00f3ff"
+            isHighlighted={isFlowActive(isStep('token_embed'), ['op_embed_gather', 'node_embed'])}
           />
 
           {/* Embed Activation Vector */}
           <TensorMatrix
             id="node_embed"
-            label="Embed Vector"
-            subLabel={`S × 6144 (shown ${activationData.tokens.length} × 64)`}
+            label="hidden"
+            subLabel="Embeddings [S × 6144]"
             position={[-11.5, 2.0, 0]}
             size={[64 * DIM_W, 3.2, 0.6]}
             gridRows={activationData.tokens.length}
