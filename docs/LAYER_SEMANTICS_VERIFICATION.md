@@ -188,3 +188,17 @@ This introduces a "Dual-Lane Parallel Highway" paradigm, providing viewers with 
 
 ### Visual Comparison
 *   ![After: Attention Branch Coplanar Alignment](./screenshots/after_attention_align_matched.png)
+
+## 13. Symmetrical Dual-Wing & Collision-Free Alignment for Latent MoE
+
+A critical architectural refactoring was executed on the Stage 3 (Latent MoE) 3D topology to resolve intersection collisions and establish a visually clean, symmetrical dual-wing design. 
+
+The previous layout suffered from overlapping components and crossed wires, which obfuscated the complex gating and routing mechanism. We resolved this by physically separating the logic into two distinct parallel lanes flanking the main residual backbone (`Z = 0`):
+
+- **Lane A (Z = +2.5) — Routing & Shared Capacity:** The Router Weights (`node_w_router`), Router Operator (`node_router`), QB Dispatch (`op_router_qb`), and the 2 high-capacity Shared Experts (`node_experts_shared`) were cleanly shifted to the `+2.5` positive Z-axis coordinate.
+- **Lane B (Z = -2.5) — Latent Compression & Routed Dispatch:** The Latent Compression Weights (`node_w_latent_down`), Compressed Vector (`node_latent_down`), Latent RMSNorm (`op_latent_norm`), the 8 dynamic Routed Experts (`node_experts_routed`), and the Up-Projection Weights (`node_w_latent_up`) were symmetrically shifted to the `-2.5` negative Z-axis coordinate.
+
+This "butterfly" configuration prevents routing flows from colliding. Furthermore, the dispatch connection from the `QB Router` to the `8 Routed Experts` is now rendered as a cross-axis **Gating Beam** arching over the residual backbone with a curved trajectory (`curveHeight=1.2`), explicitly showcasing the dynamic conditional dispatch mechanism without intersection. Finally, both the Shared Experts and Up-Projected Latent outputs symmetrically converge back into the `MoE Add (Σ)` node at the main `Z = 0` highway.
+
+### Visual Comparison
+*   ![After: MoE Dual-Wing Z-Alignment](./screenshots/after_moe_aligned_matched.png)
