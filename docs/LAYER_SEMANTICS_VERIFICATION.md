@@ -217,3 +217,20 @@ Building upon the strict Z-axis symmetry established in Section 13, a subsequent
     ![After: MoE Spread Perspective](./screenshots/after_moe_spread_perspective.png)
 *   **Top-Down Orthographic View**:
     ![After: MoE Spread Top-Down](./screenshots/after_moe_spread_topdown.png)
+
+## 15. Anti-Gravity Global Elevation Refactoring (ΔY = +2.0)
+
+During final spatial review, it was observed that several bottom-aligned tensor matrices (specifically `node_v` in the Attention stage and `node_latent_down` / `Latent RMSNorm` in the MoE stage) were intersecting or sinking below the `Y=0` obsidian ground platform plane. Furthermore, bottom-anchored text labels were being visually occluded by the ground mesh.
+
+To correct this and achieve a pristine floating architectural design, a global "anti-gravity" elevation refactoring was implemented:
+
+- **Global Computational Plane Lift**: Every single operational node, weight matrix, flow connection, and residual skip bridge across all four processing stages (Stage 1 to Stage 4) was wrapped within a unified coordinate group and elevated by `ΔY = +2.0`. 
+- **Anchored Ground Floor**: The structural dark slate ground platform and stage demarcation labels were kept at their absolute original coordinates (`Y=-1.8` and `Y=-1.72`), acting as the absolute foundational bedrock. 
+- **Perfect Clearances**: The lowest-hanging components (which extend downwards by half their height, approx 1.45 units) now clear the ground floor by a comfortable `0.55` unit minimum margin. Bottom-anchored text labels hang cleanly in the void between the modules and the ground, eliminating all mesh clipping.
+- **Synchronized Camera Tracking**: All 19 pre-defined step camera waypoints in the temporal sequencer (`stepDefinitions.ts`) and global interactive camera defaults (`App.tsx`) were uniformly incremented by `+2.0` on the Y-axis. This guarantees that auto-follow camera tracking remains perfectly centered on the newly elevated logic plane without any vertical drift.
+
+### Visual Comparison
+*   **Stage 2 (Attention) - Clearance Validation**:
+    ![After: Stage 2 node_v Cleared](./screenshots/after_elevation_attn_v.png)
+*   **Stage 3 (Latent MoE) - Ground Clearance Validation**:
+    ![After: Stage 3 Latent Norm Cleared](./screenshots/after_elevation_moe_ground.png)

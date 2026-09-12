@@ -129,6 +129,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
       {/* ========================================================
           STAGE 1: INPUT & EMBEDDING
           ======================================================== */}
+      <group position={[0, 2.0, 0]}>
       {isFirstLayer ? (
         <group>
           {/* Input Tokens */}
@@ -1023,6 +1024,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           />
         </group>
       )}
+      </group>
     </group>
   );
 };

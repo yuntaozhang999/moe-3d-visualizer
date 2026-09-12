@@ -25,8 +25,8 @@ import { SamplingHUD } from './components/UI/SamplingHUD';
 // Default single_block overview camera: framed to fit the full forward-pass strip
 // spanning roughly x ∈ [-18, 44], so nothing is clipped at the viewport edges.
 const SINGLE_BLOCK_CAMERA: { pos: [number, number, number]; focus: [number, number, number] } = {
-  pos: [12.5, 20.0, 70.0],
-  focus: [12.5, 2.0, 0],
+  pos: [12.5, 22.0, 70.0],
+  focus: [12.5, 4.0, 0],
 };
 
 export function App() {
@@ -191,7 +191,7 @@ export function App() {
     } else if (viewMode === 'macro_stack') {
       setCameraOverride({ pos: [0, 42, 0.01], focus: [0, 0, 0] });
     } else {
-      setCameraOverride({ pos: [13.0, 48.0, 0.01], focus: [13.0, 0, 0] });
+      setCameraOverride({ pos: [13.0, 50.0, 0.01], focus: [13.0, 2.0, 0] });
     }
     setAutoFollow(false);
     setResetTrigger((prev) => prev + 1);
@@ -218,9 +218,9 @@ export function App() {
     const targetBranch = branch || (activeBranchFocus === 'attn' ? 'moe' : 'attn');
     setActiveBranchFocus(targetBranch);
     if (targetBranch === 'attn') {
-      setCameraOverride({ pos: [3.5, 12.0, 24.0], focus: [3.5, 2.5, -1.0] });
+      setCameraOverride({ pos: [3.5, 14.0, 24.0], focus: [3.5, 4.5, -1.0] });
     } else {
-      setCameraOverride({ pos: [26.0, 12.0, 26.0], focus: [26.0, 2.5, 1.0] });
+      setCameraOverride({ pos: [26.0, 14.0, 26.0], focus: [26.0, 4.5, 1.0] });
     }
     setAutoFollow(false);
     setResetTrigger((prev) => prev + 1);
