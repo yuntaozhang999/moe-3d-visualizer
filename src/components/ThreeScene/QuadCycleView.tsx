@@ -177,32 +177,6 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
 
   return (
     <group position={[0, 0, 0]}>
-      {/* Overview Group Label with Billboard & Dark Card */}
-      <Billboard follow={true} position={[4, 8, -25]}>
-        <Text
-          position={[0, 0.12, 0.01]}
-          fontSize={0.72}
-          color="#38bdf8"
-          fontWeight={700}
-          anchorX="center"
-          outlineWidth={0.024}
-          outlineColor="#090c13"
-          outlineBlur={0.006}
-        >
-          Marin 535B: 4-Layer Cycle (3 Local Sliding + 1 Global Causal)
-        </Text>
-        <Text
-          position={[0, -0.48, 0.01]}
-          fontSize={0.32}
-          color="#cbd5e1"
-          anchorX="center"
-          outlineWidth={0.024}
-          outlineColor="#090c13"
-          outlineBlur={0.006}
-        >
-          Repeating 12× over 48 layers · 36 Local (12 KV, 2048w, Half-RoPE) + 12 Global (6 KV, Full Causal, NoPE)
-        </Text>
-      </Billboard>
 
       {/* Render the 4 Layers in 3D */}
       {groupLayers.map((layer, idx) => {

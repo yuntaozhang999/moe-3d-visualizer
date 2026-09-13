@@ -93,6 +93,19 @@ export const ViewModeSwitcher: React.FC<ViewModeSwitcherProps> = ({
       {/* 3D View Mode Switcher */}
       <div className="flex items-center bg-[#090c13]/90 backdrop-blur-md border border-white/10 rounded-xl p-1 space-x-1 shadow-lg">
         <button
+          onClick={() => onChangeViewMode('macro_stack')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all ${
+            viewMode === 'macro_stack'
+              ? 'bg-[#1c2333] border border-sky-500/40 text-white shadow-sm'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-[#141924]'
+          }`}
+          title="See all 48 Layers in 3D perspective"
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>48-Layer Tower</span>
+        </button>
+
+        <button
           onClick={() => onChangeViewMode('quad_cycle')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all ${
             viewMode === 'quad_cycle'
@@ -116,19 +129,6 @@ export const ViewModeSwitcher: React.FC<ViewModeSwitcherProps> = ({
         >
           <Cuboid className="w-3.5 h-3.5" />
           <span>Single Block (L{selectedLayerIndex})</span>
-        </button>
-
-        <button
-          onClick={() => onChangeViewMode('macro_stack')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all ${
-            viewMode === 'macro_stack'
-              ? 'bg-[#1c2333] border border-sky-500/40 text-white shadow-sm'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-[#141924]'
-          }`}
-          title="See all 48 Layers in 3D perspective"
-        >
-          <Layers className="w-3.5 h-3.5" />
-          <span>48-Layer Tower</span>
         </button>
       </div>
 
