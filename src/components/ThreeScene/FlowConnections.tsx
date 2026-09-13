@@ -127,7 +127,7 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
     if (isResidual) {
       // Filleted Orthogonal Manhattan Residual Bus:
       // Rises vertically, turns 90° with fillet, runs horizontal parallel to pipeline, turns 90° down into target
-      const yBus = Math.max(start.y, end.y) + (curveHeight ? Math.min(curveHeight, 1.6) : 1.4);
+      const yBus = Math.max(start.y, end.y) + (curveHeight ? Math.min(curveHeight, 12.0) : 1.4);
       const zBus = start.z;
       const r = 0.35; // Fillet corner radius
       

@@ -321,9 +321,9 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           ======================================================== */}
       <TensorMatrix
         id="node_w_q"
-        label="W_Q Weight Matrix"
-        subLabel="[6144 × 6144] · 48 Query Heads"
-        position={[-4.6, 4.8, -4.5]}
+        label="W_Q"
+        subLabel="[6144 × 6144] · 48 Heads"
+        position={[-5.0, 4.8, -4.5]}
         size={[1.4, 1.6, 0.8]}
         gridRows={16}
         gridCols={16}
@@ -356,7 +356,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'op_q_proj'])}
       />
       <FlowConnection
-        from={[-4.6, 4.8, -4.1]}
+        from={[-5.0, 4.8, -4.1]}
         to={[-4.6, 4.8, -2.4]}
         color="#64748b"
         tubeRadius={0.02}
@@ -377,9 +377,9 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           ======================================================== */}
       <TensorMatrix
         id="node_w_k"
-        label="W_K Weight Matrix"
-        subLabel={isGlobal ? "[6144 × 768] · GQA 8:1 (6h)" : "[6144 × 1536] · GQA 4:1 (12h)"}
-        position={[-4.6, 2.0, -4.5]}
+        label="W_K"
+        subLabel={isGlobal ? "[6144 × 768] (6h)" : "[6144 × 1536] (12h)"}
+        position={[-5.0, 2.0, -4.5]}
         size={isGlobal ? [1.1, 1.2, 0.4] : [1.2, 1.2, 0.6]}
         gridRows={16}
         gridCols={isGlobal ? 4 : 8}
@@ -411,7 +411,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'op_k_proj'])}
       />
       <FlowConnection
-        from={[-4.6, 2.0, -4.1]}
+        from={[-5.0, 2.0, -4.1]}
         to={[-4.6, 2.0, -2.4]}
         color="#64748b"
         tubeRadius={0.02}
@@ -432,9 +432,9 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
           ======================================================== */}
       <TensorMatrix
         id="node_w_v"
-        label="W_V Weight Matrix"
-        subLabel={isGlobal ? "[6144 × 768] · GQA 8:1 (6h)" : "[6144 × 1536] · GQA 4:1 (12h)"}
-        position={[-4.6, -0.8, -4.5]}
+        label="W_V"
+        subLabel={isGlobal ? "[6144 × 768] (6h)" : "[6144 × 1536] (12h)"}
+        position={[-5.0, -0.8, -4.5]}
         size={isGlobal ? [1.1, 1.2, 0.4] : [1.2, 1.2, 0.6]}
         gridRows={16}
         gridCols={isGlobal ? 4 : 8}
@@ -467,7 +467,7 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'op_v_proj'])}
       />
       <FlowConnection
-        from={[-4.6, -0.8, -4.1]}
+        from={[-5.0, -0.8, -4.1]}
         to={[-4.6, -0.8, -2.4]}
         color="#64748b"
         tubeRadius={0.02}
