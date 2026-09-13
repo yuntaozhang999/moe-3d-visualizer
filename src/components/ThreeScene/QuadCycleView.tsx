@@ -82,20 +82,15 @@ const QuadLayerEnclosure: React.FC<QuadLayerEnclosureProps> = ({
 
       {/* Layer Header in 3D with Billboard & Dark Card */}
       <Billboard follow={true} position={[-2.5, 4.8, -4]}>
-        <mesh position={[0, -0.15, -0.02]}>
-          <planeGeometry args={[11.5, 1.25]} />
-          <meshBasicMaterial color="#080c16" transparent opacity={0.94} depthWrite={true} />
-        </mesh>
-        <lineSegments position={[0, -0.15, -0.01]}>
-          <edgesGeometry args={[new THREE.PlaneGeometry(11.5, 1.25)]} />
-          <lineBasicMaterial color={borderColor} transparent opacity={0.65} />
-        </lineSegments>
         <Text
           position={[-5.3, 0.15, 0.01]}
           fontSize={0.52}
           color={isGlobal ? "#d8b4fe" : "#7dd3fc"}
           fontWeight={700}
           anchorX="left"
+          outlineWidth={0.024}
+          outlineColor="#090c13"
+          outlineBlur={0.006}
         >
           Layer {layer.index} — {isGlobal ? 'GLOBAL LAYER' : 'LOCAL LAYER'}
         </Text>
@@ -104,6 +99,9 @@ const QuadLayerEnclosure: React.FC<QuadLayerEnclosureProps> = ({
           fontSize={0.26}
           color={isGlobal ? "#c084fc" : "#38bdf8"}
           anchorX="left"
+          outlineWidth={0.024}
+          outlineColor="#090c13"
+          outlineBlur={0.006}
         >
           {isGlobal
             ? '[⚡ 6 KV Heads (-50% Cache) | 100% NoPE | 🌐 Full Causal]'
@@ -181,20 +179,15 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
     <group position={[0, 0, 0]}>
       {/* Overview Group Label with Billboard & Dark Card */}
       <Billboard follow={true} position={[4, 8, -25]}>
-        <mesh position={[0, -0.35, -0.02]}>
-          <planeGeometry args={[16.5, 1.8]} />
-          <meshBasicMaterial color="#080c16" transparent opacity={0.94} depthWrite={true} />
-        </mesh>
-        <lineSegments position={[0, -0.35, -0.01]}>
-          <edgesGeometry args={[new THREE.PlaneGeometry(16.5, 1.8)]} />
-          <lineBasicMaterial color="#0284c7" transparent opacity={0.65} />
-        </lineSegments>
         <Text
           position={[0, 0.12, 0.01]}
           fontSize={0.72}
           color="#38bdf8"
           fontWeight={700}
           anchorX="center"
+          outlineWidth={0.024}
+          outlineColor="#090c13"
+          outlineBlur={0.006}
         >
           Marin 535B: 4-Layer Cycle (3 Local Sliding + 1 Global Causal)
         </Text>
@@ -203,6 +196,9 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
           fontSize={0.32}
           color="#cbd5e1"
           anchorX="center"
+          outlineWidth={0.024}
+          outlineColor="#090c13"
+          outlineBlur={0.006}
         >
           Repeating 12× over 48 layers · 36 Local (12 KV, 2048w, Half-RoPE) + 12 Global (6 KV, Full Causal, NoPE)
         </Text>

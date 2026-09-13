@@ -128,20 +128,15 @@ export const MacroTowerView: React.FC<MacroTowerViewProps> = ({
     <group position={[0, 0, 0]}>
       {/* 3D Title with Billboard & Dark Card */}
       <Billboard follow={true} position={[0, 14.2, 0]}>
-        <mesh position={[0, -0.4, -0.02]}>
-          <planeGeometry args={[18, 2.0]} />
-          <meshBasicMaterial color="#080c16" transparent opacity={0.94} depthWrite={true} />
-        </mesh>
-        <lineSegments position={[0, -0.4, -0.01]}>
-          <edgesGeometry args={[new THREE.PlaneGeometry(18, 2.0)]} />
-          <lineBasicMaterial color="#0284c7" transparent opacity={0.65} />
-        </lineSegments>
         <Text
           position={[0, 0.15, 0.01]}
           fontSize={0.85}
           color="#38bdf8"
           fontWeight={700}
           anchorX="center"
+          outlineWidth={0.03}
+          outlineColor="#080c16"
+          outlineBlur={0.008}
         >
           Marin 535B: Full 48-Layer Macro Perspective
         </Text>
@@ -150,6 +145,9 @@ export const MacroTowerView: React.FC<MacroTowerViewProps> = ({
           fontSize={0.36}
           color="#cbd5e1"
           anchorX="center"
+          outlineWidth={0.02}
+          outlineColor="#080c16"
+          outlineBlur={0.008}
         >
           12 Quad-Groups × (3 Local Sliding Window + 1 Global Full Causal Layer) · Click any layer to isolate
         </Text>

@@ -368,38 +368,16 @@ export const FlowConnection: React.FC<FlowConnectionProps> = ({
         <ScreenSpaceBillboard
           position={[midPoint.x, midPoint.y + (isResidual ? 0.38 : 0.45), midPoint.z]}
         >
-          {/* Semi-transparent dark pill backdrop for ultra-high contrast */}
-          <mesh position={[0, 0, -0.01]}>
-            <planeGeometry args={[Math.max(1.1, label.length * 0.15 + 0.42), 0.36]} />
-            <meshBasicMaterial
-              color="#090c13"
-              transparent
-              opacity={0.94}
-              depthWrite={true}
-            />
-          </mesh>
-          <lineSegments position={[0, 0, 0]}>
-            <edgesGeometry
-              args={[
-                new THREE.PlaneGeometry(
-                  Math.max(1.1, label.length * 0.15 + 0.42),
-                  0.36
-                ),
-              ]}
-            />
-            <lineBasicMaterial
-              color={isHighlighted ? '#38bdf8' : (isResidual ? '#fb7185' : '#243046')}
-              transparent
-              opacity={0.7}
-            />
-          </lineSegments>
           <Text
             position={[0, 0, 0.01]}
             fontSize={0.21}
-            color={isHighlighted ? '#ffffff' : (isResidual ? '#fecdd3' : '#cbd5e1')}
+            color={isHighlighted ? '#ffffff' : (isResidual ? '#fb7185' : '#e2e8f0')}
             anchorX="center"
             anchorY="middle"
             fontWeight={600}
+            outlineWidth={0.024}
+            outlineColor="#090c13"
+            outlineBlur={0.006}
           >
             {label}
           </Text>
