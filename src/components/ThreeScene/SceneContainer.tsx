@@ -1,5 +1,6 @@
-import React from 'react';
-import { Canvas } from '@react-three/fiber';
+import React, { useEffect, useMemo } from 'react';
+import * as THREE from 'three';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { EffectComposer, DepthOfField } from '@react-three/postprocessing';
 import { MicroBlockView } from './MicroBlockView';
 import { QuadCycleView } from './QuadCycleView';
@@ -8,6 +9,28 @@ import { CameraRig } from './CameraRig';
 import { FlowProvider } from './FlowConnections';
 import { LayerMetadata, ForwardStep, ViewMode } from '../../types/model';
 import { ActivationData } from '../../data/tokenSimulation';
+
+export function AdaptiveFog({ color, focusTarget }: { color: string, focusTarget: [number, number, number] }) {
+  const { scene } = useThree();
+  const targetVec = useMemo(() => new THREE.Vector3(...focusTarget), [focusTarget]);
+
+  useEffect(() => {
+    if (!scene.fog) {
+      scene.fog = new THREE.Fog(color, 18, 65);
+    }
+    return () => { scene.fog = null; };
+  }, [scene, color]);
+
+  useFrame(({ camera }) => {
+    if (scene.fog && (scene.fog as THREE.Fog).isFog) {
+      const fog = scene.fog as THREE.Fog;
+      const dist = camera.position.distanceTo(targetVec);
+      fog.near = Math.max(18, dist * 0.85);
+      fog.far = Math.max(65, dist * 2.4);
+    }
+  });
+  return null;
+}
 
 interface SceneContainerProps {
   viewMode: ViewMode;
@@ -70,11 +93,11 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
       >
         {/* Visual FX Modes */}
         {vfxMode === 'fog' && (
-          <fog attach="fog" args={['#08090e', 16, 52]} />
+          <AdaptiveFog color="#08090e" focusTarget={cameraFocus || [0,0,0]} />
         )}
         {vfxMode === 'bokeh' && (
-          <EffectComposer>
-            <DepthOfField target={cameraFocus || [0,0,0]} focalLength={0.02} bokehScale={2} height={480} />
+          <EffectComposer multisampling={0}>
+            <DepthOfField target={cameraFocus || [0,0,0]} focalLength={0.035} bokehScale={3.5} height={720} />
           </EffectComposer>
         )}
 
