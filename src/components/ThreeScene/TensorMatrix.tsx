@@ -19,7 +19,7 @@ interface TensorMatrixProps {
   isHighlighted?: boolean;
   isFocused?: boolean;
   onHover?: (id: string | null) => void;
-  onClick?: (id: string) => void;
+  onClick?: (id: string, worldPos?: [number, number, number]) => void;
   onHoverCell?: (cellInfo: HoveredCellInfo | null) => void;
   labelYOffset?: number;
   tokenLabels?: string[];
@@ -269,7 +269,9 @@ export const TensorMatrix: React.FC<TensorMatrixProps> = ({
         }}
         onClick={(e) => {
           e.stopPropagation();
-          onClick?.(id);
+          const targetVec = new THREE.Vector3();
+          e.object.getWorldPosition(targetVec);
+          onClick?.(id, [targetVec.x, targetVec.y, targetVec.z]);
         }}
         material={[sideMaterial, sideMaterial, sideMaterial, sideMaterial, frontMaterial, frontMaterial]}
       >

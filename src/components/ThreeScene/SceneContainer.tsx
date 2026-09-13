@@ -44,7 +44,7 @@ interface SceneContainerProps {
   cameraPos: [number, number, number];
   cameraFocus: [number, number, number];
   onHoverItem: (id: string | null) => void;
-  onClickItem: (id: string) => void;
+  onClickItem: (id: string, worldPos?: [number, number, number]) => void;
   onSelectLayer: (index: number) => void;
   onHoverCell?: (cellInfo: any) => void;
   onUserInteract?: () => void;

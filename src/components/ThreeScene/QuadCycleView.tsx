@@ -14,7 +14,7 @@ interface QuadCycleViewProps {
   activationData: ActivationData;
   onSelectLayer: (index: number) => void;
   onHoverItem: (id: string | null) => void;
-  onClickItem: (id: string) => void;
+  onClickItem: (id: string, worldPos?: [number, number, number]) => void;
   onHoverCell?: (cellInfo: any) => void;
   inspectedId: string | null;
   hoveredItemId?: string | null;

@@ -149,6 +149,19 @@ export function App() {
     localStorage.setItem('marin_inspector_collapsed', 'false');
   }, [currentStepIndex, dynamicSteps]);
 
+  const handleItemClick = useCallback((id: string, worldPos?: [number, number, number]) => {
+    setInspectedId(id);
+    if (worldPos) {
+      // 1. Lock the camera focus precisely onto the clicked module's center
+      setCameraOverride({
+        pos: [worldPos[0] + 0.6, worldPos[1] + 2.8, worldPos[2] + 7.2],
+        focus: [worldPos[0], worldPos[1], worldPos[2]]
+      });
+      // 3. Trigger the smooth lerp camera transition
+      setResetTrigger(prev => prev + 1);
+    }
+  }, []);
+
   // Synchronize group and selected layer
   const currentGroup = layerGroups[currentGroupIndex] || layerGroups[0];
   const currentLayer = layers[selectedLayerIndex] || layers[0];
@@ -527,7 +540,7 @@ export function App() {
             onHoverItem={(id) => {
               setHoveredItemId(id);
             }}
-            onClickItem={(id) => setInspectedId(id)}
+            onClickItem={handleItemClick}
             onSelectLayer={handleSelectLayer}
             onHoverCell={setHoveredCell}
             onUserInteract={() => setAutoFollow(false)}

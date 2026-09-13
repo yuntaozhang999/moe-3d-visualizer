@@ -11,7 +11,7 @@ interface OperatorNodeProps {
   color?: string;
   isHighlighted?: boolean;
   onHover?: (id: string | null) => void;
-  onClick?: (id: string) => void;
+  onClick?: (id: string, worldPos?: [number, number, number]) => void;
   onHoverCell?: (cellInfo: any) => void;
   labelPosition?: 'top' | 'bottom';
   labelOffset?: [number, number, number];
@@ -41,7 +41,9 @@ export const OperatorNode: React.FC<OperatorNodeProps> = ({
         onPointerOut={() => onHover?.(null)}
         onClick={(e) => {
           e.stopPropagation();
-          onClick?.(id);
+          const targetVec = new THREE.Vector3();
+          e.object.getWorldPosition(targetVec);
+          onClick?.(id, [targetVec.x, targetVec.y, targetVec.z]);
         }}
       >
         <cylinderGeometry args={[0.45, 0.45, 0.15, 32]} />

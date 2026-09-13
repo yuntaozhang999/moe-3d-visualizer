@@ -13,7 +13,7 @@ interface MicroBlockViewProps {
   activeStep: ForwardStep;
   activationData: ActivationData;
   onHoverItem: (id: string | null) => void;
-  onClickItem: (id: string) => void;
+  onClickItem: (id: string, worldPos?: [number, number, number]) => void;
   onHoverCell?: (cellInfo: HoveredCellInfo | null) => void;
   inspectedId: string | null;
   hoveredItemId?: string | null;
