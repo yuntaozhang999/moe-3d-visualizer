@@ -35,6 +35,7 @@ export function App() {
 
   // View mode: default to 'single_block' (the comprehensive isolated layer architecture)
   const [viewMode, setViewMode] = useState<ViewMode>('single_block');
+  const [vfxMode, setVfxMode] = useState<'crisp' | 'fog' | 'bokeh'>('crisp');
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [selectedLayerIndex, setSelectedLayerIndex] = useState<number>(() => {
     if (typeof window !== 'undefined') {
@@ -450,6 +451,8 @@ export function App() {
               setViewMode(mode);
               setResetTrigger((prev) => prev + 1);
             }}
+            vfxMode={vfxMode}
+            onChangeVfxMode={setVfxMode}
             onOpenLayerSpecs={() => setShowLayerSpecsModal(true)}
             currentGroupIndex={currentGroupIndex}
             onChangeGroup={handleChangeGroup}
@@ -512,6 +515,7 @@ export function App() {
           {/* Three.js 3D Scene */}
           <SceneContainer
             viewMode={viewMode}
+            vfxMode={vfxMode}
             allLayers={layers}
             groupLayers={currentGroup.layers}
             currentLayer={currentLayer}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
+import { EffectComposer, DepthOfField } from '@react-three/postprocessing';
 import { MicroBlockView } from './MicroBlockView';
 import { QuadCycleView } from './QuadCycleView';
 import { MacroTowerView } from './MacroTowerView';
@@ -10,6 +11,7 @@ import { ActivationData } from '../../data/tokenSimulation';
 
 interface SceneContainerProps {
   viewMode: ViewMode;
+  vfxMode?: 'crisp' | 'fog' | 'bokeh';
   allLayers: LayerMetadata[];
   groupLayers: LayerMetadata[];
   currentLayer: LayerMetadata;
@@ -32,6 +34,7 @@ interface SceneContainerProps {
 
 export const SceneContainer: React.FC<SceneContainerProps> = ({
   viewMode,
+  vfxMode = 'crisp',
   allLayers,
   groupLayers,
   currentLayer,
@@ -65,6 +68,16 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
         orthographic={cameraMode === 'orthographic'}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
+        {/* Visual FX Modes */}
+        {vfxMode === 'fog' && (
+          <fog attach="fog" args={['#08090e', 16, 52]} />
+        )}
+        {vfxMode === 'bokeh' && (
+          <EffectComposer>
+            <DepthOfField target={cameraFocus || [0,0,0]} focalLength={0.02} bokehScale={2} height={480} />
+          </EffectComposer>
+        )}
+
         {/* Ambient & Directional Lights */}
         <ambientLight intensity={1.1} />
         <directionalLight position={[20, 32, 20]} intensity={1.3} castShadow />
