@@ -1,11 +1,10 @@
 import React from 'react';
 import * as THREE from 'three';
 import { Text, Billboard } from '@react-three/drei';
-import { TensorMatrix } from './TensorMatrix';
-import { OperatorNode } from './OperatorNode';
 import { FlowConnection } from './FlowConnections';
 import { LayerMetadata, ForwardStep } from '../../types/model';
 import { ActivationData, simulateActivations } from '../../data/tokenSimulation';
+import { MicroBlockView } from './MicroBlockView';
 
 interface QuadCycleViewProps {
   groupLayers: LayerMetadata[];
@@ -20,142 +19,6 @@ interface QuadCycleViewProps {
   hoveredItemId?: string | null;
 }
 
-interface QuadLayerEnclosureProps {
-  layer: LayerMetadata;
-  isSelected: boolean;
-  onSelectLayer: (index: number) => void;
-}
-
-const QuadLayerEnclosure: React.FC<QuadLayerEnclosureProps> = ({
-  layer,
-  isSelected,
-  onSelectLayer,
-}) => {
-  const [isHovered, setIsHovered] = React.useState(false);
-  const isGlobal = layer.isGlobal;
-  const borderColor = isGlobal ? '#a855f7' : '#38bdf8';
-
-  return (
-    <>
-      {/* 3D Floating Floor Tray */}
-      <mesh
-        position={[4.5, -2.0, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelectLayer(layer.index);
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setIsHovered(true);
-          document.body.style.cursor = 'pointer';
-        }}
-        onPointerOut={() => {
-          setIsHovered(false);
-          document.body.style.cursor = 'default';
-        }}
-      >
-        <planeGeometry args={[26.5, 11]} />
-        <meshStandardMaterial
-          color={borderColor}
-          transparent
-          opacity={0.05}
-          metalness={0.8}
-          roughness={0.2}
-        />
-      </mesh>
-
-      {/* Glowing edges */}
-      <lineSegments position={[4.5, -1.98, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <edgesGeometry args={[new THREE.PlaneGeometry(26.5, 11)]} />
-        <lineBasicMaterial
-          color={borderColor}
-          transparent
-          opacity={0.5}
-        />
-      </lineSegments>
-
-      {/* Layer Header in 3D with Billboard & Dark Card */}
-      <Billboard follow={true} position={[-3.5, 5.8, -3.5]}>
-        <mesh position={[0, 0, -0.05]}>
-          <planeGeometry args={[7.6, 1.4]} />
-          <meshBasicMaterial color="#070a12" transparent opacity={0.88} />
-          {/* Optional thin border */}
-          <lineSegments>
-            <edgesGeometry args={[new THREE.PlaneGeometry(7.6, 1.4)]} />
-            <lineBasicMaterial color={borderColor} transparent opacity={0.5} />
-          </lineSegments>
-        </mesh>
-        <Text
-          position={[0, 0.25, 0.01]}
-          fontSize={0.52}
-          color={isGlobal ? "#d8b4fe" : "#7dd3fc"}
-          fontWeight={700}
-          anchorX="center"
-          outlineWidth={0.024}
-          outlineColor="#090c13"
-          outlineBlur={0.006}
-        >
-          Layer {layer.index} — {isGlobal ? 'GLOBAL LAYER' : 'LOCAL LAYER'}
-        </Text>
-        <Text
-          position={[0, -0.32, 0.01]}
-          fontSize={0.26}
-          color={isGlobal ? "#c084fc" : "#38bdf8"}
-          anchorX="center"
-          outlineWidth={0.024}
-          outlineColor="#090c13"
-          outlineBlur={0.006}
-        >
-          {isGlobal
-            ? '[⚡ 6 KV Heads (-50% Cache) | 100% NoPE | 🌐 Full Causal]'
-            : '[12 KV Heads | Half-RoPE (64d) | Sliding Window (2048)]'}
-        </Text>
-      </Billboard>
-
-      {/* Click to Focus / Isolate Tag */}
-      <group
-        position={[13, 4.5, -4]}
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelectLayer(layer.index);
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setIsHovered(true);
-          document.body.style.cursor = 'pointer';
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation();
-          setIsHovered(false);
-          document.body.style.cursor = 'default';
-        }}
-      >
-        <mesh position={[0, 0, 0]}>
-          <planeGeometry args={[5.4, 0.85]} />
-          <meshBasicMaterial
-            color={
-              isGlobal
-                ? isHovered ? '#9333ea' : '#581c87'
-                : isHovered ? '#0284c7' : '#0369a1'
-            }
-          />
-        </mesh>
-        <Text
-          position={[0, 0, 0.05]}
-          fontSize={0.27}
-          color="#ffffff"
-          fontWeight={700}
-          anchorX="center"
-          anchorY="middle"
-        >
-          🔍 Focus & Isolate Layer
-        </Text>
-      </group>
-    </>
-  );
-};
-
 export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
   groupLayers,
   activeLayerIndex,
@@ -169,424 +32,127 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
   hoveredItemId,
 }) => {
   // 4 layers spaced along the Z axis
-  const layerZOffsets = [-24, -8, 8, 24];
+  const layerZOffsets = [-39, -13, 13, 39];
 
   // Generate unique activation data for each of the 4 layers
   const layerActivations = React.useMemo(() => {
     return groupLayers.map(layer => simulateActivations(activationData.tokens, layer.index, layer.isGlobal));
   }, [groupLayers, activationData.tokens]);
-  // One world-unit column represents 96 real features (same policy as MicroBlockView,
-  // scaled down to fit four stacked layers side by side).
-  const DIM_W = 0.035;
 
   return (
     <group position={[0, 0, 0]}>
-
       {/* Render the 4 Layers in 3D */}
       {groupLayers.map((layer, idx) => {
         const z = layerZOffsets[idx];
-        const isSelected = layer.index === activeLayerIndex;
         const isGlobal = layer.isGlobal;
         const layerData = layerActivations[idx];
-        const isFocused = isSelected || (hoveredItemId?.startsWith(`l${layer.index}_`) ?? false);
 
         return (
           <group key={layer.index} position={[0, 0, z]}>
-            <QuadLayerEnclosure
+            {/* 3D Floating Floor Tray */}
+            <mesh
+              position={[14, -2.0, 0]}
+              rotation={[-Math.PI / 2, 0, 0]}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectLayer(layer.index);
+              }}
+              onPointerOver={(e) => {
+                e.stopPropagation();
+                document.body.style.cursor = 'pointer';
+              }}
+              onPointerOut={() => {
+                document.body.style.cursor = 'default';
+              }}
+            >
+              <planeGeometry args={[68, 20]} />
+              <meshStandardMaterial
+                color={isGlobal ? '#a855f7' : '#38bdf8'}
+                transparent
+                opacity={0.05}
+                metalness={0.8}
+                roughness={0.2}
+              />
+            </mesh>
+
+            {/* Glowing edges */}
+            <lineSegments position={[14, -1.98, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <edgesGeometry args={[new THREE.PlaneGeometry(68, 20)]} />
+              <lineBasicMaterial
+                color={isGlobal ? '#a855f7' : '#38bdf8'}
+                transparent
+                opacity={0.5}
+              />
+            </lineSegments>
+
+            {/* Layer Header in 3D with Billboard & Dark Card */}
+            <Billboard follow={true} position={[-3.5, 6.2, -3.5]}>
+              <mesh position={[0, 0, -0.05]}>
+                <planeGeometry args={[7.6, 1.4]} />
+                <meshBasicMaterial color="#070a12" transparent opacity={0.88} />
+                <lineSegments>
+                  <edgesGeometry args={[new THREE.PlaneGeometry(7.6, 1.4)]} />
+                  <lineBasicMaterial color={isGlobal ? '#a855f7' : '#38bdf8'} transparent opacity={0.5} />
+                </lineSegments>
+              </mesh>
+              <Text
+                position={[0, 0.25, 0.01]}
+                fontSize={0.52}
+                color={isGlobal ? "#d8b4fe" : "#7dd3fc"}
+                fontWeight={700}
+                anchorX="center"
+                outlineWidth={0.024}
+                outlineColor="#090c13"
+                outlineBlur={0.006}
+              >
+                Layer {layer.index} — {isGlobal ? 'GLOBAL LAYER' : 'LOCAL LAYER'}
+              </Text>
+              <Text
+                position={[0, -0.32, 0.01]}
+                fontSize={0.26}
+                color={isGlobal ? "#c084fc" : "#38bdf8"}
+                anchorX="center"
+                outlineWidth={0.024}
+                outlineColor="#090c13"
+                outlineBlur={0.006}
+              >
+                {isGlobal
+                  ? '[⚡ 6 KV Heads (-50% Cache) | 100% NoPE | 🌐 Full Causal]'
+                  : '[12 KV Heads | Half-RoPE (64d) | Sliding Window (2048)]'}
+              </Text>
+            </Billboard>
+
+            <MicroBlockView
               layer={layer}
-              isSelected={isSelected}
-              onSelectLayer={onSelectLayer}
-            />
-
-            {/* Internal Architecture within Layer */}
-            {/* 1. Pre-Attn GatedNorm */}
-            <OperatorNode
-              id={`l${layer.index}_gn_attn`}
-              name={isFocused ? "GatedNorm (r128)" : ""}
-              symbol="GN"
-              position={[-7, 1.5, 0]}
-              color="#10b981"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_attn_gn')}
-              onHover={onHoverItem}
+              activeStep={activeStep}
+              activationData={layerData}
+              onHoverItem={onHoverItem}
+              onClickItem={(id, worldPos) => {
+                onSelectLayer(layer.index);
+                onClickItem(id, worldPos);
+              }}
               onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* 2. QKV Matrices */}
-            <TensorMatrix
-              id={`l${layer.index}_q`}
-              label="Q (48 Heads)"
-              subLabel={isFocused ? "dim 128" : undefined}
-              position={[-4.2, 3.0, -1.8]}
-              size={[64 * DIM_W, 1.5, 0.4]}
-              gridRows={layerData.tokens.length}
-              gridCols={64}
-              data={layerData.qValues}
-              colorTheme="purple"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_q')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            <TensorMatrix
-              id={`l${layer.index}_k`}
-              label={isGlobal ? "K (⚡ 6 KV Heads)" : "K (12 KV Heads)"}
-              subLabel={isFocused ? (isGlobal ? "100% NoPE · GQA 8:1" : "Half-RoPE · GQA 4:1") : undefined}
-              position={[-4.2, 1.5, -1.8]}
-              size={isGlobal ? [8 * DIM_W, 1.4, 0.2] : [16 * DIM_W, 1.4, 0.4]}
-              gridRows={layerData.tokens.length}
-              gridCols={isGlobal ? 8 : 16}
-              data={layerData.kValues}
-              colorTheme={isGlobal ? "purple" : "cyan"}
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_k')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            <TensorMatrix
-              id={`l${layer.index}_v`}
-              label={isGlobal ? "V (⚡ 6 KV Heads)" : "V (12 KV Heads)"}
-              subLabel={isFocused ? (isGlobal ? "⚡ GQA 8:1 (-50% Cache)" : "GQA 4:1 Cache") : undefined}
-              position={[-4.2, 0.0, -1.8]}
-              size={isGlobal ? [8 * DIM_W, 1.4, 0.2] : [16 * DIM_W, 1.4, 0.4]}
-              gridRows={layerData.tokens.length}
-              gridCols={isGlobal ? 8 : 16}
-              data={layerData.vValues}
-              colorTheme={isGlobal ? "purple" : "cyan"}
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_v')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            <OperatorNode
-              id={`l${layer.index}_rope`}
-              name={isFocused ? (isGlobal ? "100% NoPE (Disabled)" : "Half-RoPE (64 RoPE + 64 NoPE)") : ""}
-              symbol={isGlobal ? "NoPE" : "RoPE"}
-              position={[-2.5, 1.5, -1.5]}
-              color={isGlobal ? "#6b7280" : "#0284c7"}
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_rope')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* 3. Attention Heatmap & XSA */}
-            <TensorMatrix
-              id={`l${layer.index}_attn`}
-              label={isGlobal ? "Full Causal Map" : "Sliding Window Map"}
-              subLabel={isFocused ? (isGlobal ? "Full Context" : "Window 2048") : undefined}
-              position={[-0.8, 1.5, -1.2]}
-              size={[2.0, 2.0, 0.3]}
-              gridRows={layerData.tokens.length}
-              gridCols={layerData.tokens.length}
-              data={layerData.attnScores}
-              colorTheme={isGlobal ? "purple" : "cyan"}
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_attn_matrix')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            <OperatorNode
-              id={`l${layer.index}_xsa`}
-              name={isFocused ? "XSA Decorrelate" : ""}
-              symbol="XSA"
-              position={[1.5, 1.5, -1.2]}
-              color="#e879f9"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_xsa')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            <OperatorNode
-              id={`l${layer.index}_gate`}
-              name={isFocused ? "Head Gate" : ""}
-              symbol="HG"
-              position={[3.0, 1.5, -0.6]}
-              color="#f43f5e"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_head_gate')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* Attention Residual Add */}
-            <OperatorNode
-              id={`l${layer.index}_attn_add`}
-              name={isFocused ? "Attn Add" : ""}
-              symbol="+"
-              position={[4.6, 1.5, 0]}
-              color="#38bdf8"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_attn_add')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* 1 to 2: Pre-Attn GN into QKV */}
-            <FlowConnection
-              from={[-6.4, 1.5, 0]}
-              to={[-4.9, 1.5, -1.8]}
-              color="#c084fc"
-              isHighlighted={isSelected && (activeStep.activeNodeIds.includes('node_q') || activeStep.activeNodeIds.includes('node_k'))}
-            />
-
-            {/* QKV to RoPE */}
-            <FlowConnection
-              from={[-3.5, 1.5, -1.8]}
-              to={[-2.8, 1.5, -1.5]}
-              color="#c084fc"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_rope')}
-            />
-
-            {/* 2 to 3: RoPE into Attention Matrix */}
-            <FlowConnection
-              from={[-2.2, 1.5, -1.5]}
-              to={[-1.9, 1.5, -1.2]}
-              color="#c084fc"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_attn_matrix')}
-            />
-
-            {/* 3 to XSA: Attention Matrix into XSA */}
-            <FlowConnection
-              from={[0.3, 1.5, -1.2]}
-              to={[1.1, 1.5, -1.2]}
-              color="#e879f9"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_xsa')}
-            />
-
-            {/* XSA to Head Gate */}
-            <FlowConnection
-              from={[1.9, 1.5, -1.2]}
-              to={[2.6, 1.5, -0.6]}
-              color="#f43f5e"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_head_gate')}
-            />
-
-            {/* Head Gate to Attn Add */}
-            <FlowConnection
-              from={[3.4, 1.5, -0.6]}
-              to={[4.2, 1.5, 0]}
-              color="#38bdf8"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_attn_add')}
-            />
-
-            {/* Attention Bypass Residual */}
-            <FlowConnection
-              from={[-7.5, 1.5, 0]}
-              to={[4.6, 1.5, 0]}
-              isResidual={true}
-              curveHeight={2.8}
-              isHighlighted={isSelected && activeStep.id === 'attn_proj_residual'}
-              label="Attn Skip [6144]"
-            />
-
-            {/* 4. Pre-MoE GatedNorm */}
-            <FlowConnection
-              from={[5.0, 1.5, 0]}
-              to={[6.0, 1.5, 0]}
-              color="#10b981"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_moe_gn')}
-            />
-
-            <OperatorNode
-              id={`l${layer.index}_gn_moe`}
-              name={isFocused ? "Pre-MoE GN" : ""}
-              symbol="GN"
-              position={[6.4, 1.5, 0]}
-              color="#10b981"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_moe_gn')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* Pre-MoE GN Branches: A to Router, B to Latent Down */}
-            <FlowConnection
-              from={[6.8, 1.5, 0]}
-              to={[8.1, 3.2, 1.5]}
-              color="#f59e0b"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_router')}
-            />
-            <FlowConnection
-              from={[6.8, 1.5, 0]}
-              to={[8.1, 0.5, -1.5]}
-              color="#38bdf8"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_latent_down')}
-              label="Compress 50%"
-            />
-
-            {/* 5. LatentMoE Router + 8 Experts + 2 Shared */}
-            <TensorMatrix
-              id={`l${layer.index}_router`}
-              label="Router (QB)"
-              subLabel={isFocused ? "Top-8 / 384" : undefined}
-              position={[9.0, 3.2, 1.5]}
-              size={[1.6, 1.4, 0.4]}
-              gridRows={layerData.tokens.length}
-              gridCols={16}
-              colorTheme="amber"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_router')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* Router to 8 Routed Experts: Top-8 Gating Beam */}
-            <FlowConnection
-              from={[9.9, 3.2, 1.5]}
-              to={[11.4, 0.5, -1.5]}
-              color="#f59e0b"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_experts_routed')}
-              label="Top-8 Dispatch"
-            />
-
-            <TensorMatrix
-              id={`l${layer.index}_latent`}
-              label="Latent 3072"
-              subLabel={isFocused ? "Down-Proj 50% Comms" : undefined}
-              position={[9.0, 0.5, -1.5]}
-              size={[32 * DIM_W, 1.4, 0.4]}
-              gridRows={layerData.tokens.length}
-              gridCols={32}
-              data={layerData.latentDown}
-              colorTheme="blue"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_latent_down')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* Latent to Routed Experts; Full-Width mlp_in to Shared Experts */}
-            <FlowConnection
-              from={[9.9, 0.5, -1.5]}
-              to={[11.4, 0.5, -1.5]}
-              color="#38bdf8"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_experts_routed')}
-            />
-            <FlowConnection
-              from={[6.8, 1.5, -0.4]}
-              to={[11.5, 3.2, 1.5]}
-              color="#10b981"
-              curveHeight={2.4}
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_experts_shared')}
-              label="Full Width [6144]"
-            />
-
-            <TensorMatrix
-              id={`l${layer.index}_routed`}
-              label="8 Routed (SwiGLU)"
-              subLabel={isFocused ? "Width 3072" : undefined}
-              position={[12.5, 0.5, -1.5]}
-              size={[32 * DIM_W, 1.5, 0.5]}
-              gridRows={8}
-              gridCols={32}
-              colorTheme="amber"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_experts_routed')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            <TensorMatrix
-              id={`l${layer.index}_shared`}
-              label="2 Shared Experts"
-              subLabel={isFocused ? "6144 → 3072 → 6144 (each)" : undefined}
-              position={[12.5, 3.2, 1.5]}
-              size={[64 * DIM_W, 1.4, 0.5]}
-              gridRows={layerData.tokens.length}
-              gridCols={64}
-              data={layerData.sharedExpert1}
-              colorTheme="emerald"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('node_experts_shared')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* Experts to MoE Merge */}
-            <FlowConnection
-              from={[13.6, 0.5, -1.5]}
-              to={[15.1, 1.5, 0]}
-              color="#f59e0b"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_moe_add')}
-            />
-            <FlowConnection
-              from={[13.6, 3.2, 1.5]}
-              to={[15.1, 1.5, 0]}
-              color="#10b981"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_moe_add')}
-            />
-
-            {/* MoE Bypass Residual */}
-            <FlowConnection
-              from={[6.8, 1.5, 0]}
-              to={[15.6, 1.5, 0]}
-              isResidual={true}
-              curveHeight={2.8}
-              isHighlighted={isSelected && activeStep.id === 'moe_aggregation_residual'}
-              label="MoE Skip [6144]"
-            />
-
-            {/* MoE Merge Node */}
-            <OperatorNode
-              id={`l${layer.index}_moe_add`}
-              name={isFocused ? "MoE Merge" : ""}
-              symbol="+"
-              position={[15.6, 1.5, 0]}
-              color="#f59e0b"
-              isHighlighted={isSelected && activeStep.activeNodeIds.includes('op_moe_add')}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
-            />
-
-            {/* Merge to Output */}
-            <FlowConnection
-              from={[16.0, 1.5, 0]}
-              to={[16.9, 1.5, 0]}
-              color={isGlobal ? "#c084fc" : "#38bdf8"}
-              isHighlighted={isSelected}
-            />
-
-            {/* Output of this layer */}
-            <TensorMatrix
-              id={`l${layer.index}_out`}
-              label={`L${layer.index} Output`}
-              subLabel={isFocused ? `[${layerData.tokens.length}, 6144]` : undefined}
-              position={[17.5, 1.5, 0]}
-              size={[64 * DIM_W, 2.4, 0.4]}
-              gridRows={layerData.tokens.length}
-              gridCols={64}
-              colorTheme={isGlobal ? "purple" : "cyan"}
-              isHighlighted={isSelected}
-              onHover={onHoverItem}
-              onHoverCell={onHoverCell}
-              onClick={onClickItem}
+              inspectedId={inspectedId}
+              hoveredItemId={hoveredItemId}
+              totalLayers={48}
             />
           </group>
         );
       })}
 
       {/* Inter-Layer Connection Tubes */}
-      {[0, 1, 2].map((idx) => {
-        const fromZ = layerZOffsets[idx];
-        const toZ = layerZOffsets[idx + 1];
+      {groupLayers.slice(0, 3).map((layer, idx) => {
         return (
           <group key={`link_${idx}`}>
             <FlowConnection
-              from={[18.1, 1.5, fromZ]}
-              to={[-7.4, 1.5, toZ]}
+              from={[39.5, 2.0, layerZOffsets[idx]]}
+              to={[-11.5, 2.0, layerZOffsets[idx + 1]]}
+              curveHeight={4.0}
+              particleCount={24}
+              speed={0.6}
               color="#38bdf8"
-              curveHeight={2.6}
-              particleCount={16}
-              speed={0.5}
               isHighlighted={true}
-              label={`L${idx}→L${idx+1} Stream [6144]`}
+              label={`L${groupLayers[idx].index}→L${groupLayers[idx+1].index} Residual Stream [6144]`}
             />
           </group>
         );

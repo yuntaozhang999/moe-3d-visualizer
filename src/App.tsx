@@ -254,7 +254,7 @@ export function App() {
   // Smooth reset to optimal overview angle (gentle 14.5° elevation, perfect 1:1 framing)
   const handleResetCamera = useCallback(() => {
     if (viewMode === 'quad_cycle') {
-      setCameraOverride({ pos: [-26, 30, 52], focus: [5, 1.5, 0] });
+      setCameraOverride({ pos: [-36, 44, 76], focus: [14, 2.0, 0] });
     } else if (viewMode === 'macro_stack') {
       setCameraOverride({ pos: [0, 8, 38], focus: [0, 2, 0] });
     } else {
@@ -471,8 +471,8 @@ export function App() {
     }
     if (viewMode === 'quad_cycle') {
       return {
-        currentCameraPos: [-26, 30, 52] as [number, number, number],
-        currentCameraFocus: [5, 1.5, 0] as [number, number, number],
+        currentCameraPos: [-36, 44, 76] as [number, number, number],
+        currentCameraFocus: [14, 2.0, 0] as [number, number, number],
       };
     }
     if (viewMode === 'macro_stack') {
