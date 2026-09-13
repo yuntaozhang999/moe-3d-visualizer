@@ -151,16 +151,51 @@ export function App() {
 
   const handleItemClick = useCallback((id: string, worldPos?: [number, number, number]) => {
     setInspectedId(id);
+
+    let targetStepIndex = dynamicSteps.findIndex(step => step.activeNodeIds?.includes(id));
+    if (targetStepIndex === -1) {
+      const fallbackMap: Record<string, string> = {
+        'op_attn_add': 'attn_proj_residual',
+        'op_moe_add': 'moe_aggregation_residual',
+        'node_w_q': 'qkv_proj',
+        'node_w_k': 'qkv_proj',
+        'node_w_v': 'qkv_proj',
+        'node_attn_score': 'attn_softmax',
+        'node_attn_dropout': 'attn_softmax',
+        'node_attn_prob': 'attn_softmax',
+        'node_attn_out': 'attn_out',
+        'node_w_o': 'attn_proj_residual',
+        'node_moe_router': 'moe_router',
+        'node_moe_topk': 'moe_router',
+        'node_expert_1': 'moe_experts',
+        'node_expert_2': 'moe_experts',
+        'node_w_g': 'moe_experts',
+        'node_w_u': 'moe_experts',
+        'node_w_d': 'moe_experts'
+      };
+      
+      const fallbackStepId = fallbackMap[id];
+      if (fallbackStepId) {
+        targetStepIndex = dynamicSteps.findIndex(step => step.id === fallbackStepId);
+      }
+    }
+
+    if (targetStepIndex !== -1) {
+      setCurrentStepIndex(targetStepIndex);
+      setIsPlaying(false);
+      setIsNarratorCollapsed(false);
+    }
+
     if (worldPos) {
-      // 1. Lock the camera focus precisely onto the clicked module's center
+      // 2. Zoom-out Calibration (More comfortable view distance)
       setCameraOverride({
-        pos: [worldPos[0] + 0.6, worldPos[1] + 2.8, worldPos[2] + 7.2],
+        pos: [worldPos[0] + 0.8, worldPos[1] + 4.2, worldPos[2] + 14.5],
         focus: [worldPos[0], worldPos[1], worldPos[2]]
       });
       // 3. Trigger the smooth lerp camera transition
       setResetTrigger(prev => prev + 1);
     }
-  }, []);
+  }, [dynamicSteps]);
 
   // Synchronize group and selected layer
   const currentGroup = layerGroups[currentGroupIndex] || layerGroups[0];
