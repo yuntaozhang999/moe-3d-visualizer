@@ -37,9 +37,10 @@ const QuadLayerEnclosure: React.FC<QuadLayerEnclosureProps> = ({
 
   return (
     <>
-      {/* 3D Bounding Card / Enclosure for this Layer */}
+      {/* 3D Floating Floor Tray */}
       <mesh
-        position={[4, 1.5, 0]}
+        position={[4.5, -2.0, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
         onClick={(e) => {
           e.stopPropagation();
           onSelectLayer(layer.index);
@@ -54,40 +55,43 @@ const QuadLayerEnclosure: React.FC<QuadLayerEnclosureProps> = ({
           document.body.style.cursor = 'default';
         }}
       >
-        <boxGeometry args={[26, 7, 10]} />
+        <planeGeometry args={[26.5, 11]} />
         <meshStandardMaterial
-          color={
-            isSelected
-              ? isGlobal ? '#3b0764' : '#082f49'
-              : isHovered
-              ? isGlobal ? '#2e1065' : '#0c4a6e'
-              : '#0b0f19'
-          }
+          color={borderColor}
           transparent
-          opacity={isSelected ? 0.45 : isHovered ? 0.35 : 0.18}
-          roughness={0.8}
+          opacity={0.05}
+          metalness={0.8}
+          roughness={0.2}
         />
       </mesh>
 
-      {/* Layer Boundary Wireframe */}
-      <lineSegments position={[4, 1.5, 0]}>
-        <edgesGeometry args={[new THREE.BoxGeometry(26, 7, 10)]} />
+      {/* Glowing edges */}
+      <lineSegments position={[4.5, -1.98, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <edgesGeometry args={[new THREE.PlaneGeometry(26.5, 11)]} />
         <lineBasicMaterial
           color={borderColor}
           transparent
-          opacity={isSelected || isHovered ? 0.95 : 0.3}
-          linewidth={isSelected || isHovered ? 2 : 1}
+          opacity={0.5}
         />
       </lineSegments>
 
       {/* Layer Header in 3D with Billboard & Dark Card */}
-      <Billboard follow={true} position={[-2.5, 4.8, -4]}>
+      <Billboard follow={true} position={[-3.5, 5.8, -3.5]}>
+        <mesh position={[0, 0, -0.05]}>
+          <planeGeometry args={[7.6, 1.4]} />
+          <meshBasicMaterial color="#070a12" transparent opacity={0.88} />
+          {/* Optional thin border */}
+          <lineSegments>
+            <edgesGeometry args={[new THREE.PlaneGeometry(7.6, 1.4)]} />
+            <lineBasicMaterial color={borderColor} transparent opacity={0.5} />
+          </lineSegments>
+        </mesh>
         <Text
-          position={[-5.3, 0.15, 0.01]}
+          position={[0, 0.25, 0.01]}
           fontSize={0.52}
           color={isGlobal ? "#d8b4fe" : "#7dd3fc"}
           fontWeight={700}
-          anchorX="left"
+          anchorX="center"
           outlineWidth={0.024}
           outlineColor="#090c13"
           outlineBlur={0.006}
@@ -95,10 +99,10 @@ const QuadLayerEnclosure: React.FC<QuadLayerEnclosureProps> = ({
           Layer {layer.index} — {isGlobal ? 'GLOBAL LAYER' : 'LOCAL LAYER'}
         </Text>
         <Text
-          position={[-5.3, -0.32, 0.01]}
+          position={[0, -0.32, 0.01]}
           fontSize={0.26}
           color={isGlobal ? "#c084fc" : "#38bdf8"}
-          anchorX="left"
+          anchorX="center"
           outlineWidth={0.024}
           outlineColor="#090c13"
           outlineBlur={0.006}
@@ -165,7 +169,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
   hoveredItemId,
 }) => {
   // 4 layers spaced along the Z axis
-  const layerZOffsets = [-22, -7, 8, 23];
+  const layerZOffsets = [-27, -9, 9, 27];
 
   // Generate unique activation data for each of the 4 layers
   const layerActivations = React.useMemo(() => {
@@ -184,6 +188,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
         const isSelected = layer.index === activeLayerIndex;
         const isGlobal = layer.isGlobal;
         const layerData = layerActivations[idx];
+        const isFocused = isSelected || (hoveredItemId?.startsWith(`l${layer.index}_`) ?? false);
 
         return (
           <group key={layer.index} position={[0, 0, z]}>
@@ -197,7 +202,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             {/* 1. Pre-Attn GatedNorm */}
             <OperatorNode
               id={`l${layer.index}_gn_attn`}
-              name="GatedNorm (r128)"
+              name={isFocused ? "GatedNorm (r128)" : ""}
               symbol="GN"
               position={[-7, 1.5, 0]}
               color="#10b981"
@@ -211,7 +216,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_q`}
               label="Q (48 Heads)"
-              subLabel="dim 128"
+              subLabel={isFocused ? "dim 128" : undefined}
               position={[-4.2, 3.0, -1.8]}
               size={[64 * DIM_W, 1.5, 0.4]}
               gridRows={layerData.tokens.length}
@@ -227,7 +232,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_k`}
               label={isGlobal ? "K (⚡ 6 KV Heads)" : "K (12 KV Heads)"}
-              subLabel={isGlobal ? "100% NoPE · GQA 8:1" : "Half-RoPE · GQA 4:1"}
+              subLabel={isFocused ? (isGlobal ? "100% NoPE · GQA 8:1" : "Half-RoPE · GQA 4:1") : undefined}
               position={[-4.2, 1.5, -1.8]}
               size={isGlobal ? [8 * DIM_W, 1.4, 0.2] : [16 * DIM_W, 1.4, 0.4]}
               gridRows={layerData.tokens.length}
@@ -243,7 +248,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_v`}
               label={isGlobal ? "V (⚡ 6 KV Heads)" : "V (12 KV Heads)"}
-              subLabel={isGlobal ? "⚡ GQA 8:1 (-50% Cache)" : "GQA 4:1 Cache"}
+              subLabel={isFocused ? (isGlobal ? "⚡ GQA 8:1 (-50% Cache)" : "GQA 4:1 Cache") : undefined}
               position={[-4.2, 0.0, -1.8]}
               size={isGlobal ? [8 * DIM_W, 1.4, 0.2] : [16 * DIM_W, 1.4, 0.4]}
               gridRows={layerData.tokens.length}
@@ -258,7 +263,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
 
             <OperatorNode
               id={`l${layer.index}_rope`}
-              name={isGlobal ? "100% NoPE (Disabled)" : "Half-RoPE (64 RoPE + 64 NoPE)"}
+              name={isFocused ? (isGlobal ? "100% NoPE (Disabled)" : "Half-RoPE (64 RoPE + 64 NoPE)") : ""}
               symbol={isGlobal ? "NoPE" : "RoPE"}
               position={[-2.5, 1.5, -1.5]}
               color={isGlobal ? "#6b7280" : "#0284c7"}
@@ -272,7 +277,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_attn`}
               label={isGlobal ? "Full Causal Map" : "Sliding Window Map"}
-              subLabel={isGlobal ? "Full Context" : "Window 2048"}
+              subLabel={isFocused ? (isGlobal ? "Full Context" : "Window 2048") : undefined}
               position={[-0.8, 1.5, -1.2]}
               size={[2.0, 2.0, 0.3]}
               gridRows={layerData.tokens.length}
@@ -287,7 +292,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
 
             <OperatorNode
               id={`l${layer.index}_xsa`}
-              name="XSA Decorrelate"
+              name={isFocused ? "XSA Decorrelate" : ""}
               symbol="XSA"
               position={[1.5, 1.5, -1.2]}
               color="#e879f9"
@@ -299,7 +304,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
 
             <OperatorNode
               id={`l${layer.index}_gate`}
-              name="Head Gate"
+              name={isFocused ? "Head Gate" : ""}
               symbol="HG"
               position={[3.0, 1.5, -0.6]}
               color="#f43f5e"
@@ -312,7 +317,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             {/* Attention Residual Add */}
             <OperatorNode
               id={`l${layer.index}_attn_add`}
-              name="Attn Add"
+              name={isFocused ? "Attn Add" : ""}
               symbol="+"
               position={[4.6, 1.5, 0]}
               color="#38bdf8"
@@ -390,7 +395,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
 
             <OperatorNode
               id={`l${layer.index}_gn_moe`}
-              name="Pre-MoE GN"
+              name={isFocused ? "Pre-MoE GN" : ""}
               symbol="GN"
               position={[6.4, 1.5, 0]}
               color="#10b981"
@@ -419,7 +424,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_router`}
               label="Router (QB)"
-              subLabel="Top-8 / 384"
+              subLabel={isFocused ? "Top-8 / 384" : undefined}
               position={[9.0, 3.2, 1.5]}
               size={[1.6, 1.4, 0.4]}
               gridRows={layerData.tokens.length}
@@ -443,7 +448,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_latent`}
               label="Latent 3072"
-              subLabel="Down-Proj 50% Comms"
+              subLabel={isFocused ? "Down-Proj 50% Comms" : undefined}
               position={[9.0, 0.5, -1.5]}
               size={[32 * DIM_W, 1.4, 0.4]}
               gridRows={layerData.tokens.length}
@@ -475,7 +480,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_routed`}
               label="8 Routed (SwiGLU)"
-              subLabel="Width 3072"
+              subLabel={isFocused ? "Width 3072" : undefined}
               position={[12.5, 0.5, -1.5]}
               size={[32 * DIM_W, 1.5, 0.5]}
               gridRows={8}
@@ -490,7 +495,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_shared`}
               label="2 Shared Experts"
-              subLabel="6144 → 3072 → 6144 (each)"
+              subLabel={isFocused ? "6144 → 3072 → 6144 (each)" : undefined}
               position={[12.5, 3.2, 1.5]}
               size={[64 * DIM_W, 1.4, 0.5]}
               gridRows={layerData.tokens.length}
@@ -530,7 +535,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             {/* MoE Merge Node */}
             <OperatorNode
               id={`l${layer.index}_moe_add`}
-              name="MoE Merge"
+              name={isFocused ? "MoE Merge" : ""}
               symbol="+"
               position={[15.6, 1.5, 0]}
               color="#f59e0b"
@@ -552,7 +557,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
             <TensorMatrix
               id={`l${layer.index}_out`}
               label={`L${layer.index} Output`}
-              subLabel={`[${layerData.tokens.length}, 6144]`}
+              subLabel={isFocused ? `[${layerData.tokens.length}, 6144]` : undefined}
               position={[17.5, 1.5, 0]}
               size={[64 * DIM_W, 2.4, 0.4]}
               gridRows={layerData.tokens.length}
@@ -583,19 +588,10 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
               isHighlighted={true}
               label={`L${idx}→L${idx+1} Stream [6144]`}
             />
-            <Text
-              position={[5, 4.2, (fromZ + toZ) / 2]}
-              fontSize={0.28}
-              color="#38bdf8"
-              anchorX="center"
-              outlineWidth={0.03}
-              outlineColor="#05070c"
-            >
-              Residual Stream [6144] →
-            </Text>
           </group>
         );
       })}
     </group>
   );
 };
+
