@@ -62,7 +62,7 @@ export function App() {
   const [hoveredCell, setHoveredCell] = useState<HoveredCellInfo | null>(null);
   const [isNarratorCollapsed, setIsNarratorCollapsed] = useState<boolean>(() => {
     const saved = localStorage.getItem('marin_narrator_collapsed');
-    return saved !== null ? saved === 'true' : false;
+    return saved !== null ? saved === 'true' : true;
   });
 
   // Step 19 Dynamic Sampling HUD state
@@ -212,8 +212,10 @@ export function App() {
     if (targetStepIndex !== -1) {
       setCurrentStepIndex(targetStepIndex);
       setIsPlaying(false);
-      setIsNarratorCollapsed(false);
     }
+    
+    // Always collapse the inspector (right panel) to prevent taking up screen space
+    setIsInspectorCollapsed(true);
 
     if (worldPos) {
       // 2. Zoom-out Calibration (More comfortable view distance)
