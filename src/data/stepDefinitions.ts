@@ -80,7 +80,7 @@ const RAW_FORWARD_STEPS: Omit<ForwardStep, 'formulaData'>[] = [
     hardwareSignificance: 'GQA 4:1 (local) and 8:1 (global) slashes KV cache memory by 75%–87.5% during long-context inference.',
     cameraFocus: [-2.2, 4.5, -2],
     cameraPos: [-1.6, 9.0, 9],
-    activeNodeIds: ['node_q', 'node_k', 'node_v'],
+    activeNodeIds: ['node_w_q', 'node_w_k', 'node_w_v', 'op_q_proj', 'op_k_proj', 'op_v_proj', 'node_q', 'node_k', 'node_v'],
   },
   {
     id: 'short_conv_k',

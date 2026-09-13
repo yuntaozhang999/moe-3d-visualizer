@@ -207,6 +207,120 @@ export const EQUATION_DEFINITIONS: Record<string, EnrichedEquationData> = {
     codeSnippet: 'attn_in = self.attn_gated_norm(self.rms_attn(x))',
   },
 
+  node_w_q: {
+    id: 'node_w_q',
+    title: 'Query Weight Matrix (W_Q)',
+    category: 'Attention',
+    formula: 'W_Q \\in \\mathbb{R}^{6144 \\times 6144}',
+    intuitiveMeaning: 'Projects the 6144-dimensional hidden states into 48 Query heads of dimension 128.',
+    dataflow: {
+      inputShape: '-',
+      operation: 'Weight Matrix',
+      outputShape: '[6144, 6144]',
+      transformationNote: '48 heads × 128 dim',
+      stages: []
+    },
+    variables: [],
+    realShape: '[6144, 6144]',
+    visualShape: '[16, 16]',
+    codeSnippet: 'self.w_q = _init_weight((6144, 6144))'
+  },
+
+  node_w_k: {
+    id: 'node_w_k',
+    title: 'Key Weight Matrix (W_K)',
+    category: 'Attention',
+    formula: 'W_K \\in \\mathbb{R}^{6144 \\times (H_{kv} \\times 128)}',
+    intuitiveMeaning: 'Projects hidden states into Key heads using Grouped Query Attention (GQA). Ratio is 4:1 (12h) for Local layers, and 8:1 (6h) for Global layers.',
+    dataflow: {
+      inputShape: '-',
+      operation: 'Weight Matrix',
+      outputShape: '[6144, 1536] or [6144, 768]',
+      transformationNote: 'GQA compression',
+      stages: []
+    },
+    variables: [],
+    realShape: '[6144, 1536/768]',
+    visualShape: '[4/8, 16]',
+    codeSnippet: 'self.w_k = _init_weight((6144, kv_heads * 128))'
+  },
+
+  node_w_v: {
+    id: 'node_w_v',
+    title: 'Value Weight Matrix (W_V)',
+    category: 'Attention',
+    formula: 'W_V \\in \\mathbb{R}^{6144 \\times (H_{kv} \\times 128)}',
+    intuitiveMeaning: 'Projects hidden states into Value heads using Grouped Query Attention (GQA). Ratio is 4:1 (12h) for Local layers, and 8:1 (6h) for Global layers.',
+    dataflow: {
+      inputShape: '-',
+      operation: 'Weight Matrix',
+      outputShape: '[6144, 1536] or [6144, 768]',
+      transformationNote: 'GQA compression',
+      stages: []
+    },
+    variables: [],
+    realShape: '[6144, 1536/768]',
+    visualShape: '[4/8, 16]',
+    codeSnippet: 'self.w_v = _init_weight((6144, kv_heads * 128))'
+  },
+
+  op_q_proj: {
+    id: 'op_q_proj',
+    title: 'Query Projection Operator',
+    category: 'Attention',
+    formula: 'Q = X @ W_Q',
+    intuitiveMeaning: 'Computes the queries for all 48 attention heads.',
+    dataflow: {
+      inputShape: '[1, 4096, 6144]',
+      operation: 'Matrix Multiplication',
+      outputShape: '[1, 4096, 48, 128]',
+      transformationNote: 'Linear projection to Q',
+      stages: []
+    },
+    variables: [],
+    realShape: '[1, 4096, 6144]',
+    visualShape: 'Operator',
+    codeSnippet: 'q = jnp.einsum("bsh,hd->bsd", x, self.w_q)'
+  },
+
+  op_k_proj: {
+    id: 'op_k_proj',
+    title: 'Key Projection Operator',
+    category: 'Attention',
+    formula: 'K = X @ W_K',
+    intuitiveMeaning: 'Computes the keys for the KV heads. GQA reduces memory bandwidth requirements.',
+    dataflow: {
+      inputShape: '[1, 4096, 6144]',
+      operation: 'Matrix Multiplication',
+      outputShape: '[1, 4096, 12/6, 128]',
+      transformationNote: 'Linear projection to K',
+      stages: []
+    },
+    variables: [],
+    realShape: '[1, 4096, 1536/768]',
+    visualShape: 'Operator',
+    codeSnippet: 'k = jnp.einsum("bsh,hd->bsd", x, self.w_k)'
+  },
+
+  op_v_proj: {
+    id: 'op_v_proj',
+    title: 'Value Projection Operator',
+    category: 'Attention',
+    formula: 'V = X @ W_V',
+    intuitiveMeaning: 'Computes the values for the KV heads. GQA allows smaller KV caches.',
+    dataflow: {
+      inputShape: '[1, 4096, 6144]',
+      operation: 'Matrix Multiplication',
+      outputShape: '[1, 4096, 12/6, 128]',
+      transformationNote: 'Linear projection to V',
+      stages: []
+    },
+    variables: [],
+    realShape: '[1, 4096, 1536/768]',
+    visualShape: 'Operator',
+    codeSnippet: 'v = jnp.einsum("bsh,hd->bsd", x, self.w_v)'
+  },
+
   qkv_proj: {
     id: 'qkv_proj',
     title: 'QKV Projections & GQA Compression',

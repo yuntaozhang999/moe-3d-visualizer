@@ -316,80 +316,171 @@ export const MicroBlockView: React.FC<MicroBlockViewProps> = ({
         label="Residual Skip 1 [6144]"
       />
 
-      {/* W_QKV Weights Matrix */}
+      {/* ========================================================
+          Upper Query Rail (Y = 4.8)
+          ======================================================== */}
       <TensorMatrix
-        id="node_w_qkv"
-        label="W_Q, W_K, W_V Weights"
-        subLabel="[6144 × 9216]"
-        position={[-4.6, 3.4, -4.5]}
-        size={[1.4, 3.4, 0.8]}
+        id="node_w_q"
+        label="W_Q Weight Matrix"
+        subLabel="[6144 × 6144] · 48 Query Heads"
+        position={[-4.6, 4.8, -4.5]}
+        size={[1.4, 1.6, 0.8]}
         gridRows={16}
         gridCols={16}
         isWeight={true}
         colorTheme="slate"
-        isHighlighted={isHighlighted('node_w_qkv') || isHighlighted('node_q')}
+        isHighlighted={isHighlighted('node_w_q') || isHighlighted('node_q')}
         onHover={onHoverItem}
         onClick={onClickItem}
         onHoverCell={onHoverCell}
-        labelYOffset={0.2}
+        labelYOffset={0.15}
       />
 
-      {/* QKV Proj Node */}
       <OperatorNode
-        id="op_qkv_proj"
-        name="QKV Proj (@)"
+        id="op_q_proj"
+        name="Q Proj (@)"
+        symbol="@"
+        position={[-4.6, 4.8, -2.0]}
+        color="#818cf8"
+        isHighlighted={isHighlighted('op_q_proj') || isHighlighted('node_w_q')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        labelPosition="top"
+      />
+
+      <FlowConnection
+        from={[-6.3, 2.0, -2.0]}
+        to={[-5.15, 4.8, -2.0]}
+        color="#10b981"
+        label="Normed [6144]"
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'op_q_proj'])}
+      />
+      <FlowConnection
+        from={[-4.6, 4.8, -4.1]}
+        to={[-4.6, 4.8, -2.4]}
+        color="#64748b"
+        tubeRadius={0.02}
+        particleCount={5}
+        label="W_Q"
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['node_w_q', 'op_q_proj'])}
+      />
+      <FlowConnection
+        from={[-4.05, 4.8, -2.0]}
+        to={[-3.85, 4.8, -2.0]}
+        color="#818cf8"
+        label="Q (48h)"
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_q_proj', 'node_q'])}
+      />
+
+      {/* ========================================================
+          Middle Key Rail (Y = 2.0)
+          ======================================================== */}
+      <TensorMatrix
+        id="node_w_k"
+        label="W_K Weight Matrix"
+        subLabel={isGlobal ? "[6144 × 768] · GQA 8:1 (6h)" : "[6144 × 1536] · GQA 4:1 (12h)"}
+        position={[-4.6, 2.0, -4.5]}
+        size={isGlobal ? [1.1, 1.2, 0.4] : [1.2, 1.2, 0.6]}
+        gridRows={16}
+        gridCols={isGlobal ? 4 : 8}
+        isWeight={true}
+        colorTheme="slate"
+        isHighlighted={isHighlighted('node_w_k') || isHighlighted('node_k')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        onHoverCell={onHoverCell}
+        labelYOffset={0.15}
+      />
+
+      <OperatorNode
+        id="op_k_proj"
+        name="K Proj (@)"
         symbol="@"
         position={[-4.6, 2.0, -2.0]}
-        color="#818cf8"
-        isHighlighted={isHighlighted('op_qkv_proj') || isHighlighted('node_w_qkv')}
+        color="#38bdf8"
+        isHighlighted={isHighlighted('op_k_proj') || isHighlighted('node_w_k')}
         onHover={onHoverItem}
         onClick={onClickItem}
         labelPosition="bottom"
       />
 
-      {/* Pre-Attn GN -> QKV Proj */}
       <FlowConnection
         from={[-6.3, 2.0, -2.0]}
         to={[-5.15, 2.0, -2.0]}
         color="#10b981"
-        label="Normed [6144]"
-        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'op_qkv_proj'])}
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'op_k_proj'])}
       />
-
-      {/* W_QKV Weights projection flow */}
       <FlowConnection
-        from={[-4.6, 3.4, -4.5]}
+        from={[-4.6, 2.0, -4.1]}
         to={[-4.6, 2.0, -2.4]}
         color="#64748b"
         tubeRadius={0.02}
         particleCount={5}
-        label="W_QKV"
-        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['node_w_qkv', 'op_qkv_proj'])}
+        label="W_K"
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['node_w_k', 'op_k_proj'])}
+      />
+      <FlowConnection
+        from={[-4.05, 2.0, -2.0]}
+        to={[isGlobal ? -2.45 : -2.65, 2.0, -2.0]}
+        color="#38bdf8"
+        label={isGlobal ? "K (6h)" : "K (12h)"}
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_k_proj', 'node_k'])}
       />
 
-      {/* op_qkv_proj -> Q */}
-      <FlowConnection
-        from={[-4.6, 2.0, -2.0]}
-        to={[-3.85, 4.8, -2.0]}
-        color="#818cf8"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_qkv_proj', 'node_q'])}
-        label="Q (48h)"
+      {/* ========================================================
+          Lower Value Rail (Y = -0.8)
+          ======================================================== */}
+      <TensorMatrix
+        id="node_w_v"
+        label="W_V Weight Matrix"
+        subLabel={isGlobal ? "[6144 × 768] · GQA 8:1 (6h)" : "[6144 × 1536] · GQA 4:1 (12h)"}
+        position={[-4.6, -0.8, -4.5]}
+        size={isGlobal ? [1.1, 1.2, 0.4] : [1.2, 1.2, 0.6]}
+        gridRows={16}
+        gridCols={isGlobal ? 4 : 8}
+        isWeight={true}
+        colorTheme="slate"
+        isHighlighted={isHighlighted('node_w_v') || isHighlighted('node_v')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        onHoverCell={onHoverCell}
+        labelYOffset={-0.15}
       />
-      {/* op_qkv_proj -> K */}
-      <FlowConnection
-        from={[-4.6, 2.0, -2.0]}
-        to={[isGlobal ? -2.45 : -2.65, 2.0, -2.0]}
-        color="#818cf8"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_qkv_proj', 'node_k'])}
-        label={`K (${kvHeads}h)`}
+
+      <OperatorNode
+        id="op_v_proj"
+        name="V Proj (@)"
+        symbol="@"
+        position={[-4.6, -0.8, -2.0]}
+        color="#38bdf8"
+        isHighlighted={isHighlighted('op_v_proj') || isHighlighted('node_w_v')}
+        onHover={onHoverItem}
+        onClick={onClickItem}
+        labelPosition="bottom"
       />
-      {/* op_qkv_proj -> V */}
+
       <FlowConnection
-        from={[-4.6, 2.0, -2.0]}
+        from={[-6.3, 2.0, -2.0]}
+        to={[-5.15, -0.8, -2.0]}
+        color="#10b981"
+        label="Normed [6144]"
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['op_attn_gn', 'op_v_proj'])}
+      />
+      <FlowConnection
+        from={[-4.6, -0.8, -4.1]}
+        to={[-4.6, -0.8, -2.4]}
+        color="#64748b"
+        tubeRadius={0.02}
+        particleCount={5}
+        label="W_V"
+        isHighlighted={isFlowActive(isStep('pre_attn_gated_norm') || isStep('qkv_proj'), ['node_w_v', 'op_v_proj'])}
+      />
+      <FlowConnection
+        from={[-4.05, -0.8, -2.0]}
         to={[isGlobal ? -2.45 : -2.65, -0.8, -2.0]}
-        color="#818cf8"
-        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_qkv_proj', 'node_v'])}
-        label={`V (${kvHeads}h)`}
+        color="#38bdf8"
+        label={isGlobal ? "V (6h)" : "V (12h)"}
+        isHighlighted={isFlowActive(isStep('qkv_proj'), ['op_v_proj', 'node_v'])}
       />
 
       {/* Q Matrix */}
