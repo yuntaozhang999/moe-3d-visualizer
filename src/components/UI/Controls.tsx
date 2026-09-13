@@ -46,7 +46,7 @@ export const Controls: React.FC<ControlsProps> = ({
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 w-auto max-w-[94vw] sm:max-w-3xl md:max-w-4xl bg-[#090c13]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-3.5 py-2 shadow-2xl shadow-black/70 flex items-center space-x-3 select-none transition-all">
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 w-[920px] max-w-[94vw] bg-[#090c13]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-3.5 py-2 shadow-2xl shadow-black/70 flex items-center space-x-3 select-none transition-all">
       {/* Left Area: Playback Group */}
       <div className="flex items-center space-x-1.5 shrink-0">
         <button
@@ -101,7 +101,7 @@ export const Controls: React.FC<ControlsProps> = ({
       <div className="h-6 w-px bg-white/10 shrink-0" />
 
       {/* Middle Area: Step Info & Micro Scrubber */}
-      <div className="flex-1 min-w-[200px] max-w-[360px] flex flex-col justify-center space-y-1">
+      <div className="flex-1 min-w-[240px] flex flex-col justify-center space-y-1">
         <div className="flex items-center space-x-2">
           <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-[#161b26] border border-white/10 text-indigo-300 shrink-0">
             {currentStep.category}

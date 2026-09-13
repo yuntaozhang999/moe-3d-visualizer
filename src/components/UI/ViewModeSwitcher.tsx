@@ -1,12 +1,12 @@
 import React from 'react';
-import { Layers, Cuboid, Network, FileSpreadsheet, ChevronLeft, ChevronRight, Cloud, Aperture, Eye } from 'lucide-react';
+import { Layers, Cuboid, Network, FileSpreadsheet, ChevronLeft, ChevronRight, Cloud, Eye } from 'lucide-react';
 import { LayerMetadata, ViewMode } from '../../types/model';
 
 interface ViewModeSwitcherProps {
   viewMode: ViewMode;
   onChangeViewMode: (mode: ViewMode) => void;
-  vfxMode: 'crisp' | 'fog' | 'bokeh';
-  onChangeVfxMode: (mode: 'crisp' | 'fog' | 'bokeh') => void;
+  vfxMode: 'crisp' | 'fog';
+  onChangeVfxMode: (mode: 'crisp' | 'fog') => void;
   onOpenLayerSpecs: () => void;
   currentGroupIndex: number;
   onChangeGroup: (groupIndex: number) => void;
@@ -157,18 +157,6 @@ export const ViewModeSwitcher: React.FC<ViewModeSwitcherProps> = ({
         >
           <Cloud className="w-3.5 h-3.5" />
           <span>Fog</span>
-        </button>
-        <button
-          onClick={() => onChangeVfxMode('bokeh')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all ${
-            vfxMode === 'bokeh'
-              ? 'bg-[#1c2333] border border-rose-500/40 text-white shadow-sm'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-[#141924]'
-          }`}
-          title="Bokeh (Cinematic Depth of Field)"
-        >
-          <Aperture className="w-3.5 h-3.5" />
-          <span>Bokeh</span>
         </button>
       </div>
 

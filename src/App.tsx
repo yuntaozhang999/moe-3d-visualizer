@@ -35,7 +35,7 @@ export function App() {
 
   // View mode: default to 'single_block' (the comprehensive isolated layer architecture)
   const [viewMode, setViewMode] = useState<ViewMode>('single_block');
-  const [vfxMode, setVfxMode] = useState<'crisp' | 'fog' | 'bokeh'>('crisp');
+  const [vfxMode, setVfxMode] = useState<'crisp' | 'fog'>('crisp');
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [selectedLayerIndex, setSelectedLayerIndex] = useState<number>(() => {
     if (typeof window !== 'undefined') {

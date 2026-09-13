@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { EffectComposer, DepthOfField } from '@react-three/postprocessing';
 import { MicroBlockView } from './MicroBlockView';
 import { QuadCycleView } from './QuadCycleView';
 import { MacroTowerView } from './MacroTowerView';
@@ -34,7 +33,7 @@ export function AdaptiveFog({ color, focusTarget }: { color: string, focusTarget
 
 interface SceneContainerProps {
   viewMode: ViewMode;
-  vfxMode?: 'crisp' | 'fog' | 'bokeh';
+  vfxMode?: 'crisp' | 'fog';
   allLayers: LayerMetadata[];
   groupLayers: LayerMetadata[];
   currentLayer: LayerMetadata;
@@ -94,11 +93,6 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
         {/* Visual FX Modes */}
         {vfxMode === 'fog' && (
           <AdaptiveFog color="#08090e" focusTarget={cameraFocus || [0,0,0]} />
-        )}
-        {vfxMode === 'bokeh' && (
-          <EffectComposer multisampling={0}>
-            <DepthOfField target={cameraFocus || [0,0,0]} focalLength={0.035} bokehScale={3.5} height={720} />
-          </EffectComposer>
         )}
 
         {/* Ambient & Directional Lights */}
