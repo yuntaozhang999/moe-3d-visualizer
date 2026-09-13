@@ -46,92 +46,88 @@ export const Controls: React.FC<ControlsProps> = ({
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-20 bg-[#090c13]/95 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-2xl flex flex-col space-y-2 select-none">
-      {/* Top row: Current Step Name & Progress bar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-[#161b26] border border-white/10 text-indigo-300">
-            {currentStep.category}
-          </span>
-          <h3 className="text-xs font-semibold text-slate-100">
-            {currentStep.name}
-          </h3>
-        </div>
-        <div className="text-xs font-mono text-slate-400">
-          Step <strong className="text-indigo-400">{currentStepIndex + 1}</strong> of {steps.length}
-        </div>
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 w-auto max-w-[94vw] sm:max-w-3xl md:max-w-4xl bg-[#090c13]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-3.5 py-2 shadow-2xl shadow-black/70 flex items-center space-x-3 select-none transition-all">
+      {/* Left Area: Playback Group */}
+      <div className="flex items-center space-x-1.5 shrink-0">
+        <button
+          onClick={onReset}
+          className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 text-slate-300 hover:text-white transition-colors"
+          title="Reset to Beginning"
+        >
+          <RotateCcw className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={onPrevStep}
+          disabled={currentStepIndex === 0}
+          className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 hover:text-white transition-colors"
+          title="Previous Step"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={onTogglePlay}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-md transition-all ${
+            isPlaying
+              ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20'
+              : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
+          }`}
+        >
+          {isPlaying ? (
+            <>
+              <Pause className="w-3.5 h-3.5" />
+              <span>Pause</span>
+            </>
+          ) : (
+            <>
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>Play</span>
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={onNextStep}
+          disabled={currentStepIndex === steps.length - 1}
+          className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 hover:text-white transition-colors"
+          title="Next Step"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
 
-      {/* Interactive Step Timeline Slider */}
-      <div className="relative flex items-center py-1">
+      {/* First Divider */}
+      <div className="h-6 w-px bg-white/10 shrink-0" />
+
+      {/* Middle Area: Step Info & Micro Scrubber */}
+      <div className="flex-1 min-w-[200px] max-w-[360px] flex flex-col justify-center space-y-1">
+        <div className="flex items-center space-x-2">
+          <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-[#161b26] border border-white/10 text-indigo-300 shrink-0">
+            {currentStep.category}
+          </span>
+          <span className="text-xs font-semibold text-slate-100 truncate">
+            {currentStep.name}
+          </span>
+          <span className="text-[11px] font-mono text-slate-400 shrink-0 ml-auto">
+            {currentStepIndex + 1}/{steps.length}
+          </span>
+        </div>
         <input
           type="range"
           min="0"
           max={steps.length - 1}
           value={currentStepIndex}
           onChange={(e) => onSelectStep(Number(e.target.value))}
-          className="w-full h-1.5 bg-[#161b26] rounded-lg appearance-none cursor-pointer accent-indigo-400 hover:accent-indigo-300"
+          className="w-full h-1 bg-[#161b26] rounded-lg appearance-none cursor-pointer accent-indigo-400 hover:accent-indigo-300 transition-all"
         />
       </div>
 
-      {/* Bottom row: Playback Buttons & Speed Selector */}
-      <div className="flex items-center justify-between pt-1">
-        {/* Playback Button Group */}
-        <div className="flex items-center space-x-1.5">
-          <button
-            onClick={onReset}
-            className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 text-slate-300 hover:text-white transition-colors"
-            title="Reset to Beginning"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
+      {/* Second Divider */}
+      <div className="h-6 w-px bg-white/10 shrink-0" />
 
-          <button
-            onClick={onPrevStep}
-            disabled={currentStepIndex === 0}
-            className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 hover:text-white transition-colors"
-            title="Previous Step"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={onTogglePlay}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-md transition-all ${
-              isPlaying
-                ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
-            }`}
-          >
-            {isPlaying ? (
-              <>
-                <Pause className="w-3.5 h-3.5" />
-                <span>Pause</span>
-              </>
-            ) : (
-              <>
-                <Play className="w-3.5 h-3.5 fill-current" />
-                <span>Play Flow</span>
-              </>
-            )}
-          </button>
-
-          <button
-            onClick={onNextStep}
-            disabled={currentStepIndex === steps.length - 1}
-            className="p-1.5 rounded-lg bg-[#141924] hover:bg-[#1c2230] border border-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 hover:text-white transition-colors"
-            title="Next Step"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Math summary hint */}
-        <div className="hidden md:block text-[11px] font-mono text-slate-400 truncate max-w-sm">
-          {currentStep.shortDesc}
-        </div>
-
-        {/* Step Walkthrough Narrator Toggle Button */}
+      {/* Right Area: Action Tools Group */}
+      <div className="flex items-center space-x-1.5 shrink-0">
         {onToggleNarrator && (
           <button
             onClick={onToggleNarrator}
@@ -140,15 +136,14 @@ export const Controls: React.FC<ControlsProps> = ({
                 ? 'bg-[#1e2434] border-indigo-500/50 text-indigo-200'
                 : 'bg-[#141924] hover:bg-[#1c2230] border-white/10 text-slate-300 hover:text-white'
             }`}
-            title={isNarratorActive ? "Collapse step walkthrough & formula card (Shortcut: M)" : "Expand step walkthrough & formula card (Shortcut: M)"}
+            title={isNarratorActive ? "Collapse step walkthrough (Shortcut: M)" : "Expand step walkthrough (Shortcut: M)"}
           >
             <span className="text-xs">📖</span>
-            <span>Walkthrough</span>
+            <span className="hidden sm:inline">Walkthrough</span>
             <span className={`w-1.5 h-1.5 rounded-full ${isNarratorActive ? 'bg-indigo-400 animate-pulse' : 'bg-slate-500'}`} />
           </button>
         )}
 
-        {/* Formula Inspector Toggle Button */}
         {onToggleInspector && (
           <button
             onClick={onToggleInspector}
@@ -157,15 +152,14 @@ export const Controls: React.FC<ControlsProps> = ({
                 ? 'bg-[#1e2434] border-indigo-500/50 text-indigo-200'
                 : 'bg-[#141924] hover:bg-[#1c2230] border-white/10 text-slate-300 hover:text-white'
             }`}
-            title={isInspectorActive ? "Collapse/Close formula inspector" : "Expand mathematical formula & operator details"}
+            title={isInspectorActive ? "Collapse/Close formula inspector" : "Expand mathematical formula details"}
           >
             <span className="text-xs">📐</span>
-            <span>Formulas</span>
+            <span className="hidden sm:inline">Formulas</span>
             <span className={`w-1.5 h-1.5 rounded-full ${isInspectorActive ? 'bg-indigo-400 animate-pulse' : 'bg-slate-500'}`} />
           </button>
         )}
 
-        {/* Dynamic Sampling HUD Toggle Button */}
         {onToggleSamplingHUD && (
           <button
             onClick={onToggleSamplingHUD}
@@ -176,18 +170,12 @@ export const Controls: React.FC<ControlsProps> = ({
                 ? 'bg-[#1e2434] border-amber-500/40 text-amber-300 shadow-sm'
                 : 'bg-[#141924] hover:bg-[#1c2230] border-white/10 text-slate-300 hover:text-white'
             }`}
-            title={
-              isSamplingHUDOpen
-                ? 'Collapse/Close Sampling HUD (Shortcut: S)'
-                : isStep19
-                ? 'Step 19 Exclusive: Expand Dynamic Sampling & Roulette HUD (Shortcut: S)'
-                : 'Expand Dynamic Sampling & Distribution HUD (Shortcut: S)'
-            }
+            title={isSamplingHUDOpen ? 'Collapse HUD (Shortcut: S)' : 'Expand HUD (Shortcut: S)'}
           >
             <span className="text-xs">🎲</span>
-            <span>Sampling</span>
+            <span className="hidden sm:inline">Sampling</span>
             {isStep19 && (
-              <span className="px-1 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500/30 text-amber-200 border border-amber-400/40">
+              <span className="px-1 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/30 text-amber-200 border border-amber-400/40 hidden md:inline">
                 Step 19
               </span>
             )}

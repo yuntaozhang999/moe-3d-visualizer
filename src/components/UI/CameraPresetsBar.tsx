@@ -29,7 +29,7 @@ export const CameraPresetsBar: React.FC<CameraPresetsBarProps> = ({
 }) => {
   return (
     <div
-      className={`absolute bottom-[138px] ${
+      className={`absolute bottom-20 ${
         isSamplingHUDOpen ? 'right-[510px]' : 'right-4'
       } z-20 bg-[#090c13]/90 backdrop-blur-md border border-white/10 rounded-xl p-1.5 flex items-center space-x-1.5 text-xs select-none shadow-2xl shadow-black/60 transition-all duration-300`}
     >
