@@ -169,7 +169,7 @@ export const QuadCycleView: React.FC<QuadCycleViewProps> = ({
   hoveredItemId,
 }) => {
   // 4 layers spaced along the Z axis
-  const layerZOffsets = [-27, -9, 9, 27];
+  const layerZOffsets = [-24, -8, 8, 24];
 
   // Generate unique activation data for each of the 4 layers
   const layerActivations = React.useMemo(() => {

@@ -254,7 +254,7 @@ export function App() {
   // Smooth reset to optimal overview angle (gentle 14.5° elevation, perfect 1:1 framing)
   const handleResetCamera = useCallback(() => {
     if (viewMode === 'quad_cycle') {
-      setCameraOverride({ pos: [-24, 28, 46], focus: [4, 1.5, 0] });
+      setCameraOverride({ pos: [-26, 30, 52], focus: [5, 1.5, 0] });
     } else if (viewMode === 'macro_stack') {
       setCameraOverride({ pos: [0, 8, 38], focus: [0, 2, 0] });
     } else {
@@ -280,7 +280,7 @@ export function App() {
   // Focus specific branch or layer
   const handleFocusBranch = useCallback((branch?: 'attn' | 'moe') => {
     if (viewMode === 'quad_cycle') {
-      const zOffsets = [-22, -7, 8, 23];
+      const zOffsets = [-24, -8, 8, 24];
       const z = zOffsets[selectedLayerIndex % 4] ?? 0;
       setCameraOverride({ pos: [4, 14, z + 20], focus: [4, 2, z] });
       setAutoFollow(false);
@@ -471,8 +471,8 @@ export function App() {
     }
     if (viewMode === 'quad_cycle') {
       return {
-        currentCameraPos: [-24, 28, 46] as [number, number, number],
-        currentCameraFocus: [4, 1.5, 0] as [number, number, number],
+        currentCameraPos: [-26, 30, 52] as [number, number, number],
+        currentCameraFocus: [5, 1.5, 0] as [number, number, number],
       };
     }
     if (viewMode === 'macro_stack') {
